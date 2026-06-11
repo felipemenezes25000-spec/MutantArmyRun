@@ -1,0 +1,23 @@
+# pesquisa local (1,15 GB de clones de estudo — nunca commitar)
+_research/
+
+# Unity
+MutantArmyRun/[Ll]ibrary/
+MutantArmyRun/[Tt]emp/
+MutantArmyRun/[Oo]bj/
+MutantArmyRun/[Bb]uild*/
+MutantArmyRun/[Ll]ogs/
+MutantArmyRun/[Uu]serSettings/
+MutantArmyRun/*.csproj
+MutantArmyRun/*.sln
+*.apk
+*.aab
+
+# .NET
+tests/**/bin/
+tests/**/obj/
+
+# OS/IDE
+.vs/
+.idea/
+Thumbs.db
