@@ -1,0 +1,5 @@
+nome,url,licenca,autor,uso_no_projeto
+KayKit Adventurers,https://kaylousberg.itch.io/kaykit-adventurers,CC0 1.0,Kay Lousberg (KayKit),"Modelos das tropas do MVP: Soldado=Barbarian, Arqueiro=Ranger, Escudeiro=Knight, Mago=Mage; acessórios/armas para as 10 skins do Soldado; Gigante = Barbarian em escala 2.5x + recolor (opção A)"
+Quaternius Ultimate Monsters,https://quaternius.com/packs/ultimatemonsters.html,CC0 1.0,Quaternius,"Modelos dos 5 bosses do MVP (Golem de Pedra, Gigante de Madeira, Brutamontes Zumbi, Zumbi Titã, Robô Escorpião), escalando tamanho/vida/cor; opção B para o Gigante; extras viram tropas épicas pós-MVP"
+Kenney UI Pack,https://kenney.nl/assets/ui-pack,CC0 1.0,Kenney,"UI das 7 telas do MVP (inicial, gameplay/HUD, vitória, derrota, tropas, upgrades, loja), recolorida nos tons de raridade (cinza/azul/roxo/dourado)"
+Universal Animation Library,https://quaternius.com/packs/universalanimationlibrary.html,CC0 1.0,Quaternius,"Animações das tropas (locomoção 8 direções, combate, morte) em FBX/GLB com retarget Humanoid — elimina Mixamo do MVP"

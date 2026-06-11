@@ -1,0 +1,11 @@
+{
+    "name": "MutantArmy.Gameplay",
+    "rootNamespace": "MutantArmy.Gameplay",
+    "references": [
+        "MutantArmy.Domain",
+        "MutantArmy.Core",
+        "Unity.TextMeshPro"
+    ],
+    "noEngineReferences": false,
+    "autoReferenced": true
+}

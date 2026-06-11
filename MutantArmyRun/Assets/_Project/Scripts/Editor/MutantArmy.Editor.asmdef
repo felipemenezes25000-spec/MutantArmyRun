@@ -1,0 +1,24 @@
+{
+    "name": "MutantArmy.Editor",
+    "rootNamespace": "MutantArmy.Editor",
+    "references": [
+        "MutantArmy.Domain",
+        "MutantArmy.Core",
+        "MutantArmy.Gameplay",
+        "MutantArmy.Meta",
+        "MutantArmy.Services",
+        "MutantArmy.UI",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
