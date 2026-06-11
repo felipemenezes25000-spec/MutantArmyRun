@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b964d4801db8244ba7e1392ed91f9c8, type: 3}
+  m_Name: W01_CampoInicial
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.WorldConfigSO
+  worldIndex: 1
+  displayNameKey: world_01_campo_inicial
+  levels:
+  - {fileID: 11400000, guid: afc3861719699b54881c0f02cd1eec2a, type: 2}
+  - {fileID: 11400000, guid: 3b0f2d9c135469244b87ef187be5f4cb, type: 2}
+  - {fileID: 11400000, guid: 3f64f4baa9a4d8e43a9b3100e5b31efb, type: 2}
+  - {fileID: 11400000, guid: e388cc1918c54e14bbc34b795e06afe9, type: 2}
+  - {fileID: 11400000, guid: c34dd10e04f761b41abf8cab84ffc4c8, type: 2}
+  - {fileID: 11400000, guid: b82ae8624cfab0d46a5b06d76ba5c6d0, type: 2}
+  - {fileID: 11400000, guid: 073e7d42564e1c24db2e028b7ac3b881, type: 2}
+  worldBoss: {fileID: 11400000, guid: ad185b2c82a4fd5438e02aa81388e908, type: 2}
+  skyboxMaterial: {fileID: 0}
+  trackSegmentPrefabs: []
+  musicTrack: {fileID: 0}
+  worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}

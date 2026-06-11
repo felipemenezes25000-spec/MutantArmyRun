@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b964d4801db8244ba7e1392ed91f9c8, type: 3}
+  m_Name: W02_CidadeZumbi
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.WorldConfigSO
+  worldIndex: 2
+  displayNameKey: world_02_cidade_zumbi
+  levels:
+  - {fileID: 11400000, guid: c45f28be94eca0a4f8ec2760a18e7df3, type: 2}
+  - {fileID: 11400000, guid: 63a97e6863b59304abcae1e2a9f31273, type: 2}
+  - {fileID: 11400000, guid: d5ed2d5144b107d43b1945aca3c1631d, type: 2}
+  - {fileID: 11400000, guid: 4def2aa4807028a4f970816a13a99625, type: 2}
+  - {fileID: 11400000, guid: 8cd721d6280fee9428bc8f6d7dd27504, type: 2}
+  - {fileID: 11400000, guid: 52fbff6027ea2ab459652e2fa022d311, type: 2}
+  - {fileID: 11400000, guid: 87238c3cf6827d442acd2d2895aa6815, type: 2}
+  worldBoss: {fileID: 11400000, guid: 7da27fb2794390749ad67f96ba6abf8b, type: 2}
+  skyboxMaterial: {fileID: 0}
+  trackSegmentPrefabs: []
+  musicTrack: {fileID: 0}
+  worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}

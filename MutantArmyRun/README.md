@@ -3,9 +3,15 @@
 > Runner de multidão hybrid-casual com camada estratégica (Boss Scout + Supply + elementos).
 > Spec completa em `..\GDD\` — a fonte da verdade é `..\GDD\CANON.md`; a arquitetura é `..\GDD\12-arquitetura-unity.md`.
 
-Este repositório contém o **scaffold completo do MVP** para Unity **2022.3 LTS + URP 14**, com toda a
+Este repositório contém o **scaffold completo do MVP** para Unity **6 (6000.4) + URP 17**, com toda a
 lógica determinística de jogo isolada no assembly `MutantArmy.Domain` (C# puro, sem `UnityEngine`),
 coberta por testes xUnit que rodam **sem o Unity instalado** via `dotnet test`.
+
+> **Nota de migração (2026-06-11):** o projeto foi concebido para 2022.3 LTS (CANON §13) e migrado
+> para **Unity 6000.4.8f1** — a versão instalada nesta máquina. Mudanças: URP 14→17.4, TextMeshPro
+> agora vem embutido no pacote `com.unity.ugui` 2.0 (o assembly `Unity.TextMeshPro` continua existindo,
+> então os asmdefs não mudaram). Compilação, cenas, conteúdo MVP e testes EditMode já foram validados
+> no 6000.4.8f1 em batchmode.
 
 ---
 
@@ -16,21 +22,17 @@ coberta por testes xUnit que rodam **sem o Unity instalado** via `dotnet test`.
 1. Baixe o Unity Hub na página oficial: <https://unity.com/download>
 2. Instale e faça login com uma conta Unity (gratuita — a licença Personal é suficiente).
 
-### 1.2 Unity 2022.3 LTS com módulo Android
+### 1.2 Unity 6 (6000.4) com módulo Android
 
-O projeto está fixado em **`2022.3.62f1`** (ver `ProjectSettings\ProjectVersion.txt`).
+O projeto está fixado em **`6000.4.8f1`** (ver `ProjectSettings\ProjectVersion.txt`) — já instalado
+nesta máquina em `D:\6000.4.8f1\Editor\Unity.exe`.
 
-1. No Unity Hub: **Installs → Install Editor → Archive → download archive**
-   (ou direto no navegador: <https://unity.com/releases/editor/archive> → aba **2022** → `2022.3.62f1` → botão **Unity Hub**, que abre o Hub via deep link `unityhub://`).
-2. Na tela de módulos do instalador, marque:
-   - **Android Build Support**
-     - **OpenJDK**
-     - **Android SDK & NDK Tools**
-3. Conclua a instalação. Documentação oficial do ambiente Android:
-   <https://docs.unity3d.com/2022.3/Documentation/Manual/android-sdksetup.html>
+Para o build Android (ainda não necessário para abrir/jogar no editor), confirme no Hub que a
+instalação `6000.4.8f1` tem os módulos:
+- **Android Build Support** (com **OpenJDK** e **Android SDK & NDK Tools**)
 
-> Se você já tem outro 2022.3.x instalado, o Hub oferecerá abrir com ele — prefira instalar a versão
-> exata `2022.3.62f1` para evitar reimport/upgrade de Library entre máquinas.
+Se faltar: Hub → **Installs → ⚙ da versão → Add modules**. Documentação oficial:
+<https://docs.unity3d.com/6000.4/Documentation/Manual/android-sdksetup.html>
 
 ### 1.3 .NET 8 SDK (testes do Domain — funciona SEM Unity)
 
@@ -87,7 +89,7 @@ dotnet test "tests\Domain.Persistence.Tests" -v minimal
 
 Os 3 projetos compilam os MESMOS arquivos `.cs` de
 `MutantArmyRun\Assets\_Project\Scripts\Domain\` (via `<Compile Include>` com lista explícita),
-com `LangVersion 9.0` — paridade com o compilador do Unity 2022.
+com `LangVersion 9.0` — baseline conservadora que compila tanto no Unity quanto no .NET 8.
 
 ### 4.2 Testes EditMode (precisam do Unity aberto)
 
@@ -100,7 +102,7 @@ com `LangVersion 9.0` — paridade com o compilador do Unity 2022.
 
 ## 5. Status — verificado hoje vs pendente de Unity instalado
 
-Estado em **2026-06-11** (máquina de scaffold SEM Unity instalado — login da conta Unity é interativo):
+Estado em **2026-06-11** (atualizado após a migração para Unity 6000.4.8f1 e validação em batchmode):
 
 | Item | Status | Como foi/será verificado |
 |---|---|---|
@@ -108,9 +110,9 @@ Estado em **2026-06-11** (máquina de scaffold SEM Unity instalado — login da 
 | `tests\Domain.Gameplay.Tests` — GateMath, SupplyLedger, ElementChart, CombatMath, FormationMath, RiskGate | ✅ Verificado hoje — **80 testes verdes** | `dotnet test` nesta máquina |
 | `tests\Domain.Flow.Tests` — GameStateStack, Countdown, RunWallet, InterstitialPolicy | ✅ Verificado hoje — **49 testes verdes** | `dotnet test` nesta máquina |
 | `tests\Domain.Persistence.Tests` — SaveData, SaveMigration, SaveChecksum, EconomyMath | ✅ Verificado hoje — **94 testes verdes** | `dotnet test` nesta máquina |
-| Compilação dos asmdefs da camada Unity (Core/Gameplay/Meta/Services/UI/Editor) | ⏳ Pendente de Unity | Primeira abertura do projeto no 2022.3.62f1 |
-| Testes EditMode (`JsonRoundTripTests`, `GateConfigTests`) | ⏳ Pendente de Unity | Test Runner na primeira abertura |
-| `MAR Tools → Setup Project` / `Create MVP Content` | ⏳ Pendente de Unity | Rodar os menus e inspecionar cenas/assets gerados |
+| Compilação dos asmdefs da camada Unity (Core/Gameplay/Meta/Services/UI/Editor) | ✅ Verificado hoje — **0 erros CS, 8 assemblies** | Batchmode no 6000.4.8f1 |
+| Testes EditMode (`JsonRoundTripTests`, `GateConfigTests`) | ✅ Verificado hoje — **18/18 verdes** | `-runTests -testPlatform EditMode` em batchmode |
+| `MAR Tools → Setup Project` / `Create MVP Content` | ✅ Executado hoje — 3 cenas + **53 assets** gerados | `-executeMethod` em batchmode; inspecionar no editor |
 | 60 fps com exército cheio (Supply 60) em celular mediano | ⏳ Pendente de Unity + device | Profiler em build Android de desenvolvimento |
 | Boot ≤ 2,5 s até o primeiro input | ⏳ Pendente de Unity + device | Cronômetro/Profiler em device |
 | SDKs (MAX, Firebase, RevenueCat) + Mediation Debugger/DebugView | ⏳ Pendente (pós-Unity, semanas S1–S4) | Plano de integração do GDD doc 15 §6.2 |

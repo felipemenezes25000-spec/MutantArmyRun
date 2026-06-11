@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf3e5065c2af14741bc52734eed2c5b3, type: 3}
+  m_Name: Rarity_Epic
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.RarityConfigSO
+  rarity: 2
+  frameColor: {r: 0.6, g: 0.3, b: 0.9, a: 1}
+  glowColor: {r: 0.75, g: 0.5, b: 1, a: 1}
+  statPremium: 1.3
+  chestWeight: 5

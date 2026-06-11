@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e042e148420b4164c841f4871c89970c, type: 3}
+  m_Name: Boss_M2_ZombieTitan
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.BossConfigSO
+  bossId: m2_final_zombie_titan
+  displayNameKey: m2_final_zombie_titan_name
+  element: 0
+  weaknesses: 0100000005000000
+  immunities: 04000000
+  rotatingWeakness: 0
+  bodyType: 2
+  maxHp: 2800
+  contactDps: 10
+  entranceSeconds: 2
+  telegraphSeconds: 1.2
+  specialAttackDamage: 35
+  specialAttackArea: 2.5
+  specialBaseCooldown: 3.5
+  arenaWaves: []
+  prefab: {fileID: 0}
+  scoutCardArt: {fileID: 0}
+  killReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}

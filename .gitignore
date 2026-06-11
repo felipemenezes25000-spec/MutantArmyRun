@@ -22,3 +22,6 @@ tests/**/obj/
 .idea/
 Thumbs.db
 .claude/
+_unity-template-My-project/
+unity-*.log
+editmode-results.xml
