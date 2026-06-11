@@ -22,6 +22,7 @@ namespace MutantArmy.Core
         public static event Action<BossPhase> OnBossPhaseChanged;
         public static event Action<LevelResult> OnLevelFinished;        // vitória ou derrota + stats
         public static event Action<CurrencyChange> OnCurrencyChanged;
+        public static event Action<float> OnRunProgress;                // 0..1 da pista — Raise SÓ em mudança (≥0,5%), nunca polling da UI
 
         public static void RaiseGateConsumed(GateResult r) => OnGateConsumed?.Invoke(r);
         public static void RaiseCrowdChanged(int count, int supplyUsed) => OnCrowdChanged?.Invoke(count, supplyUsed);
@@ -31,5 +32,6 @@ namespace MutantArmy.Core
         public static void RaiseBossPhaseChanged(BossPhase p) => OnBossPhaseChanged?.Invoke(p);
         public static void RaiseLevelFinished(LevelResult r) => OnLevelFinished?.Invoke(r);
         public static void RaiseCurrencyChanged(CurrencyChange c) => OnCurrencyChanged?.Invoke(c);
+        public static void RaiseRunProgress(float progress01) => OnRunProgress?.Invoke(progress01);
     }
 }

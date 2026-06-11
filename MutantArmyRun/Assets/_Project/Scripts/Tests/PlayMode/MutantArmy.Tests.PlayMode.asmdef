@@ -1,0 +1,25 @@
+{
+    "name": "MutantArmy.Tests.PlayMode",
+    "rootNamespace": "MutantArmy.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "MutantArmy.Domain",
+        "MutantArmy.Core",
+        "MutantArmy.Gameplay",
+        "MutantArmy.Meta"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

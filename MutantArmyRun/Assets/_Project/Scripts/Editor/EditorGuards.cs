@@ -40,6 +40,10 @@ namespace MutantArmy.Editor
                 if (normalized.Contains("/Editor/")) continue;
                 // Tests/EditMode é assembly Editor-only (includePlatforms: Editor) — permitido.
                 if (normalized.Contains("/Tests/EditMode/")) continue;
+                // Tests/PlayMode compila para editor E player de testes: '#if UNITY_EDITOR'
+                // com fallback de player é o padrão legítimo do UTF, e assemblies de teste
+                // nunca entram no build de device — permitido.
+                if (normalized.Contains("/Tests/PlayMode/")) continue;
                 violations += ScanFile(file, normalized);
             }
             return violations;

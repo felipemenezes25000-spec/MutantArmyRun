@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf00ae5d778c6c44b86b080d0b9143c, type: 3}
+  m_Name: GameSettings
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.GameSettingsSO
+  levels:
+  - {fileID: 11400000, guid: afc3861719699b54881c0f02cd1eec2a, type: 2}
+  - {fileID: 11400000, guid: 3b0f2d9c135469244b87ef187be5f4cb, type: 2}
+  - {fileID: 11400000, guid: 3f64f4baa9a4d8e43a9b3100e5b31efb, type: 2}
+  - {fileID: 11400000, guid: e388cc1918c54e14bbc34b795e06afe9, type: 2}
+  - {fileID: 11400000, guid: c34dd10e04f761b41abf8cab84ffc4c8, type: 2}
+  - {fileID: 11400000, guid: b82ae8624cfab0d46a5b06d76ba5c6d0, type: 2}
+  - {fileID: 11400000, guid: 073e7d42564e1c24db2e028b7ac3b881, type: 2}
+  - {fileID: 11400000, guid: c45f28be94eca0a4f8ec2760a18e7df3, type: 2}
+  - {fileID: 11400000, guid: 63a97e6863b59304abcae1e2a9f31273, type: 2}
+  - {fileID: 11400000, guid: d5ed2d5144b107d43b1945aca3c1631d, type: 2}
+  - {fileID: 11400000, guid: 4def2aa4807028a4f970816a13a99625, type: 2}
+  - {fileID: 11400000, guid: 8cd721d6280fee9428bc8f6d7dd27504, type: 2}
+  - {fileID: 11400000, guid: 52fbff6027ea2ab459652e2fa022d311, type: 2}
+  - {fileID: 11400000, guid: 87238c3cf6827d442acd2d2895aa6815, type: 2}
+  - {fileID: 11400000, guid: cfc015845bac33445ad86844cbfe5d8d, type: 2}
+  - {fileID: 11400000, guid: c76c9d73a1234bf4685dc1c2f169481c, type: 2}
+  - {fileID: 11400000, guid: 886c70dcd60c4854ea8e55de4a5f97f9, type: 2}
+  - {fileID: 11400000, guid: 99f019206e132784987bcd04b0b2341e, type: 2}
+  - {fileID: 11400000, guid: 553f9da55aa15614b82ffa299d2797a7, type: 2}
+  - {fileID: 11400000, guid: 8be75f24a48401746a6ac9b644db6960, type: 2}

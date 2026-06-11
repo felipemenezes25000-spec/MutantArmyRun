@@ -23,8 +23,8 @@ MonoBehaviour:
   element: 0
   bodyType: 0
   specialAbilityId: cohesion
-  mesh: {fileID: 0}
-  material: {fileID: 0}
+  mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  material: {fileID: 2100000, guid: 2d8b188715e9c2646bb00570ab5964ac, type: 2}
   vatTexture: {fileID: 0}
   cardIcon: {fileID: 0}
   levelHpCurve:

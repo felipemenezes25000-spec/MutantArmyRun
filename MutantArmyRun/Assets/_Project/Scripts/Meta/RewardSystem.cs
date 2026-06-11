@@ -51,7 +51,11 @@ namespace MutantArmy.Meta
         {
             if (!r.won || GameManager.Instance == null) return;
             LevelConfigSO level = GameManager.Instance.CurrentLevel;
-            if (level != null && level.boss != null) GrantBossReward(level.boss);
+            if (level == null) return;
+            if (level.boss != null) GrantBossReward(level.boss);
+            // Recompensa extra da fase (CANON §16: fase 10 = baú épico + 50 gemas) — o
+            // winReward do LevelConfigSO entra por aqui; sem isto o asset nunca paga.
+            if (level.winReward != null) GrantReward(level.winReward, "level_win_" + level.levelIndex);
         }
 
         /// <summary>Funil único de concessão: moedas/gemas/XP via EconomySystem + drop de carta.</summary>

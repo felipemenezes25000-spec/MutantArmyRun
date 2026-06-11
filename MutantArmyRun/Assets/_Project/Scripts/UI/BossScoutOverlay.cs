@@ -46,6 +46,16 @@ namespace MutantArmy.UI
             });
         }
 
+        /// <summary>
+        /// Pulo PROGRAMÁTICO do cartão (AutoPilot/PlayMode em batchmode): mesmo caminho do
+        /// toque — fecha 1× e dispara o onDone (que leva BossScout→Running). Necessário
+        /// porque o auto-dismiss roda em tempo UNSCALED (Time.timeScale não acelera o cartão).
+        /// </summary>
+        public void Skip()
+        {
+            Finish();
+        }
+
         /// <summary>Preenche o cartão a partir do dado — a UI nunca inventa conteúdo.</summary>
         public void Bind(BossConfigSO boss)
         {

@@ -181,5 +181,15 @@ namespace MutantArmy.UI
                 if (onDone != null) onDone();
             });
         }
+
+        /// <summary>
+        /// Pulo programático do Boss Scout (AutoPilot/PlayMode em batchmode): o cartão roda
+        /// em tempo UNSCALED, então timeScale alto não o acelera — testes chamam isto.
+        /// No-op se o cartão não está visível.
+        /// </summary>
+        public void SkipBossScout()
+        {
+            if (_bossScout != null && _bossScout.IsVisible) _bossScout.Skip();
+        }
     }
 }

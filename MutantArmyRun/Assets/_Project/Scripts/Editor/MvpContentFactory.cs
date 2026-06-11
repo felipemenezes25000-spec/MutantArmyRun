@@ -59,12 +59,14 @@ namespace MutantArmy.Editor
             CreateUpgrades();
             RewardSet rewards = CreateRewards(units);
             BossSet bosses = CreateBosses(rewards);
-            CreateWorldsAndLevels(bosses, gates, rewards);
+            List<LevelConfigSO> allLevels = CreateWorldsAndLevels(bosses, gates, rewards);
+            CreateGameSettings(allLevels);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("MAR Tools: conteúdo MVP criado/atualizado — 8 portais, 5 tropas, 5 bosses, " +
-                      "chart elemental, 4 raridades, 4 trilhas de upgrade, 3 recompensas, 3 mundos e 20 fases.");
+                      "chart elemental, 4 raridades, 4 trilhas de upgrade, 3 recompensas, 3 mundos, " +
+                      "20 fases e o catálogo Resources/GameSettings.asset.");
         }
 
         // ------------------------------------------------------------------ Units (CANON §5 · doc 03 §3.1/§4)
@@ -446,7 +448,7 @@ namespace MutantArmy.Editor
             160f, 220f, 220f, 260f, 260f, 280f                  // M3: fases 15–20
         };
 
-        private static void CreateWorldsAndLevels(BossSet bosses, GateSet gates, RewardSet rewards)
+        private static List<LevelConfigSO> CreateWorldsAndLevels(BossSet bosses, GateSet gates, RewardSet rewards)
         {
             WorldConfigSO w1 = ConfigureWorld("W01_CampoInicial", 1, "world_01_campo_inicial", bosses.WoodGiant, rewards.WorldBoss);
             WorldConfigSO w2 = ConfigureWorld("W02_CidadeZumbi", 2, "world_02_cidade_zumbi", bosses.Titan, rewards.WorldBoss);
@@ -490,6 +492,27 @@ namespace MutantArmy.Editor
             EditorUtility.SetDirty(w1);
             EditorUtility.SetDirty(w2);
             EditorUtility.SetDirty(w3);
+
+            var all = new List<LevelConfigSO>(20);
+            all.AddRange(w1Levels);
+            all.AddRange(w2Levels);
+            all.AddRange(w3Levels);
+            return all;
+        }
+
+        /// <summary>
+        /// Catálogo de fases em Resources/GameSettings.asset — ÚNICO asset permitido em
+        /// Resources (bootstrap, doc 12 §2.1). É como o botão Jogar (Main) e o "próxima
+        /// fase" (ResultScreen) resolvem LevelConfigSO em runtime.
+        /// </summary>
+        private static void CreateGameSettings(List<LevelConfigSO> levels)
+        {
+            EnsureFolder("Assets/_Project/Resources");
+            var settings = LoadOrCreate<GameSettingsSO>(
+                "Assets/_Project/Resources/" + GameSettingsSO.ResourcesName + ".asset");
+            levels.Sort((a, b) => a.levelIndex.CompareTo(b.levelIndex));
+            settings.levels = levels.ToArray();
+            EditorUtility.SetDirty(settings);
         }
 
         private static WorldConfigSO ConfigureWorld(string assetName, int index, string nameKey,

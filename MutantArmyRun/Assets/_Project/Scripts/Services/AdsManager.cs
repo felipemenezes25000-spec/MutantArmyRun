@@ -55,7 +55,13 @@ namespace MutantArmy.Services
             // Modo LIGADO: o SaveSystem (1º da ordem §3.3) já publicou a instância viva do
             // save no blackboard — pacing lê/zera direto no save (doc 12 §4.8).
             if (GameBootstrap.Current != null)
+            {
                 BindSaveState(GameBootstrap.Current.Save, GameBootstrap.Current.MarkSaveDirty);
+                // Hooks de rewarded no blackboard do Core: a UI (ResultScreen/Revive) não
+                // referencia Services (doc 12 §2.3) — consome ads por aqui.
+                GameBootstrap.Current.RewardedAdReady = () => IsRewardedReady;
+                GameBootstrap.Current.ShowRewardedAd = ShowRewarded;
+            }
 
             // "UI/Ads/Analytics reagem" ao fim de fase (doc 12 §4.1): o pacing roda por
             // evento — Gameplay/UI nunca chamam Services diretamente (§2.3).

@@ -21,6 +21,8 @@ namespace MutantArmy.UI
         [SerializeField] private Image _supplyFill;
         [SerializeField] private TMP_Text _coinsText;           // carteira PERSISTENTE (save)
         [SerializeField] private TMP_Text _runCoinsText;        // RunCoins da corrida — visual DISTINTO (doc 12 §4.13)
+        [SerializeField] private Image _progressFill;           // barra de progresso da pista (OnRunProgress)
+        [SerializeField] private TMP_Text[] _mutationSlotTexts; // 3 slots rotativos (CANON §3.3)
         [SerializeField] private int _supplyCap = 60;           // CANON §15: cap fixo do MVP
         [SerializeField] private Color _supplyNormalColor = new Color(0.30f, 0.85f, 0.95f);
         [SerializeField] private Color _supplyWarnColor = new Color(1.00f, 0.75f, 0.15f);   // âmbar ≥ 80%
@@ -36,12 +38,21 @@ namespace MutantArmy.UI
         private long _coins;
         private long _runCoins;
         private Coroutine _punch;
+        private int _nextMutationSlot;   // rotação espelha o CrowdManager (CANON §3.3: a 4ª substitui a mais antiga)
 
         private void OnEnable()
         {
             GameEvents.OnCrowdChanged += HandleCrowdChanged;
             GameEvents.OnCurrencyChanged += HandleCurrencyChanged;
             GameEvents.OnLevelFinished += HandleLevelFinished;
+            GameEvents.OnRunProgress += HandleRunProgress;
+            GameEvents.OnMutationGained += HandleMutationGained;
+            if (GameManager.Instance != null)
+            {
+                // -= antes de += : enable repetido não duplica a inscrição.
+                GameManager.Instance.LevelStarted -= HandleLevelStarted;
+                GameManager.Instance.LevelStarted += HandleLevelStarted;
+            }
 
             // Leitura única do saldo no enable (não é polling); dali em diante o HUD
             // acompanha só os deltas dos eventos.
@@ -60,6 +71,10 @@ namespace MutantArmy.UI
             GameEvents.OnCrowdChanged -= HandleCrowdChanged;
             GameEvents.OnCurrencyChanged -= HandleCurrencyChanged;
             GameEvents.OnLevelFinished -= HandleLevelFinished;
+            GameEvents.OnRunProgress -= HandleRunProgress;
+            GameEvents.OnMutationGained -= HandleMutationGained;
+            if (GameManager.Instance != null)
+                GameManager.Instance.LevelStarted -= HandleLevelStarted;
         }
 
         public void SetSupplyCap(int cap)
@@ -116,6 +131,33 @@ namespace MutantArmy.UI
         {
             _runCoins = 0;
             RenderRunCoins();
+        }
+
+        // Nova corrida (StartLevel): slots de mutação e progresso nascem limpos.
+        private void HandleLevelStarted(int levelIndex)
+        {
+            _nextMutationSlot = 0;
+            if (_mutationSlotTexts != null)
+            {
+                for (int i = 0; i < _mutationSlotTexts.Length; i++)
+                    if (_mutationSlotTexts[i] != null) _mutationSlotTexts[i].text = string.Empty;
+            }
+            if (_progressFill != null) _progressFill.fillAmount = 0f;
+        }
+
+        private void HandleRunProgress(float progress01)
+        {
+            if (_progressFill != null) _progressFill.fillAmount = Mathf.Clamp01(progress01);
+        }
+
+        private void HandleMutationGained(MutationConfigSO mutation)
+        {
+            if (mutation == null || _mutationSlotTexts == null || _mutationSlotTexts.Length == 0) return;
+            int slot = _nextMutationSlot % _mutationSlotTexts.Length;
+            _nextMutationSlot = (slot + 1) % _mutationSlotTexts.Length;
+            if (_mutationSlotTexts[slot] == null) return;
+            string label = string.IsNullOrEmpty(mutation.displayNameKey) ? mutation.mutationId : mutation.displayNameKey;
+            _mutationSlotTexts[slot].text = string.IsNullOrEmpty(label) ? "?" : label.ToUpperInvariant();
         }
 
         private void RenderCoins()

@@ -59,6 +59,15 @@ namespace MutantArmy.Core
         /// o save via blackboard marcam por aqui; o flush real fica nas transições de estado.</summary>
         public Action MarkSaveDirty { get; set; }
 
+        /// <summary>Fill de rewarded — publicado pelo AdsManager (Services) no Init dele.
+        /// UI consome via blackboard porque UI não referencia Services (doc 12 §2.3);
+        /// botão de rewarded só renderiza quando isto retorna true (doc 12 §7.3).</summary>
+        public Func<bool> RewardedAdReady { get; set; }
+
+        /// <summary>Exibição de rewarded (placement de <see cref="AdPlacement"/>, callback
+        /// SEMPRE responde: true = recompensa concedida) — publicado pelo AdsManager.</summary>
+        public Action<string, Action<bool>> ShowRewardedAd { get; set; }
+
         private void Awake()
         {
             Current = this;

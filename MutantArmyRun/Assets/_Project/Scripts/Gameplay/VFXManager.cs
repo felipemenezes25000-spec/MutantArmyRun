@@ -50,6 +50,17 @@ namespace MutantArmy.Gameplay
             if (_telegraphDecal != null) _telegraphDecal.gameObject.SetActive(false);
         }
 
+        private void OnDestroy()
+        {
+            // timeScale é GLOBAL: trocar de cena (botão MENU) no meio do slow-mo do golpe
+            // final deixaria menu e próxima corrida presos a 0,3× — restaura sempre.
+            if (_slowMoActive)
+            {
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = _baseFixedDelta;
+            }
+        }
+
         /// <summary>Slow motion canônico do golpe final: SlowMotion(0.3f, 0.8f).</summary>
         public void SlowMotion(float scale, float seconds)
         {

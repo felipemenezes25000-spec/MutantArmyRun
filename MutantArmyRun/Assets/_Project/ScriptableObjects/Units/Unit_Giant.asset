@@ -23,8 +23,8 @@ MonoBehaviour:
   element: 0
   bodyType: 0
   specialAbilityId: seismic_slam
-  mesh: {fileID: 0}
-  material: {fileID: 0}
+  mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  material: {fileID: 2100000, guid: 92c4d58228849694d805cb94e8d30322, type: 2}
   vatTexture: {fileID: 0}
   cardIcon: {fileID: 0}
   levelHpCurve:

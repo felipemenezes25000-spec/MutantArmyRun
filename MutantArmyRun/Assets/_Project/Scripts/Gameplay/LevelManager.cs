@@ -27,6 +27,11 @@ namespace MutantArmy.Gameplay
         private float _furthestZ;
         private float _runStartTime;
         private bool _warnedNoSegmentPrefabs;
+        private float _lastProgressRaised = -1f;
+
+        // Passo mínimo entre Raises de progresso: a barra do HUD atualiza por EVENTO
+        // (doc 12 §3.2) — Raise por mudança ≥0,5%, nunca polling da UI.
+        private const float ProgressEventStep = 0.005f;
 
         private readonly Queue<TrackSegment> _liveSegments = new Queue<TrackSegment>();
         private readonly List<GameObject> _liveObstacles = new List<GameObject>();
@@ -108,6 +113,9 @@ namespace MutantArmy.Gameplay
             if (GateManager.Instance != null) GateManager.Instance.SpawnGates(level, _rng);
             SpawnObstacles(level);
             while (_furthestZ < _spawnAheadMeters) SpawnNextSegment();
+
+            _lastProgressRaised = -1f;
+            RaiseProgressIfChanged();   // barra do HUD zera junto do soft reset
         }
 
         private void Update()
@@ -122,9 +130,18 @@ namespace MutantArmy.Gameplay
             while (_liveSegments.Count > 0 && _liveSegments.Peek().EndZ < leaderZ - _recycleBehindMeters)
                 ReleaseSegment(_liveSegments.Dequeue());
             RecycleObstaclesBehind(leaderZ);
+            RaiseProgressIfChanged();
 
             if (leaderZ >= _level.trackLength)
                 gm.ChangeState(GameState.BossFight);   // fim da pista → arena (doc 12 §4.1)
+        }
+
+        private void RaiseProgressIfChanged()
+        {
+            float p = Progress01;
+            if (Mathf.Abs(p - _lastProgressRaised) < ProgressEventStep) return;
+            _lastProgressRaised = p;
+            GameEvents.RaiseRunProgress(p);
         }
 
         // Soft reset: retry acontece na MESMA cena (doc 12 §2.2) — drena pools, repopula

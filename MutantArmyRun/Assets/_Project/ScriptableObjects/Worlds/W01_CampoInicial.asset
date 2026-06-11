@@ -24,6 +24,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 073e7d42564e1c24db2e028b7ac3b881, type: 2}
   worldBoss: {fileID: 11400000, guid: ad185b2c82a4fd5438e02aa81388e908, type: 2}
   skyboxMaterial: {fileID: 0}
-  trackSegmentPrefabs: []
+  trackSegmentPrefabs:
+  - {fileID: 8906817117229079529, guid: 868cca6b978840d419f292b010c9ed6b, type: 3}
   musicTrack: {fileID: 0}
   worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
