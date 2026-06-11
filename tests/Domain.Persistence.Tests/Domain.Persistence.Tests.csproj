@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\Enums.cs" Link="Domain\Enums.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\SaveData.cs" Link="Domain\SaveData.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\SaveChecksum.cs" Link="Domain\SaveChecksum.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\SaveMigration.cs" Link="Domain\SaveMigration.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\EconomyMath.cs" Link="Domain\EconomyMath.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="xunit" Version="2.8.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" />
+  </ItemGroup>
+</Project>

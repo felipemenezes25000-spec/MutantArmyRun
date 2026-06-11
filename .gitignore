@@ -21,3 +21,4 @@ tests/**/obj/
 .vs/
 .idea/
 Thumbs.db
+.claude/
