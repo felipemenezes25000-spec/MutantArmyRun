@@ -23,4 +23,4 @@ MonoBehaviour:
   riskFailPenalty: 0
   displayLabel: VIRAR ARQUEIRO
   icon: {fileID: 0}
-  portalColor: {r: 0.2, g: 0.75, b: 1, a: 1}
+  portalColor: {r: 0.35, g: 0.8, b: 1, a: 1}

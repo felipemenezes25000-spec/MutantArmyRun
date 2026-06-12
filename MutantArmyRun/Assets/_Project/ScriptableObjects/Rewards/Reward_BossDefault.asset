@@ -20,6 +20,11 @@ MonoBehaviour:
   cardPool:
   - {fileID: 11400000, guid: f55b01a8f10b4ea408cccbd75259a0c7, type: 2}
   - {fileID: 11400000, guid: f3359ee4d9c4a4d468fbef0431786626, type: 2}
+  - {fileID: 11400000, guid: 790bb93c8f2cb534881bad5fc8419fdb, type: 2}
   - {fileID: 11400000, guid: b23c7c69ea0fd88499450245d4ebedc1, type: 2}
+  - {fileID: 11400000, guid: aed24fab43ff3cc4f93e9cf7302a56ab, type: 2}
+  - {fileID: 11400000, guid: f7f3201c68f602c46adaafd3d4512196, type: 2}
+  - {fileID: 11400000, guid: dccac7e50c4d49b46a1ba959337014ef, type: 2}
+  - {fileID: 11400000, guid: 879456582826abb43936a6066cf1d253, type: 2}
   shardAmount: 10
   allowAdDouble: 1

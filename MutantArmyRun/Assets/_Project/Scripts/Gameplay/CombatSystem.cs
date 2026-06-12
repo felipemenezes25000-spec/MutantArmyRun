@@ -51,6 +51,17 @@ namespace MutantArmy.Gameplay
 
         private readonly List<ActiveDot> _dots = new List<ActiveDot>();
 
+        // Habilidades AGREGADAS de suporte (doc 12 §4.4): timers/estado por LUTA, não por unidade.
+        private readonly Countdown _reviveTimer = new Countdown();    // Necromante: proc a cada 6 s
+        private readonly Countdown _turretBuild = new Countdown();    // Engenheiro: torreta sobe em 1,5 s
+        private bool _turretBuilt;
+        private int _turretCount;                                     // 1 torreta por Engenheiro vivo na entrada
+        private bool _fightInitialized;
+
+        // injeção opcional de números finos por Remote Config (Médico 8 vs Anjo 12, etc.); sem
+        // provider, usam os fallbacks canônicos do Domain.CombatAbilities. Setado pela Meta.
+        private System.Func<UnitConfigSO, float> _healOf;
+
         public float TotalDamageDealt { get; private set; }   // alimenta o LevelResult (doc 12 §4.11)
 
         public void Init()   // chamado pelo bootstrap da cena Game (doc 12 §3.3)
@@ -65,11 +76,25 @@ namespace MutantArmy.Gameplay
             _critChance = Mathf.Clamp01(critChance);
         }
 
+        /// <summary>
+        /// Resolvedor opcional de HP/s de cura por unitId (Remote Config: rc_medic_heal_per_s 8 vs
+        /// rc_angel... 12, doc 03 §6). Injetado pela Meta; sem ele, usa o fallback do Domain.
+        /// </summary>
+        public void SetHealResolver(System.Func<UnitConfigSO, float> healOf)
+        {
+            _healOf = healOf;
+        }
+
         public void ResetRunStats()
         {
             TotalDamageDealt = 0f;
             _dots.Clear();
             _accum = 0f;
+            _fightInitialized = false;
+            _turretBuilt = false;
+            _turretCount = 0;
+            _reviveTimer.Set(0f);
+            _turretBuild.Set(0f);
         }
 
         private void Update()
@@ -81,13 +106,19 @@ namespace MutantArmy.Gameplay
             BossRuntime boss = bm != null ? bm.Current : null;
             if (boss == null) return;
 
+            if (!_fightInitialized) InitFight();
+
             _accum += Time.deltaTime;
             while (_accum >= TickRate)
             {
                 _accum -= TickRate;
 
+                // habilidades agregadas de SUPORTE rodam ANTES do dano (cura mantém uptime do DPS)
+                TickAggregatedAbilities(TickRate);
+
                 // crowd → arena: waves vivas absorvem antes do boss
                 float dmg = ComputeCrowdDamage(boss, TickRate);
+                dmg += TurretDamage(TickRate);                  // torreta do Engenheiro: DPS "grátis" na arena
                 float leftover = bm.DamageArenaEnemies(dmg);
                 if (leftover > 0f) bm.ApplyDamage(leftover);
                 TotalDamageDealt += dmg;
@@ -102,6 +133,56 @@ namespace MutantArmy.Gameplay
                 boss = bm.Current;   // DoTs também matam
                 if (boss == null) break;
             }
+        }
+
+        // ------------------------------------------------------------------
+        // Habilidades AGREGADAS (doc 12 §4.4): nada por unidade — somas por tipo vivo.
+        // ------------------------------------------------------------------
+
+        // 1× por entrada na arena: conta Engenheiros (1 torreta cada) e arma o build de 1,5 s.
+        private void InitFight()
+        {
+            _fightInitialized = true;
+            _turretBuilt = false;
+            CrowdManager crowd = CrowdManager.Instance;
+            _turretCount = crowd != null ? crowd.CountAbility(CombatAbilities.BuildTurret) : 0;
+            _reviveTimer.Set(CombatAbilities.ReviveIntervalSeconds);
+            _turretBuild.Set(CombatAbilities.TurretBuildSeconds);
+        }
+
+        private void TickAggregatedAbilities(float dt)
+        {
+            CrowdManager crowd = CrowdManager.Instance;
+            if (crowd == null) return;
+
+            // heal_allies (Médico/Anjo): soma de HP/s × dt curando os mais feridos primeiro
+            float healPerSec = crowd.TotalHealPerSecond(_healOf);
+            if (healPerSec > 0f) crowd.HealArmy(healPerSec * dt);
+
+            // revive_dead (Necromante): proc a cada 6 s, revive até 3 caídos (Supply total ≤6)
+            if (crowd.CountAbility(CombatAbilities.ReviveDead) > 0)
+            {
+                _reviveTimer.Tick(dt);
+                if (_reviveTimer.Done)
+                {
+                    crowd.ReviveFallen(crowd.DefaultUnit,
+                        CombatAbilities.ReviveCountPerProc, CombatAbilities.ReviveSupplyBudget);
+                    _reviveTimer.Set(CombatAbilities.ReviveIntervalSeconds);
+                }
+            }
+        }
+
+        // build_turret (Engenheiro): DPS agregado das torretas após o build de 1,5 s.
+        private float TurretDamage(float dt)
+        {
+            if (_turretCount <= 0) return 0f;
+            if (!_turretBuilt)
+            {
+                _turretBuild.Tick(dt);
+                if (!_turretBuild.Done) return 0f;   // ainda construindo
+                _turretBuilt = true;
+            }
+            return CombatAbilities.TurretDps * _turretCount * dt;
         }
 
         private float ComputeCrowdDamage(BossRuntime boss, float dt)

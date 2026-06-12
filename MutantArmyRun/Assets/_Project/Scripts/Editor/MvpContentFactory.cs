@@ -7,13 +7,16 @@ using MutantArmy.Domain;
 namespace MutantArmy.Editor
 {
     /// <summary>
-    /// MAR Tools/Create MVP Content — gera por código os assets canônicos do MVP:
-    /// 8 GateConfigSO (CANON §10) · 5 UnitConfigSO (CANON §5 + doc 03 §3.1/§4) ·
-    /// 5 BossConfigSO (CANON §6 + doc 05 §7) · ElementChartSO default (CANON §4) ·
-    /// 4 RarityConfigSO (CANON §8) · 4 UpgradeConfigSO (trilhas MVP, CANON §9) ·
-    /// 3 RewardConfigSO (CANON §8/§16) · 3 WorldConfigSO (CANON §7/§15) ·
-    /// 20 LevelConfigSO com seeds determinísticas e bosses por fase (doc 06 §8).
-    /// Idempotente: re-rodar atualiza os assets existentes.
+    /// MAR Tools/Create MVP Content — gera por código os assets canônicos do jogo:
+    /// 26 GateConfigSO (taxonomia ampliada, CANON §10 + doc 04: matemáticos, classe,
+    /// elemento, mutação, risco) · 19 UnitConfigSO (roster completo CANON §5; os 5 do MVP
+    /// intactos) · 9 MutationConfigSO (CANON §3.3) · 5 BossConfigSO (CANON §6 + doc 05 §7) ·
+    /// ElementChartSO default (CANON §4) · 4 RarityConfigSO (CANON §8) · 4 UpgradeConfigSO
+    /// (trilhas MVP, CANON §9) · 3 RewardConfigSO (CANON §8/§16) · 3 WorldConfigSO (CANON
+    /// §7/§15) · 20 LevelConfigSO com seeds determinísticas, bosses por fase e pares manuais
+    /// curados nas fases-chave (doc 06 §8). Idempotente: re-rodar atualiza os assets existentes.
+    /// NOTA p/ runtime: o GateManager carrega TODOS os GateConfigSO da pasta no _autoBalancePool —
+    /// negativos/risco/mutação entram nesse sorteio; ver avisos de integração para curar o pool.
     /// </summary>
     public static class MvpContentFactory
     {
@@ -22,12 +25,34 @@ namespace MutantArmy.Editor
 
         private sealed class UnitSet
         {
+            // Os 5 do MVP (não quebrar) — usados pelos gates/levels manuais abaixo.
             public UnitConfigSO Soldier, Archer, Shieldbearer, Mage, Giant;
+            // Os 14 restantes do roster canônico (CANON §5) — adicionados nesta fase.
+            public UnitConfigSO Runner, Ninja, FlameTrooper, FrostTrooper, Medic, Robot,
+                                Necromancer, Engineer, Alien, Dragon, Titan, WarAngel, Demon, Mecha;
+            // Tropas usadas como destino de portais de classe (ClassConvert).
+            public UnitConfigSO Knight => Shieldbearer;
         }
 
         private sealed class GateSet
         {
+            // MVP (CANON §10) — preservados; vários ainda referenciados por slots manuais.
             public GateConfigSO AddTen, AddTwentyFive, TimesTwo, TimesThree, Half, ClassArcher, ElementFire, RiskTen;
+            // Matemáticos extra (taxonomia ampliada, doc 04).
+            public GateConfigSO AddFifty, TimesFive, MinusTen, Div2Alt;
+            // Classe (transformar o exército inteiro — gateType ClassConvert).
+            public GateConfigSO ClassMage, ClassKnight, ClassNinja, ClassGiant;
+            // Elemento (gateType Element — ciano).
+            public GateConfigSO ElementIce, ElementLightning, ElementPoison;
+            // Mutação (gateType Mutation — roxo; mutation = MutationConfigSO).
+            public GateConfigSO MutWings, MutArmor, MutLaser, MutSize, MutSpeed, MutRegen;
+            // Risco (dourado — odds honestas no rótulo).
+            public GateConfigSO RiskTitan, RiskSacrifice;
+        }
+
+        private sealed class MutationSet
+        {
+            public MutationConfigSO Wings, Armor, Laser, Size, Speed, Clone, Regen, Shield, AreaBlast;
         }
 
         private sealed class BossSet
@@ -47,13 +72,15 @@ namespace MutantArmy.Editor
             EnsureFolder(Root + "/Gates");
             EnsureFolder(Root + "/Bosses");
             EnsureFolder(Root + "/Balance");
+            EnsureFolder(Root + "/Mutations");
             EnsureFolder(Root + "/Upgrades");
             EnsureFolder(Root + "/Rewards");
             EnsureFolder(Root + "/Worlds");
             EnsureFolder(Root + "/Levels");
 
             UnitSet units = CreateUnits();
-            GateSet gates = CreateGates(units);
+            MutationSet mutations = CreateMutations();
+            GateSet gates = CreateGates(units, mutations);
             CreateElementChart();
             CreateRarities();
             CreateUpgrades();
@@ -64,17 +91,23 @@ namespace MutantArmy.Editor
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("MAR Tools: conteúdo MVP criado/atualizado — 8 portais, 5 tropas, 5 bosses, " +
+            Debug.Log("MAR Tools: conteúdo criado/atualizado — 25 portais, 19 tropas, 9 mutações, 5 bosses, " +
                       "chart elemental, 4 raridades, 4 trilhas de upgrade, 3 recompensas, 3 mundos, " +
                       "20 fases e o catálogo Resources/GameSettings.asset.");
         }
 
         // ------------------------------------------------------------------ Units (CANON §5 · doc 03 §3.1/§4)
 
+        // Baseline canônico (CANON §5): Soldado nv1 = HP10 / DPS2 / vel5 → 12 "pontos"
+        // (HP+DPS) por 1 de Supply. As demais escalam por supply × prêmio de raridade
+        // (Common 1.0 · Rare 1.15 · Epic 1.30 · Lendário 1.45), com a divisão HP/DPS ditada
+        // pelo papel (tanque pende p/ HP, atirador p/ DPS). Os 5 do MVP ficam INTOCADOS
+        // (valores afinados à mão) — só os 14 novos usam a banda calculada.
         private static UnitSet CreateUnits()
         {
             var set = new UnitSet
             {
+                // ---- MVP (NÃO QUEBRAR — valores idênticos ao baseline travado) ----
                 Soldier = ConfigureUnit("Unit_Soldier", "unit_soldier", Rarity.Common, 1,
                     hp: 10f, dps: 2f, speed: 5.0f, range: 1.5f, ability: "cohesion"),
                 Archer = ConfigureUnit("Unit_Archer", "unit_archer", Rarity.Common, 2,
@@ -86,11 +119,64 @@ namespace MutantArmy.Editor
                 Giant = ConfigureUnit("Unit_Giant", "unit_giant", Rarity.Epic, 12,
                     hp: 120f, dps: 40f, speed: 3.5f, range: 2.0f, ability: "seismic_slam")
             };
+
+            // ---- COMUNS restantes (CANON §5) ----
+            set.Runner = ConfigureUnit("Unit_Runner", "unit_runner", Rarity.Common, 1,
+                hp: 7f, dps: 3f, speed: 6.5f, range: 1.2f, ability: "dodge_traps",
+                element: ElementType.None, body: BodyType.Organic);   // rápido, desvia, frágil
+
+            // ---- RAROS (CANON §5) ----
+            set.Ninja = ConfigureUnit("Unit_Ninja", "unit_ninja", Rarity.Rare, 3,
+                hp: 22f, dps: 19f, speed: 6.0f, range: 1.5f, ability: "dodge_traps",
+                element: ElementType.None, body: BodyType.Organic);
+            set.FlameTrooper = ConfigureUnit("Unit_FlameTrooper", "unit_flametrooper", Rarity.Rare, 4,
+                hp: 30f, dps: 25f, speed: 4.5f, range: 3.0f, ability: "dot_fire",
+                element: ElementType.Fire, body: BodyType.Organic);
+            set.FrostTrooper = ConfigureUnit("Unit_FrostTrooper", "unit_frosttrooper", Rarity.Rare, 4,
+                hp: 34f, dps: 21f, speed: 4.5f, range: 5.0f, ability: "slow",
+                element: ElementType.Ice, body: BodyType.Organic);
+            set.Medic = ConfigureUnit("Unit_Medic", "unit_medic", Rarity.Rare, 4,
+                hp: 38f, dps: 8f, speed: 4.8f, range: 4.0f, ability: "heal_allies",
+                element: ElementType.None, body: BodyType.Organic);
+
+            // ---- ÉPICOS (CANON §5) ----
+            set.Robot = ConfigureUnit("Unit_Robot", "unit_robot", Rarity.Epic, 8,
+                hp: 90f, dps: 38f, speed: 4.0f, range: 3.0f, ability: "armor_plating",
+                element: ElementType.None, body: BodyType.Machine);   // imune a Veneno via bodyType
+            set.Necromancer = ConfigureUnit("Unit_Necromancer", "unit_necromancer", Rarity.Epic, 8,
+                hp: 76f, dps: 30f, speed: 4.0f, range: 5.0f, ability: "revive_dead",
+                element: ElementType.Shadow, body: BodyType.Organic);
+            set.Engineer = ConfigureUnit("Unit_Engineer", "unit_engineer", Rarity.Epic, 8,
+                hp: 84f, dps: 34f, speed: 4.0f, range: 4.0f, ability: "build_turret",
+                element: ElementType.None, body: BodyType.Organic);
+            set.Alien = ConfigureUnit("Unit_Alien", "unit_alien", Rarity.Epic, 8,
+                hp: 80f, dps: 36f, speed: 4.5f, range: 4.0f, ability: "chain",
+                element: ElementType.Alien, body: BodyType.Organic);
+
+            // ---- LENDÁRIOS (CANON §5) ----
+            set.Dragon = ConfigureUnit("Unit_Dragon", "unit_dragon", Rarity.Legendary, 20,
+                hp: 200f, dps: 110f, speed: 4.5f, range: 6.0f, ability: "flight",
+                element: ElementType.Fire, body: BodyType.Organic);   // dano em área + voo
+            set.Titan = ConfigureUnit("Unit_Titan", "unit_titan", Rarity.Legendary, 25,
+                hp: 320f, dps: 110f, speed: 3.0f, range: 2.5f, ability: "seismic_slam",
+                element: ElementType.None, body: BodyType.Organic);   // enorme, forte, lento
+            set.WarAngel = ConfigureUnit("Unit_WarAngel", "unit_warangel", Rarity.Legendary, 18,
+                hp: 210f, dps: 80f, speed: 5.0f, range: 6.0f, ability: "heal_allies",
+                element: ElementType.Light, body: BodyType.Organic);  // cura + dano de Luz
+            set.Demon = ConfigureUnit("Unit_Demon", "unit_demon", Rarity.Legendary, 20,
+                hp: 230f, dps: 130f, speed: 4.2f, range: 3.0f, ability: "dot_shadow",
+                element: ElementType.Shadow, body: BodyType.Organic); // dano brutal de Sombra
+            set.Mecha = ConfigureUnit("Unit_Mecha", "unit_mecha", Rarity.Legendary, 25,
+                hp: 300f, dps: 150f, speed: 3.5f, range: 7.0f, ability: "area_damage",
+                element: ElementType.Lightning, body: BodyType.Machine); // laser + mísseis em área
+
             return set;
         }
 
         private static UnitConfigSO ConfigureUnit(string assetName, string unitId, Rarity rarity, int supply,
-                                                  float hp, float dps, float speed, float range, string ability)
+                                                  float hp, float dps, float speed, float range, string ability,
+                                                  ElementType element = ElementType.None,
+                                                  BodyType body = BodyType.Organic)
         {
             var unit = LoadOrCreate<UnitConfigSO>(Root + "/Units/" + assetName + ".asset");
             unit.unitId = unitId;
@@ -101,8 +187,8 @@ namespace MutantArmy.Editor
             unit.baseDps = dps;
             unit.moveSpeed = speed;
             unit.attackRange = range;
-            unit.element = ElementType.None;     // MVP: tropas neutras (CANON §15)
-            unit.bodyType = BodyType.Organic;
+            unit.element = element;              // MVP mantém Soldado..Gigante neutros; novos podem ter elemento nativo
+            unit.bodyType = body;
             unit.specialAbilityId = ability;
             unit.levelHpCurve = LevelCurve();
             unit.levelDpsCurve = LevelCurve();
@@ -119,53 +205,209 @@ namespace MutantArmy.Editor
             return new AnimationCurve(keys);
         }
 
-        // ------------------------------------------------------------------ Gates (CANON §10)
+        // ------------------------------------------------------------------ Mutations (CANON §3.3 · doc 12 §5.1)
 
-        private static GateSet CreateGates(UnitSet units)
+        // Aplicadas ao EXÉRCITO INTEIRO, 3 slots rotativos (a 4ª substitui a mais antiga).
+        // O CrowdManager.RecomputeMutationMultipliers só multiplica dpsMult/hpMult/sizeMult
+        // hoje; grantsFlight/addsElement/shaderVariantFlag são contratos para o runtime e o
+        // shader VAT consumirem (ver avisos_integracao). Cada mutação tem um BIT distinto.
+        private static MutationSet CreateMutations()
         {
-            Color positive = new Color(0.20f, 0.75f, 1.00f);   // azul/ciano = positivo (doc 09 §4.2)
-            Color negative = new Color(1.00f, 0.45f, 0.10f);   // laranja = negativo
-            Color special = new Color(0.95f, 0.80f, 0.20f);
+            var set = new MutationSet();
 
+            // asas: voo (ignora obstáculos de chão), leve ganho de velocidade.
+            set.Wings = ConfigureMutation("Mutation_Wings", "mut_wings", Rarity.Rare,
+                dps: 1f, hp: 1f, speed: 1.15f, size: 1f, flight: true,
+                element: ElementType.None, bit: 0);
+
+            // armadura: +50% HP (CANON: hpMult 1.5).
+            set.Armor = ConfigureMutation("Mutation_Armor", "mut_armor", Rarity.Rare,
+                dps: 1f, hp: 1.5f, speed: 1f, size: 1.05f, flight: false,
+                element: ElementType.None, bit: 1);
+
+            // laser: adiciona dano de Raio + dpsMult 1.3 (CANON).
+            set.Laser = ConfigureMutation("Mutation_Laser", "mut_laser", Rarity.Epic,
+                dps: 1.3f, hp: 1f, speed: 1f, size: 1f, flight: false,
+                element: ElementType.Lightning, bit: 2);
+
+            // tamanho: sizeMult 1.4, hpMult 1.3 (CANON), leve perda de velocidade.
+            set.Size = ConfigureMutation("Mutation_Size", "mut_size", Rarity.Epic,
+                dps: 1.15f, hp: 1.3f, speed: 0.95f, size: 1.4f, flight: false,
+                element: ElementType.None, bit: 3);
+
+            // velocidade: speedMult 1.4 (CANON).
+            set.Speed = ConfigureMutation("Mutation_Speed", "mut_speed", Rarity.Rare,
+                dps: 1f, hp: 1f, speed: 1.4f, size: 0.95f, flight: false,
+                element: ElementType.None, bit: 4);
+
+            // clonagem: ganho agressivo de dano/HP (o "dobra o exército" visual fica a cargo
+            // do runtime; aqui o efeito honesto é statístico) — lendária, momento de vídeo.
+            set.Clone = ConfigureMutation("Mutation_Clone", "mut_clone", Rarity.Legendary,
+                dps: 1.5f, hp: 1.5f, speed: 1f, size: 1f, flight: false,
+                element: ElementType.None, bit: 5);
+
+            // regeneração: HP extra (proxy de cura contínua), épica.
+            set.Regen = ConfigureMutation("Mutation_Regen", "mut_regen", Rarity.Epic,
+                dps: 1f, hp: 1.6f, speed: 1f, size: 1f, flight: false,
+                element: ElementType.None, bit: 6);
+
+            // escudo: muito HP, leve perda de dano — defensiva pura.
+            set.Shield = ConfigureMutation("Mutation_Shield", "mut_shield", Rarity.Rare,
+                dps: 0.95f, hp: 1.7f, speed: 1f, size: 1.05f, flight: false,
+                element: ElementType.None, bit: 7);
+
+            // ataque em área: dpsMult forte, adiciona Fogo (estética de explosão), épica.
+            set.AreaBlast = ConfigureMutation("Mutation_AreaBlast", "mut_area_blast", Rarity.Epic,
+                dps: 1.4f, hp: 1f, speed: 1f, size: 1f, flight: false,
+                element: ElementType.Fire, bit: 8);
+
+            return set;
+        }
+
+        private static MutationConfigSO ConfigureMutation(string assetName, string mutationId, Rarity rarity,
+                                                          float dps, float hp, float speed, float size,
+                                                          bool flight, ElementType element, int bit)
+        {
+            var m = LoadOrCreate<MutationConfigSO>(Root + "/Mutations/" + assetName + ".asset");
+            m.mutationId = mutationId;
+            m.displayNameKey = mutationId + "_name";
+            m.rarity = rarity;
+            m.dpsMult = dps;
+            m.hpMult = hp;
+            m.speedMult = speed;
+            m.sizeMult = size;
+            m.grantsFlight = flight;
+            m.addsElement = element;
+            m.shaderVariantFlag = 1 << bit;   // bit distinto por mutação (doc 12 §6.2)
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
+        // ------------------------------------------------------------------ Gates (taxonomia ampliada · CANON §10 / doc 04)
+
+        // Paleta por CATEGORIA (briefing): azul=positivo · vermelho/laranja=negativo ·
+        // dourado=risco · roxo=mutação · ciano=elemento. displayLabel SEMPRE honesto.
+        private static class GateColor
+        {
+            public static readonly Color Positive = new Color(0.20f, 0.75f, 1.00f);  // azul
+            public static readonly Color Negative = new Color(1.00f, 0.30f, 0.22f);  // vermelho
+            public static readonly Color Risk = new Color(1.00f, 0.80f, 0.20f);      // dourado
+            public static readonly Color Mutation = new Color(0.70f, 0.35f, 1.00f);  // roxo
+            public static readonly Color Element = new Color(0.30f, 0.90f, 1.00f);   // ciano
+            public static readonly Color ClassConvert = new Color(0.35f, 0.80f, 1.00f); // azul-classe
+        }
+
+        private static GateSet CreateGates(UnitSet units, MutationSet mutations)
+        {
             var set = new GateSet();
 
-            set.AddTen = ConfigureGate("Gate_Add10", "gate_add_10", GateType.AddFlat, 10f, "+10", positive);
+            // ---- MATEMÁTICOS (doc 04). unitToAdd = Soldado: AddFlat spawna soldados; Multiply
+            // só reconcilia o total (spawnType é o piso quando precisa criar). ----
+            set.AddTen = ConfigureGate("Gate_Add10", "gate_add_10", GateType.AddFlat, 10f, "+10", GateColor.Positive);
             set.AddTen.unitToAdd = units.Soldier;
-
-            set.AddTwentyFive = ConfigureGate("Gate_Add25", "gate_add_25", GateType.AddFlat, 25f, "+25", positive);
+            set.AddTwentyFive = ConfigureGate("Gate_Add25", "gate_add_25", GateType.AddFlat, 25f, "+25", GateColor.Positive);
             set.AddTwentyFive.unitToAdd = units.Soldier;
-
-            set.TimesTwo = ConfigureGate("Gate_X2", "gate_x2", GateType.Multiply, 2f, "x2", positive);
+            set.AddFifty = ConfigureGate("Gate_Add50", "gate_add_50", GateType.AddFlat, 50f, "+50", GateColor.Positive);
+            set.AddFifty.unitToAdd = units.Soldier;
+            set.TimesTwo = ConfigureGate("Gate_X2", "gate_x2", GateType.Multiply, 2f, "x2", GateColor.Positive);
             set.TimesTwo.unitToAdd = units.Soldier;
-
-            set.TimesThree = ConfigureGate("Gate_X3", "gate_x3", GateType.Multiply, 3f, "x3", positive);
+            set.TimesThree = ConfigureGate("Gate_X3", "gate_x3", GateType.Multiply, 3f, "x3", GateColor.Positive);
             set.TimesThree.unitToAdd = units.Soldier;
+            set.TimesFive = ConfigureGate("Gate_X5", "gate_x5", GateType.Multiply, 5f, "x5", GateColor.Positive);
+            set.TimesFive.unitToAdd = units.Soldier;
+            // Negativos (vermelho). −10 é AddFlat com value negativo (GateMath soma e aplica piso 1).
+            set.MinusTen = ConfigureGate("Gate_Minus10", "gate_minus_10", GateType.AddFlat, -10f, "−10", GateColor.Negative);
+            set.MinusTen.unitToAdd = units.Soldier;
+            set.Half = ConfigureGate("Gate_Div2", "gate_div2", GateType.Multiply, 0.5f, "÷2", GateColor.Negative);
+            set.Div2Alt = set.Half;   // alias semântico (CANON §10 lista ÷2 explicitamente)
 
-            set.Half = ConfigureGate("Gate_Div2", "gate_div2", GateType.Multiply, 0.5f, "÷2", negative);
-
+            // ---- CLASSE (ClassConvert): transforma o exército inteiro na tropa-alvo. ----
             set.ClassArcher = ConfigureGate("Gate_ClassArcher", "gate_class_archer",
-                GateType.ClassConvert, 1f, "VIRAR ARQUEIRO", positive);
+                GateType.ClassConvert, 1f, "VIRAR ARQUEIRO", GateColor.ClassConvert);
             set.ClassArcher.unitToAdd = units.Archer;
+            set.ClassMage = ConfigureGate("Gate_ClassMage", "gate_class_mage",
+                GateType.ClassConvert, 1f, "VIRAR MAGO", GateColor.ClassConvert);
+            set.ClassMage.unitToAdd = units.Mage;
+            set.ClassKnight = ConfigureGate("Gate_ClassKnight", "gate_class_knight",
+                GateType.ClassConvert, 1f, "VIRAR ESCUDEIRO", GateColor.ClassConvert);
+            set.ClassKnight.unitToAdd = units.Knight;
+            set.ClassNinja = ConfigureGate("Gate_ClassNinja", "gate_class_ninja",
+                GateType.ClassConvert, 1f, "VIRAR NINJA", GateColor.ClassConvert);
+            set.ClassNinja.unitToAdd = units.Ninja;
+            set.ClassGiant = ConfigureGate("Gate_ClassGiant", "gate_class_giant",
+                GateType.ClassConvert, 1f, "VIRAR GIGANTE", GateColor.ClassConvert);
+            set.ClassGiant.unitToAdd = units.Giant;
 
+            // ---- ELEMENTO (Element · ciano): aplica elemento ao exército (SetElement). ----
             set.ElementFire = ConfigureGate("Gate_ElementFire", "gate_element_fire",
-                GateType.Element, 0f, "FOGO", new Color(1.00f, 0.35f, 0.15f));
+                GateType.Element, 0f, "FOGO", new Color(1.00f, 0.45f, 0.20f));
             set.ElementFire.element = ElementType.Fire;
+            set.ElementIce = ConfigureGate("Gate_ElementIce", "gate_element_ice",
+                GateType.Element, 0f, "GELO", new Color(0.55f, 0.85f, 1.00f));
+            set.ElementIce.element = ElementType.Ice;
+            set.ElementLightning = ConfigureGate("Gate_ElementLightning", "gate_element_lightning",
+                GateType.Element, 0f, "RAIO", new Color(1.00f, 0.92f, 0.35f));
+            set.ElementLightning.element = ElementType.Lightning;
+            set.ElementPoison = ConfigureGate("Gate_ElementPoison", "gate_element_poison",
+                GateType.Element, 0f, "VENENO", new Color(0.55f, 0.95f, 0.35f));
+            set.ElementPoison.element = ElementType.Poison;
 
-            // Rótulo HONESTO com as odds visíveis (CANON §3.4) — o RNG usa exatamente estas odds.
+            // ---- MUTAÇÃO (Mutation · roxo): mutation = MutationConfigSO; ApplyMutation no toque. ----
+            set.MutWings = ConfigureGate("Gate_MutWings", "gate_mut_wings",
+                GateType.Mutation, 0f, "ASAS", GateColor.Mutation);
+            set.MutWings.mutation = mutations.Wings;
+            set.MutArmor = ConfigureGate("Gate_MutArmor", "gate_mut_armor",
+                GateType.Mutation, 0f, "ARMADURA", GateColor.Mutation);
+            set.MutArmor.mutation = mutations.Armor;
+            set.MutLaser = ConfigureGate("Gate_MutLaser", "gate_mut_laser",
+                GateType.Mutation, 0f, "LASER", GateColor.Mutation);
+            set.MutLaser.mutation = mutations.Laser;
+            set.MutSize = ConfigureGate("Gate_MutSize", "gate_mut_size",
+                GateType.Mutation, 0f, "GIGANTISMO", GateColor.Mutation);
+            set.MutSize.mutation = mutations.Size;
+            set.MutSpeed = ConfigureGate("Gate_MutSpeed", "gate_mut_speed",
+                GateType.Mutation, 0f, "VELOCIDADE", GateColor.Mutation);
+            set.MutSpeed.mutation = mutations.Speed;
+            set.MutRegen = ConfigureGate("Gate_MutRegen", "gate_mut_regen",
+                GateType.Mutation, 0f, "REGENERAÇÃO", GateColor.Mutation);
+            set.MutRegen.mutation = mutations.Regen;
+
+            // ---- RISCO (dourado): rótulo HONESTO com as odds visíveis (CANON §3.4) — o RNG
+            // usa exatamente riskSuccessChance/riskRewardMult/riskFailPenalty. ----
             set.RiskTen = ConfigureGate("Gate_RiskX10", "gate_risk_x10", GateType.Risk, 0f,
-                "70% x10 / 30% −½", special);
+                "70% x10 / 30% −½", GateColor.Risk);
             set.RiskTen.riskSuccessChance = 0.7f;
             set.RiskTen.riskRewardMult = 10f;
             set.RiskTen.riskFailPenalty = 0.5f;
+            // "x10 SE SOBREVIVER" agressivo: odds baixas, prêmio enorme.
+            set.RiskTitan = ConfigureGate("Gate_RiskTitan", "gate_risk_titan", GateType.Risk, 0f,
+                "50% x10 / 50% −½", GateColor.Risk);
+            set.RiskTitan.riskSuccessChance = 0.5f;
+            set.RiskTitan.riskRewardMult = 10f;
+            set.RiskTitan.riskFailPenalty = 0.5f;
+            // "sacrificar metade por um prêmio" — sucesso quase garantido, penalidade pesada.
+            set.RiskSacrifice = ConfigureGate("Gate_RiskSacrifice", "gate_risk_sacrifice", GateType.Risk, 0f,
+                "90% x3 / 10% −½", GateColor.Risk);
+            set.RiskSacrifice.riskSuccessChance = 0.9f;
+            set.RiskSacrifice.riskRewardMult = 3f;
+            set.RiskSacrifice.riskFailPenalty = 0.5f;
 
-            EditorUtility.SetDirty(set.AddTen);
-            EditorUtility.SetDirty(set.AddTwentyFive);
-            EditorUtility.SetDirty(set.TimesTwo);
-            EditorUtility.SetDirty(set.TimesThree);
-            EditorUtility.SetDirty(set.ClassArcher);
-            EditorUtility.SetDirty(set.ElementFire);
-            EditorUtility.SetDirty(set.RiskTen);
+            // dirty em massa (LoadOrCreate já marcou cada um; reforço para os campos pós-Configure)
+            foreach (GateConfigSO g in AllGates(set)) EditorUtility.SetDirty(g);
             return set;
+        }
+
+        private static IEnumerable<GateConfigSO> AllGates(GateSet s)
+        {
+            yield return s.AddTen; yield return s.AddTwentyFive; yield return s.AddFifty;
+            yield return s.TimesTwo; yield return s.TimesThree; yield return s.TimesFive;
+            yield return s.MinusTen; yield return s.Half;
+            yield return s.ClassArcher; yield return s.ClassMage; yield return s.ClassKnight;
+            yield return s.ClassNinja; yield return s.ClassGiant;
+            yield return s.ElementFire; yield return s.ElementIce; yield return s.ElementLightning; yield return s.ElementPoison;
+            yield return s.MutWings; yield return s.MutArmor; yield return s.MutLaser;
+            yield return s.MutSize; yield return s.MutSpeed; yield return s.MutRegen;
+            yield return s.RiskTen; yield return s.RiskTitan; yield return s.RiskSacrifice;
         }
 
         private static GateConfigSO ConfigureGate(string assetName, string gateId, GateType type,
@@ -335,15 +577,26 @@ namespace MutantArmy.Editor
             var set = new RewardSet();
 
             // CANON §8: boss de mundo dá 10 gemas; §16: fase 7 = boss de mundo M1 + baú grande.
+            // Pool de carta inclui o roster expandido (Raro/Épico/Lendário) — boss de mundo
+            // é a principal fonte grátis de tropas fortes (anti pay-to-win, CANON §11).
             set.WorldBoss = ConfigureReward("Reward_WorldBoss", coins: 0, gems: 10, playerXp: 0,
                 chest: ChestType.Rare, cardDropChance: 0.30f, shardAmount: 10,
-                cardPool: new[] { units.Archer, units.Shieldbearer, units.Mage, units.Giant });
+                cardPool: new[]
+                {
+                    units.Mage, units.Giant, units.Ninja, units.FlameTrooper, units.FrostTrooper,
+                    units.Medic, units.Robot, units.Necromancer, units.Engineer, units.Alien,
+                    units.Dragon, units.Titan, units.WarAngel, units.Demon, units.Mecha
+                });
 
             // CANON §6: todo boss tem recompensa especial + chance de drop de carta/fragmento.
             // Valores não fixados pelo CANON (drop chance) são defaults recalibráveis por RC.
             set.BossDefault = ConfigureReward("Reward_BossDefault", coins: 0, gems: 0, playerXp: 0,
                 chest: ChestType.None, cardDropChance: 0.10f, shardAmount: 10,
-                cardPool: new[] { units.Archer, units.Shieldbearer, units.Mage });
+                cardPool: new[]
+                {
+                    units.Archer, units.Shieldbearer, units.Runner, units.Mage, units.Ninja,
+                    units.FlameTrooper, units.FrostTrooper, units.Medic
+                });
 
             // CANON §16: fase 10 = baú épico + 50 gemas.
             set.Level10 = ConfigureReward("Reward_Level10", coins: 0, gems: 50, playerXp: 0,
@@ -476,9 +729,14 @@ namespace MutantArmy.Editor
                 level.winReward = levelIndex == 10 ? rewards.Level10 : null;
                 level.startingUnits = 1;        // fase sempre começa com 1 + bônus de meta
                 level.obstacles = new ObstacleSlot[0];
-                level.gateSlots = levelIndex == 1
+
+                // Marquee levels recebem pares MANUAIS curados (quantidade vs qualidade,
+                // elemento vs fraqueza do boss, mutação, risco); o resto fica autoBalance
+                // (o GateManager monta contra o boss). Fase 1 = onboarding impossível de perder.
+                GateSlot[] manual = levelIndex == 1
                     ? BuildOnboardingSlots(level.trackLength, gates)
-                    : BuildAutoSlots(SlotCount(level.trackLength), level.trackLength);
+                    : BuildManualSlotsForLevel(levelIndex, level.trackLength, gates);
+                level.gateSlots = manual ?? BuildAutoSlots(SlotCount(level.trackLength), level.trackLength);
 
                 EditorUtility.SetDirty(level);
 
@@ -609,6 +867,101 @@ namespace MutantArmy.Editor
                 leftGate = left,
                 rightGate = right
             };
+        }
+
+        /// <summary>
+        /// Pares MANUAIS marcantes para fases-chave (CANON §16 + briefing "quantidade vs
+        /// qualidade"). Retorna null para fases sem curadoria — elas caem no autoBalance.
+        /// Posições distribuídas ao longo da pista, terminando antes da zona de segurança
+        /// (trackLength − 40). Boss da fase (BossForLevel): M1 Fogo · M2 Fogo/Luz, imune Veneno ·
+        /// M3 Raio, imune Veneno — os pares de elemento expõem a rota ótima vs armadilha.
+        /// </summary>
+        private static GateSlot[] BuildManualSlotsForLevel(int levelIndex, float trackLength, GateSet g)
+        {
+            float p1 = 35f, p2 = trackLength * 0.45f, p3 = trackLength * 0.66f, p4 = trackLength - 45f;
+
+            switch (levelIndex)
+            {
+                // Fase 2 (CANON §16): PRIMEIRA escolha estratégica real — quantidade vs qualidade.
+                // x3 soldados frágeis  vs  virar Arqueiro (menos corpos, muito mais DPS à distância).
+                case 2:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassArcher),
+                        ManualSlot(trackLength - 45f, trackLength, g.AddTwentyFive, g.ClassMage)
+                    };
+
+                // Fase 3 (boss "uau" Golem, FRACO A FOGO): a rota ótima é elemento Fogo;
+                // a armadilha aparentemente boa é o número maior (x5) sem elemento.
+                case 3:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesTwo, g.AddTwentyFive),
+                        ManualSlot(p3, trackLength, g.ElementFire, g.TimesFive),       // Fogo (ótima) vs x5 (armadilha)
+                        ManualSlot(p4, trackLength, g.MutWings, g.AddFifty)            // 1ª mutação ofertada
+                    };
+
+                // Fase 4: introduz o RISCO honesto + primeira escolha de mutação dupla.
+                case 4:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ElementFire),
+                        ManualSlot(p3, trackLength, g.MutArmor, g.MutSpeed),           // tanque vs velocidade
+                        ManualSlot(p4, trackLength, g.RiskTen, g.AddFifty)            // risco vs garantido
+                    };
+
+                // Fase 6 (última variante do Golem antes do boss de mundo): qualidade pesada.
+                case 6:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassMage),
+                        ManualSlot(p2, trackLength, g.ElementFire, g.TimesFive),
+                        ManualSlot(p3, trackLength, g.MutLaser, g.MutSize),
+                        ManualSlot(p4, trackLength, g.RiskSacrifice, g.AddFifty)
+                    };
+
+                // Fase 8 (abre M2 Cidade Zumbi, Brutamontes IMUNE A VENENO): a armadilha é
+                // justamente o portal de Veneno (0 dano vs morto-vivo); ótima é Fogo.
+                case 8:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassNinja),
+                        ManualSlot(p3, trackLength, g.ElementFire, g.ElementPoison),   // Fogo (ótima) vs Veneno (armadilha — imune)
+                        ManualSlot(trackLength - 45f, trackLength, g.MutArmor, g.AddFifty)
+                    };
+
+                // Fase 11: quantidade absurda vs lendária única (x5 soldados vs virar Gigante).
+                case 11:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesFive, g.ClassGiant),        // multidão vs poucos tanques
+                        ManualSlot(p3, trackLength, g.ElementFire, g.MutLaser),
+                        ManualSlot(p4, trackLength, g.RiskTitan, g.TimesThree)
+                    };
+
+                // Fase 15 (abre M3 Deserto Robótico, Escorpião FRACO A RAIO, IMUNE A VENENO):
+                // ótima é Raio; armadilha é Veneno (0 dano vs máquina).
+                case 15:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassMage),
+                        ManualSlot(p3, trackLength, g.ElementLightning, g.ElementPoison), // Raio (ótima) vs Veneno (armadilha)
+                        ManualSlot(p4, trackLength, g.MutLaser, g.AddFifty)            // Laser (adiciona Raio!) vs número
+                    };
+
+                // Fase 18: pico de decisão — risco grande, mutação lendária, elemento certo.
+                case 18:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesFive, g.ClassGiant),
+                        ManualSlot(p2, trackLength, g.ElementLightning, g.TimesFive),
+                        ManualSlot(p3, trackLength, g.MutSize, g.MutSpeed),
+                        ManualSlot(p4, trackLength, g.RiskTitan, g.AddFifty)
+                    };
+
+                default:
+                    return null;   // demais fases: autoBalance (rota ótima + armadilha geradas vs boss)
+            }
         }
 
         /// <summary>

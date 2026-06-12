@@ -18,9 +18,20 @@ MonoBehaviour:
   chest: 2
   cardDropChance: 0.3
   cardPool:
-  - {fileID: 11400000, guid: f55b01a8f10b4ea408cccbd75259a0c7, type: 2}
-  - {fileID: 11400000, guid: f3359ee4d9c4a4d468fbef0431786626, type: 2}
   - {fileID: 11400000, guid: b23c7c69ea0fd88499450245d4ebedc1, type: 2}
   - {fileID: 11400000, guid: acf0d3f24decf7345ba1243c87709cb6, type: 2}
+  - {fileID: 11400000, guid: aed24fab43ff3cc4f93e9cf7302a56ab, type: 2}
+  - {fileID: 11400000, guid: f7f3201c68f602c46adaafd3d4512196, type: 2}
+  - {fileID: 11400000, guid: dccac7e50c4d49b46a1ba959337014ef, type: 2}
+  - {fileID: 11400000, guid: 879456582826abb43936a6066cf1d253, type: 2}
+  - {fileID: 11400000, guid: 55b48b847079e524fa0c24bcc694d173, type: 2}
+  - {fileID: 11400000, guid: 638a3e16507c8294d9d575b2d9c6242f, type: 2}
+  - {fileID: 11400000, guid: 12fec6676e7c64048a76f7a70bf039d2, type: 2}
+  - {fileID: 11400000, guid: 142fa305fc24bfc4eb1c8968d07c6757, type: 2}
+  - {fileID: 11400000, guid: 11fffe3fdb68ca5418f51762f0d806fe, type: 2}
+  - {fileID: 11400000, guid: 35f7eadedb73af442b19a31907fa1ebe, type: 2}
+  - {fileID: 11400000, guid: b498cd2bb9b2c4240aac690b106e887e, type: 2}
+  - {fileID: 11400000, guid: 3b40f8b5b4d7226428c8b05399fdc220, type: 2}
+  - {fileID: 11400000, guid: a534994da0950f04e95e581df344a6d1, type: 2}
   shardAmount: 10
   allowAdDouble: 1

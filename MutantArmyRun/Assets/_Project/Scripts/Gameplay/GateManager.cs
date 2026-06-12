@@ -90,14 +90,27 @@ namespace MutantArmy.Gameplay
             foreach (GateConfigSO g in _autoBalancePool)
             {
                 if (g == null) continue;
-                bool exploitsWeakness = g.gateType == GateType.Element && boss != null
-                                        && ContainsElement(boss.weaknesses, g.element);
-                bool resisted = g.gateType == GateType.Element && boss != null
-                                && (ContainsElement(boss.immunities, g.element) || g.element == boss.element);
+                // o elemento ESTRATÉGICO do portal: elemento direto (Element gate) OU o elemento
+                // nativo da tropa-alvo de um portal de classe (Virar Lança-Chamas vs boss de Gelo).
+                ElementType strategic = StrategicElementOf(g);
+
+                bool exploitsWeakness = boss != null && strategic != ElementType.None
+                                        && ContainsElement(boss.weaknesses, strategic);
+                bool resisted = boss != null && strategic != ElementType.None
+                                && (ContainsElement(boss.immunities, strategic) || strategic == boss.element);
                 if (exploitsWeakness) _optimalBuffer.Add(g);
                 else if (resisted) _trapBuffer.Add(g);
                 else _neutralBuffer.Add(g);
             }
+        }
+
+        // Elemento que o portal injeta no plano contra o boss (CANON §3.1): direto para Element,
+        // herdado da tropa-alvo para ClassConvert (converter em Lança-Chamas leva Fogo ao exército).
+        private static ElementType StrategicElementOf(GateConfigSO g)
+        {
+            if (g.gateType == GateType.Element) return g.element;
+            if (g.gateType == GateType.ClassConvert && g.unitToAdd != null) return g.unitToAdd.element;
+            return ElementType.None;
         }
 
         private static bool ContainsElement(ElementType[] list, ElementType e)

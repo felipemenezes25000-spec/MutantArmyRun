@@ -9,9 +9,13 @@ namespace MutantArmy.Services
     /// <summary>
     /// Áudio por EVENTO do bus (doc 12 §3.1): multiplicação de portal, fanfarra de Supply
     /// (CANON §3.2 — prêmio, nunca punição), mutação, fase de boss e fim de fase. Música
-    /// por mundo entra via PlayMusic(WorldConfigSO.musicTrack) chamado pelo fluxo de fase.
-    /// Stub do MVP: clips são opcionais (campos vazios são no-op) — os hooks e o gate de
-    /// sfxOn/musicOn já são os definitivos. Preferências persistem via BindSaveState
+    /// por mundo toca em loop e troca sozinha ao mudar de mundo/fase: o manager assina
+    /// GameManager.StateEntered e, ao entrar em Running, resolve a faixa do mundo da fase
+    /// atual (catálogo musicByWorld[worldIndex] → WorldConfigSO.musicTrack → no-op). Mesma
+    /// regra de fronteira do WorldAtmosphereApplier e do AnalyticsManager: Services enxerga
+    /// Core (§2.3), então é aqui que o evento é assinado. PlayMusic(clip) segue público para
+    /// quem queira forçar uma faixa. Clips são opcionais (campos vazios são no-op silencioso) —
+    /// o jogo roda com qualquer subconjunto. Preferências persistem via BindSaveState
     /// (SaveData é Domain — atravessa a fronteira Meta/Services).
     /// </summary>
     public class AudioManager : MonoBehaviour, IInitializable
@@ -53,6 +57,16 @@ namespace MutantArmy.Services
         private const float BossHitSfxMinInterval = 0.2f;
         private float _lastBossHitSfxTime = -1f;
 
+        // Crescimento da multidão (OnCrowdChanged): cada salto positivo solta um pop, mas a
+        // multidão muda em rajada (multiplicação 1→N) — rate-limit evita metralhadora.
+        private const float CrowdPopMinInterval = 0.06f;
+        private float _lastCrowdPopTime = -1f;
+        private int _lastCrowdCount = -1;
+
+        // Música por mundo: troca SÓ quando o worldIndex muda (mudar de fase no mesmo mundo
+        // não reinicia a faixa). -1 = nenhuma faixa tocando ainda.
+        private int _currentMusicWorld = -1;
+
         /// <summary>Chamado pelo GameBootstrap (doc 12 §3.3) via IInitializable.</summary>
         public void Init()
         {
@@ -71,11 +85,20 @@ namespace MutantArmy.Services
             Unsubscribe();
             GameEvents.OnGateConsumed += HandleGateConsumed;
             GameEvents.OnSupplyOverflow += HandleSupplyOverflow;
+            GameEvents.OnCrowdChanged += HandleCrowdChanged;
             GameEvents.OnMutationGained += HandleMutationGained;
             GameEvents.OnBossPhaseChanged += HandleBossPhaseChanged;
             GameEvents.OnLevelFinished += HandleLevelFinished;
             GameEvents.OnCurrencyChanged += HandleCurrencyChanged;
             JuiceEvents.OnBossHitPulse += HandleBossHitPulse;
+
+            // Música por mundo (Services enxerga Core §2.3, igual ao AnalyticsManager): assina
+            // a entrada em Running para resolver a faixa do mundo da fase atual.
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.StateEntered -= HandleStateEntered;
+                GameManager.Instance.StateEntered += HandleStateEntered;
+            }
         }
 
         private void OnDestroy()
@@ -87,11 +110,14 @@ namespace MutantArmy.Services
         {
             GameEvents.OnGateConsumed -= HandleGateConsumed;
             GameEvents.OnSupplyOverflow -= HandleSupplyOverflow;
+            GameEvents.OnCrowdChanged -= HandleCrowdChanged;
             GameEvents.OnMutationGained -= HandleMutationGained;
             GameEvents.OnBossPhaseChanged -= HandleBossPhaseChanged;
             GameEvents.OnLevelFinished -= HandleLevelFinished;
             GameEvents.OnCurrencyChanged -= HandleCurrencyChanged;
             JuiceEvents.OnBossHitPulse -= HandleBossHitPulse;
+            if (GameManager.Instance != null)
+                GameManager.Instance.StateEntered -= HandleStateEntered;
         }
 
         /// <summary>Liga as preferências ao save (sfxOn/musicOn) — mesma instância viva do SaveSystem.</summary>
@@ -131,8 +157,18 @@ namespace MutantArmy.Services
             ApplyMusicMute();
         }
 
-        /// <summary>Música por mundo (doc 12 §3.1): o fluxo de fase passa WorldConfigSO.musicTrack.</summary>
+        /// <summary>
+        /// Música por mundo (doc 12 §3.1): toca a faixa em loop. Chamada direta (fora do fluxo
+        /// de mundo) reseta o índice de mundo para que a próxima troca automática reavalie.
+        /// </summary>
         public void PlayMusic(AudioClip track)
+        {
+            _currentMusicWorld = -1;   // faixa forçada manualmente — desliga o cache de mundo
+            PlayMusicTrack(track);
+        }
+
+        // Troca a faixa SÓ se for diferente da que já está tocando (não corta o loop atual).
+        private void PlayMusicTrack(AudioClip track)
         {
             if (_musicSource == null || track == null) return;
             if (_musicSource.clip == track && _musicSource.isPlaying) return;
@@ -144,7 +180,40 @@ namespace MutantArmy.Services
 
         public void StopMusic()
         {
+            _currentMusicWorld = -1;
             if (_musicSource != null) _musicSource.Stop();
+        }
+
+        // ---- Música por mundo: resolvida na entrada em Running (troca ao mudar de mundo) ----
+
+        private void HandleStateEntered(GameState state)
+        {
+            // Só na entrada da corrida; BossFight herda a faixa (mesma fase/mundo).
+            if (state != GameState.Running) return;
+            _lastCrowdCount = -1;   // nova corrida: não soa pop pela diferença com a fase anterior
+            UpdateWorldMusic();
+        }
+
+        /// <summary>
+        /// Resolve e toca a música do mundo da fase atual. Precedência: catálogo
+        /// musicByWorld[worldIndex] → WorldConfigSO.musicTrack → no-op silencioso. Troca a
+        /// faixa apenas quando o worldIndex muda (mudar de fase no mesmo mundo não reinicia).
+        /// </summary>
+        public void UpdateWorldMusic()
+        {
+            LevelConfigSO level = GameManager.Instance != null ? GameManager.Instance.CurrentLevel : null;
+            WorldConfigSO world = level != null ? level.world : null;
+            if (world == null) return;
+
+            if (world.worldIndex == _currentMusicWorld && _musicSource != null && _musicSource.isPlaying)
+                return;   // mesmo mundo, já tocando — não corta o loop
+
+            AudioClip track = _catalog != null ? _catalog.MusicForWorld(world.worldIndex) : null;
+            if (track == null) track = world.musicTrack;   // fallback do próprio mundo (Lacuna L7)
+            if (track == null) return;                     // sem faixa: silêncio honesto
+
+            _currentMusicWorld = world.worldIndex;
+            PlayMusicTrack(track);
         }
 
         public void PlaySfx(AudioClip clip)
@@ -171,6 +240,14 @@ namespace MutantArmy.Services
         public void PlayUiClick() => PlaySfx(_catalog != null ? _catalog.uiClick : null);
 
         public void PlayUiConfirm() => PlaySfx(_catalog != null ? _catalog.uiConfirm : null);
+
+        // ---- Hooks cosméticos opcionais (gameplay chama; catálogo-driven, no-op se vazio) ----
+
+        /// <summary>Passo agregado da multidão (pitch random ±5%) — chamado pelo loop de locomoção.</summary>
+        public void PlayFootstep() => PlaySfxPitched(_catalog != null ? _catalog.footstep : null);
+
+        /// <summary>Explosão (telegraph do boss / golpe final) — camada de peso, pitch random.</summary>
+        public void PlayExplosion() => PlaySfxPitched(_catalog != null ? _catalog.explosion : null);
 
         private void ApplyMusicMute()
         {
@@ -219,9 +296,26 @@ namespace MutantArmy.Services
             _popCascade = null;
         }
 
-        private void HandleSupplyOverflow(SupplyOverflow o) => PlaySfx(_supplyFanfareClip);
+        private void HandleSupplyOverflow(SupplyOverflow o)
+            => PlaySfx(FirstOf(_catalog != null ? _catalog.supplyFanfare : null, _supplyFanfareClip));
 
-        private void HandleMutationGained(MutationConfigSO m) => PlaySfx(_mutationClip);
+        private void HandleMutationGained(MutationConfigSO m)
+            => PlaySfx(FirstOf(_catalog != null ? _catalog.mutation : null, _mutationClip));
+
+        // Multidão cresce (OnCrowdChanged): cada salto positivo solta um pop com pitch random,
+        // rate-limited (multiplicação 1→N dispara várias mudanças no mesmo frame). Queda
+        // (perdas) não soa aqui — o feedback de dano é cosmético em outro lugar.
+        private void HandleCrowdChanged(int count, int supplyUsed)
+        {
+            int previous = _lastCrowdCount;
+            _lastCrowdCount = count;
+            if (previous < 0 || count <= previous) return;   // primeira leitura ou não cresceu
+            AudioClip pop = _catalog != null ? _catalog.pop : null;
+            if (pop == null) return;
+            if (Time.unscaledTime - _lastCrowdPopTime < CrowdPopMinInterval) return;
+            _lastCrowdPopTime = Time.unscaledTime;
+            PlaySfxPitched(pop);
+        }
 
         private void HandleBossPhaseChanged(BossPhase p)
         {

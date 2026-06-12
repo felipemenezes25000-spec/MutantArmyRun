@@ -3,13 +3,15 @@ using UnityEngine;
 namespace MutantArmy.Services
 {
     /// <summary>
-    /// Catálogo de SFX por EVENTO do jogo (1 asset, preenchido pelo MAR Tools/Build Juice
-    /// com os clips CC0 importados em Assets/_Project/Audio). Campo vazio é no-op silencioso
-    /// no AudioManager — o jogo roda com qualquer subconjunto de clips (mesmo zero).
-    /// Fontes (PLANO-DE-USO §1.7, todos CC0 1.0 Kenney): phaserUp/Down (portais),
-    /// handleCoins (moeda), pepSound (pop de multiplicação), impactPunch_heavy (hit no boss),
-    /// lowFrequency_explosion pitch baixo (placeholder de rugido — Lacuna L6),
-    /// click/confirmation (UI), jingles_HIT (vitória/derrota).
+    /// Catálogo de áudio por EVENTO do jogo (1 asset, preenchido pelo MAR Tools/Build Audio —
+    /// e ainda pelo legado Build Juice, que continua escrevendo o subconjunto antigo). Campo
+    /// vazio é no-op silencioso no AudioManager — o jogo roda com qualquer subconjunto de clips
+    /// (mesmo zero). Fontes (PLANO-DE-USO §1.7, todos CC0 1.0 Kenney): phaserUp/Down (portais),
+    /// handleCoins (moeda), pepSound (pop de multiplicação), powerUp (fanfarra de Supply / mutação),
+    /// impactPunch_heavy (hit no boss), lowFrequency_explosion (rugido — Lacuna L6; explosão),
+    /// footstep_grass/concrete (passos da multidão), click/confirmation (UI), jingles_HIT (vitória/derrota).
+    /// Música de fundo por mundo: <see cref="musicByWorld"/> indexado por worldIndex (0-based);
+    /// na ausência de loops dedicados (Lacuna L7) o AudioFactory aponta um jingle adequado em loop.
     /// </summary>
     [CreateAssetMenu(menuName = "MutantArmy/Audio Catalog")]
     public class AudioCatalogSO : ScriptableObject
@@ -20,11 +22,19 @@ namespace MutantArmy.Services
 
         [Header("Economia e multidão")]
         public AudioClip coin;          // moeda voadora do overflow de Supply (rate-limit no manager)
-        public AudioClip pop;           // pop de multiplicação (cascata com pitch random ±5%)
+        public AudioClip pop;           // pop de multiplicação 1→N (cascata com pitch random ±5%)
+        public AudioClip supplyFanfare; // overflow de Supply (CANON §3.2 — prêmio, nunca punição)
 
-        [Header("Boss")]
+        [Header("Multidão (passos agregados por densidade — PLANO §1.7)")]
+        public AudioClip footstep;      // loop/one-shot de passo (pitch random ±10% por densidade)
+
+        [Header("Boss e impacto")]
         public AudioClip bossHit;       // pulso de dano (round-robin de pitch)
         public AudioClip bossRoar;      // troca de fase — placeholder Lacuna L6 até roar CC0 dedicado
+        public AudioClip explosion;     // telegraph do boss / golpe final (camada de peso)
+
+        [Header("Progressão")]
+        public AudioClip mutation;      // mutação ganha (CANON §4 — upgrade celebrado)
 
         [Header("UI")]
         public AudioClip uiClick;
@@ -33,5 +43,22 @@ namespace MutantArmy.Services
         [Header("Fim de fase (doc 09 §4.4/§4.5)")]
         public AudioClip victoryJingle;
         public AudioClip defeatJingle;
+
+        [Header("Música de fundo em loop por mundo (indexada por worldIndex — Lacuna L7)")]
+        [Tooltip("Indexada DIRETO por WorldConfigSO.worldIndex (assets do MVP são 1-based: " +
+                 "W01=1, W02=2, W03=3 — o slot 0 fica vago). Vazio/curto cai no fallback: " +
+                 "WorldConfigSO.musicTrack e, por fim, no-op silencioso.")]
+        public AudioClip[] musicByWorld;
+
+        /// <summary>
+        /// Música do mundo, indexada direto por worldIndex (como autorado no WorldConfigSO).
+        /// Null se fora do range ou slot vazio — o AudioManager trata como no-op silencioso.
+        /// </summary>
+        public AudioClip MusicForWorld(int worldIndex)
+        {
+            if (musicByWorld == null || worldIndex < 0 || worldIndex >= musicByWorld.Length)
+                return null;
+            return musicByWorld[worldIndex];
+        }
     }
 }

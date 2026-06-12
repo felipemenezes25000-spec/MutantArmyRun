@@ -23,4 +23,4 @@ MonoBehaviour:
   riskFailPenalty: 0
   displayLabel: "\xF72"
   icon: {fileID: 0}
-  portalColor: {r: 1, g: 0.45, b: 0.1, a: 1}
+  portalColor: {r: 1, g: 0.3, b: 0.22, a: 1}

@@ -23,4 +23,4 @@ MonoBehaviour:
   riskFailPenalty: 0
   displayLabel: FOGO
   icon: {fileID: 0}
-  portalColor: {r: 1, g: 0.35, b: 0.15, a: 1}
+  portalColor: {r: 1, g: 0.45, b: 0.2, a: 1}

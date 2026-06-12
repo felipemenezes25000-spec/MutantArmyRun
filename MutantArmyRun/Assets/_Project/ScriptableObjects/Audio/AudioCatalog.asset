@@ -16,9 +16,18 @@ MonoBehaviour:
   gateNegative: {fileID: 8300000, guid: e0504e2628a2559438fe755e0a1856e8, type: 3}
   coin: {fileID: 8300000, guid: 6107e2f52194d9446be34090ce10b6db, type: 3}
   pop: {fileID: 8300000, guid: db8169677a80ea1418182bab6eed823d, type: 3}
+  supplyFanfare: {fileID: 8300000, guid: f1112631ca9c44d4798084f298335aad, type: 3}
+  footstep: {fileID: 8300000, guid: 86523254f7a455f43965b90b41f9407b, type: 3}
   bossHit: {fileID: 8300000, guid: 87a9dc0aad2c19149b963a6ed8041723, type: 3}
   bossRoar: {fileID: 8300000, guid: f73081df16f57c846ae12ba1f7a887d7, type: 3}
+  explosion: {fileID: 8300000, guid: 4869b7f6ec243d84389bffa16a51e4c9, type: 3}
+  mutation: {fileID: 8300000, guid: 2a66325eadd1a814192f3cdee352c889, type: 3}
   uiClick: {fileID: 8300000, guid: 9160b45fd98bee14980cb69135fffc46, type: 3}
   uiConfirm: {fileID: 8300000, guid: 11ad9c3d89943a54a8fd2bbb0a8ef483, type: 3}
   victoryJingle: {fileID: 8300000, guid: 3d957fa62f1c5914ca8b80b1644fa6e3, type: 3}
   defeatJingle: {fileID: 8300000, guid: 250282a506c3b584480937e792edc0c5, type: 3}
+  musicByWorld:
+  - {fileID: 0}
+  - {fileID: 8300000, guid: 7af7c5b8d781833458354b0863b89865, type: 3}
+  - {fileID: 8300000, guid: 91c48bb2505ffd748b76016e98eb0214, type: 3}
+  - {fileID: 8300000, guid: 2627b8596661d0a4e8743b487a484160, type: 3}

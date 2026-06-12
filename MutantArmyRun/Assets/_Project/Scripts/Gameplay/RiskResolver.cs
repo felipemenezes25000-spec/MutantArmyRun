@@ -64,11 +64,30 @@ namespace MutantArmy.Gameplay
             CrowdManager crowd = CrowdManager.Instance;
             if (crowd == null) return;
 
-            // Domain decide: sucesso → ×rewardMult; falha → ×failPenalty com piso 1.
-            // Mesma semântica de TOTAL-ALVO dos demais portais — reconciliada no funil único.
+            // Sacrifício do Titã (doc 04 §3.5): DETERMINÍSTICO — consome 50% (mais baratas primeiro,
+            // piso ≥1 além do Titã) e entrega 1 Titã. Distingue-se do "x10 se sobreviver" por ter
+            // tropa-alvo (unitToAdd) lendária de alto Supply.
+            if (IsTitanSacrifice(gate))
+            {
+                crowd.SacrificeForTitan(gate.unitToAdd);
+                return;
+            }
+
+            // Zona de Perigo "x10 se sobreviver": Domain decide — sucesso → ×rewardMult; falha →
+            // ×failPenalty com piso 1. Mesma semântica de TOTAL-ALVO, reconciliada no funil único.
             int target = RiskGate.Resolve(
                 _rng, gate.riskSuccessChance, gate.riskRewardMult, gate.riskFailPenalty, crowd.Count);
             crowd.ReconcileTo(target, gate.unitToAdd);
+        }
+
+        // Detecção content-light e SEGURA: o sacrifício só dispara quando a tropa-alvo é, de fato,
+        // uma lendária de Supply alto (Titã/Tità-classe). Sem unitToAdd, o portal "x10 se sobreviver"
+        // (gate_risk_titan probabilístico do factory atual) segue pela via padrão — nada muda.
+        private static bool IsTitanSacrifice(GateConfigSO gate)
+        {
+            return gate.unitToAdd != null
+                   && gate.unitToAdd.rarity == Rarity.Legendary
+                   && gate.unitToAdd.supplyCost >= 18;
         }
     }
 }
