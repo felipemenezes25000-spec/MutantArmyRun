@@ -196,22 +196,19 @@ namespace MutantArmy.Meta
         }
 
         /// <summary>
-        /// Nível de jogador (CANON §8 define os DESBLOQUEIOS por nível, não a curva de XP).
-        /// Curva provisória recalibrável por RC sem rebuild: subir do nível n custa n × base.
+        /// Nível de jogador (CANON §8 define os DESBLOQUEIOS por nível). Curva de XP do doc 07 §3.3,
+        /// agora canônica no Domain (EconomyMath.PlayerLevelXpToNext): o limiar do próximo nível é o
+        /// DELTA acumulado nível→nível+1, batendo nos marcos do CANON §16 (nv 2 = 120, nv 4 = 380…).
+        /// playerXp guarda a XP DENTRO do nível atual; o excedente sobe níveis em loop.
         /// </summary>
-        // Chave local (fora do RcKeys do Core): entra lá quando o doc 07 fixar a curva.
-        private const string PlayerXpPerLevelKey = "player_xp_per_level";
-
         private void CheckPlayerLevelUp(SaveData d)
         {
-            int xpPerLevel = GetRcInt(PlayerXpPerLevelKey, 100);
-            if (xpPerLevel <= 0) return;
-            int required = d.playerLevel * xpPerLevel;
-            while (d.playerXp >= required)
+            int required = EconomyMath.PlayerLevelXpToNext(d.playerLevel);
+            while (required > 0 && d.playerXp >= required)
             {
                 d.playerXp -= required;
                 d.playerLevel++;
-                required = d.playerLevel * xpPerLevel;
+                required = EconomyMath.PlayerLevelXpToNext(d.playerLevel);
             }
         }
 

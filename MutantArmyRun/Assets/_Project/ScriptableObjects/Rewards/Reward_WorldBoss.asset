@@ -15,7 +15,7 @@ MonoBehaviour:
   coins: 0
   gems: 10
   playerXp: 0
-  chest: 2
+  chest: 5
   cardDropChance: 0.3
   cardPool:
   - {fileID: 11400000, guid: b23c7c69ea0fd88499450245d4ebedc1, type: 2}

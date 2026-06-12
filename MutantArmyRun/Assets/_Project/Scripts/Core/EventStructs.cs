@@ -104,6 +104,39 @@ namespace MutantArmy.Core
         }
     }
 
+    /// <summary>
+    /// Bônus de meta lidos no INÍCIO da corrida (CANON §9 / doc 07 §5.3). Owner = Meta
+    /// (UpgradeSystem); consumidor = Gameplay (LevelManager.BeginRun empurra para os setters
+    /// de CombatSystem/CrowdAnchor/CrowdManager). Trafega por Core porque Meta e Gameplay são
+    /// camadas-irmãs (nenhuma enxerga a outra, doc 12 §2.3) — o GameManager carrega o provider.
+    /// Valores FRACIONÁRIOS acumulados (0.25 = +25%), exceto extraStartUnits (unidades inteiras).
+    /// </summary>
+    public struct RunStartBonuses
+    {
+        public float startDamage;     // +DPS base do exército (trilha StartDamage)
+        public float startHealth;     // +HP base do exército (trilha StartHealth)
+        public float speedRunMult;    // multiplicador de velocidade de CORRIDA já capado (trilha Speed)
+        public int extraStartUnits;   // unidades extras no início (trilha StartArmy: +1 a cada 2 níveis)
+        public float bossDamage;      // +dano na arena do boss (trilha BossDamage)
+        public float critChance;      // chance de crítico 0..1 (trilha CritChance)
+        public float obstacleLossFactor; // perdas por obstáculo × este fator (trilha ObstacleResist; 1 = sem bônus)
+
+        public RunStartBonuses(float startDamage, float startHealth, float speedRunMult, int extraStartUnits,
+                               float bossDamage, float critChance, float obstacleLossFactor)
+        {
+            this.startDamage = startDamage;
+            this.startHealth = startHealth;
+            this.speedRunMult = speedRunMult;
+            this.extraStartUnits = extraStartUnits;
+            this.bossDamage = bossDamage;
+            this.critChance = critChance;
+            this.obstacleLossFactor = obstacleLossFactor;
+        }
+
+        /// <summary>Neutro: sem nenhuma trilha (fallback quando a Meta ainda não ligou o provider).</summary>
+        public static RunStartBonuses None => new RunStartBonuses(0f, 0f, 1f, 0, 0f, 0f, 1f);
+    }
+
     /// <summary>Transação de moeda na carteira persistente (doc 12 §4.6). amount negativo = gasto.</summary>
     public struct CurrencyChange
     {

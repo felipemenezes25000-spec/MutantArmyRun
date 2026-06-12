@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using MutantArmy.Core;
 using MutantArmy.Domain;
+using MutantArmy.UI;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -30,12 +31,19 @@ namespace MutantArmy.Gameplay
     /// cada um dos 10 mundos (índices 1, 11, 21, …, 91), deixa cada um rodar ~3 s com AutoPilot,
     /// captura 1–2 screenshots por mundo ROTULADOS PELO MUNDO (shot_NNN_W1_…, shot_NNN_W5_…) e
     /// passa pro próximo, encerrando ao fim (watchdog 90 s). Permite VER os 10 mundos sem jogar
-    /// tudo. Os dois modos são mutuamente exclusivos; -screenshotRun (4 fases) segue intacto.
+    /// tudo.
+    ///
+    /// MODO -menuShowcase: a partir do MENU (cena Main, sem entrar em jogo), abre cada TELA DE
+    /// META (Tropas, Upgrades, Loja, Mapa, Diário) via UIManager.Push, captura 1–2 screenshots
+    /// de cada (shot_NNN_troops.png, shot_NNN_upgrades.png…) e fecha, encerrando ao fim
+    /// (watchdog 60 s). Permite VER as telas de meta sem tocar no desktop. Os três modos são
+    /// mutuamente exclusivos; -screenshotRun (4 fases) e -showcaseRun (10 mundos) seguem intactos.
     /// </summary>
     public class DevScreenshotRig : MonoBehaviour
     {
         private const string Flag = "-screenshotRun";
-        private const string ShowcaseFlag = "-showcaseRun";   // tour dos 10 mundos (não joga até vencer)
+        private const string ShowcaseFlag = "-showcaseRun";       // tour dos 10 mundos (não joga até vencer)
+        private const string MenuShowcaseFlag = "-menuShowcase";  // tour das telas de meta (não entra em jogo)
         private const string DirArgPrefix = "-shotsDir=";
         private const string DefaultShotsDir = @"C:\Users\Felipe\Downloads\jogo test\Build\shots";
         private const string GameSceneName = "Game";
@@ -48,6 +56,7 @@ namespace MutantArmy.Gameplay
         private const int LevelsPerWorld = 10;
         private const float ShowcaseDwellSeconds = 3f;     // ~3 s rodando por mundo
         private const float ShowcaseWatchdogSeconds = 90f; // 10 mundos × ~6 s + folga
+        private const float MenuShowcaseWatchdogSeconds = 60f; // 5 telas × ~2 s + folga
 
         [SerializeField] private int _width = 540;
         [SerializeField] private int _height = 960;
@@ -66,6 +75,7 @@ namespace MutantArmy.Gameplay
         private bool _firstGateCaptured;
         private bool _finished;
         private bool _showcase;             // modo -showcaseRun (tour dos mundos)
+        private bool _menuShowcase;         // modo -menuShowcase (tour das telas de meta)
         private int _showcaseWorld = 1;     // mundo atual do tour (rotula os shots W1..W10)
         private float _finishedAt = -1f;
         private readonly List<Canvas> _convertedCanvases = new List<Canvas>(8);
@@ -85,10 +95,10 @@ namespace MutantArmy.Gameplay
             go.AddComponent<DevScreenshotRig>();
         }
 
-        /// <summary>True se -screenshotRun OU -showcaseRun está presente.</summary>
+        /// <summary>True se -screenshotRun, -showcaseRun OU -menuShowcase está presente.</summary>
         private static bool HasAnyFlag()
         {
-            return HasArg(Flag) || HasArg(ShowcaseFlag);
+            return HasArg(Flag) || HasArg(ShowcaseFlag) || HasArg(MenuShowcaseFlag);
         }
 
         private static bool HasArg(string flag)
@@ -122,9 +132,11 @@ namespace MutantArmy.Gameplay
             }
 
             s_active = this;
-            // -showcaseRun tem prioridade se ambos vierem; -screenshotRun é o default histórico.
-            _showcase = HasArg(ShowcaseFlag);
-            if (_showcase) _watchdogSeconds = ShowcaseWatchdogSeconds;
+            // Prioridade: -menuShowcase > -showcaseRun > -screenshotRun (este é o default histórico).
+            _menuShowcase = HasArg(MenuShowcaseFlag);
+            _showcase = !_menuShowcase && HasArg(ShowcaseFlag);
+            if (_menuShowcase) _watchdogSeconds = MenuShowcaseWatchdogSeconds;
+            else if (_showcase) _watchdogSeconds = ShowcaseWatchdogSeconds;
             transform.SetParent(null, false);          // DontDestroyOnLoad exige root
             DontDestroyOnLoad(gameObject);
             Application.runInBackground = true;        // captura segue com janela em 2º plano
@@ -183,6 +195,16 @@ namespace MutantArmy.Gameplay
             while (GameManager.Instance == null || GameManager.Instance.State == GameState.Boot)
                 yield return new WaitForSecondsRealtime(0.25f);
             SubscribeGameManager();
+
+            // Modo menu-showcase: tour pelas telas de meta na cena Main (NÃO entra em jogo) —
+            // caminho separado; -screenshotRun e -showcaseRun seguem intactos.
+            if (_menuShowcase)
+            {
+                yield return MenuShowcaseRoutine();
+                Debug.Log("[DevScreenshotRig] fim do menu-showcase — encerrando o player.");
+                Quit();
+                yield break;
+            }
 
             // Modo showcase: tour pela fase 1 de cada mundo (não joga até vencer) — caminho
             // totalmente separado do -screenshotRun, que segue intacto abaixo.
@@ -322,6 +344,67 @@ namespace MutantArmy.Gameplay
                     }
                     yield return null;
                 }
+            }
+        }
+
+        // ------------------------------------------------------------------ menu showcase (telas de meta)
+
+        /// <summary>
+        /// Tour pelas 5 telas de META na cena Main, sem entrar em jogo: abre Tropas → Upgrades →
+        /// Loja → Mapa → Diário via UIManager.Push, captura 1–2 shots de cada (rotulados pela
+        /// tela) e fecha com Pop. Encerra ao fim. Permite VER as telas de meta sem tocar no
+        /// desktop. Captura via o MESMO pipeline offscreen (ConvertOverlayCanvases) das demais.
+        /// </summary>
+        private IEnumerator MenuShowcaseRoutine()
+        {
+            // garante a cena Main (o Boot encadeia para ela; se ainda estamos no MainMenu, segue)
+            float bootWait = Time.realtimeSinceStartup;
+            while ((GameManager.Instance == null || GameManager.Instance.State != GameState.MainMenu) &&
+                   Time.realtimeSinceStartup - bootWait < 8f)
+                yield return new WaitForSecondsRealtime(0.2f);
+
+            // deixa o menu renderizar e captura a tela inicial
+            yield return new WaitForSecondsRealtime(0.6f);
+            Capture("menu");
+
+            UIScreen[] screens =
+            {
+                FindFirstObjectByType<TroopsScreen>(FindObjectsInactive.Include),
+                FindFirstObjectByType<UpgradesScreen>(FindObjectsInactive.Include),
+                FindFirstObjectByType<ShopScreen>(FindObjectsInactive.Include),
+                FindFirstObjectByType<MapScreen>(FindObjectsInactive.Include),
+                FindFirstObjectByType<DailyScreen>(FindObjectsInactive.Include)
+            };
+            string[] tags = { "troops", "upgrades", "shop", "map", "daily" };
+
+            float watchdogStart = Time.realtimeSinceStartup;
+            for (int i = 0; i < screens.Length; i++)
+            {
+                if (Time.realtimeSinceStartup - watchdogStart >= _watchdogSeconds)
+                {
+                    Debug.LogWarning("[DevScreenshotRig] watchdog do menu-showcase — encerrando cedo.");
+                    break;
+                }
+
+                UIScreen screen = screens[i];
+                if (screen == null)
+                {
+                    Debug.LogWarning("[DevScreenshotRig] tela de meta '" + tags[i] + "' ausente na cena — pulando.");
+                    continue;
+                }
+
+                if (UIManager.Instance != null) UIManager.Instance.Push(screen);
+                else screen.Show();
+
+                // espera a animação de entrada (slide 200 ms) e o build data-driven da grade/lista
+                yield return new WaitForSecondsRealtime(0.7f);
+                Capture(tags[i]);
+                yield return new WaitForSecondsRealtime(0.4f);
+                Capture(tags[i] + "_2");   // 2º shot: após scroll/itens montados
+
+                if (UIManager.Instance != null) UIManager.Instance.Pop();
+                else screen.Hide();
+                yield return new WaitForSecondsRealtime(0.4f);
             }
         }
 
@@ -488,9 +571,12 @@ namespace MutantArmy.Gameplay
                 tex.Apply(false);
                 RenderTexture.active = previous;
 
-                // rótulo no nome: showcase rotula pelo MUNDO (shot_NNN_W5_run.png — me deixa VER
-                // os 10 mundos); o screenshot run rotula pela FASE (shot_NNN_L2_portal.png).
-                string label = _showcase ? "W" + _showcaseWorld : "L" + _currentLevelIndex;
+                // rótulo no nome: menu-showcase rotula pela TELA (shot_NNN_meta_troops.png — me
+                // deixa VER as telas de meta); world-showcase pelo MUNDO (shot_NNN_W5_run.png);
+                // screenshot run pela FASE (shot_NNN_L2_portal.png).
+                string label = _menuShowcase ? "meta"
+                             : _showcase ? "W" + _showcaseWorld
+                             : "L" + _currentLevelIndex;
                 string file = string.Format("shot_{0:000}_{1}_{2}.png", _shotIndex, label, tag);
                 _shotIndex += 10;
                 File.WriteAllBytes(Path.Combine(_outputDir, file), tex.EncodeToPNG());

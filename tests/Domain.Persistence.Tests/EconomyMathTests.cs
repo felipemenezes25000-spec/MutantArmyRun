@@ -122,5 +122,99 @@ namespace Domain.Persistence.Tests
             Assert.Equal(0, EconomyMath.ShardsToLevel(0));
             Assert.Equal(0, EconomyMath.ShardsToLevel(-1));
         }
+
+        // ---------- EvolveCoinCost — doc 07 §6: 100 × 2^(n−1) × raridade ----------
+
+        [Theory]
+        [InlineData(1, 1, 100)]    // Comum 1→2
+        [InlineData(2, 1, 200)]    // Comum 2→3
+        [InlineData(3, 1, 400)]
+        [InlineData(9, 1, 25600)]  // Comum 9→10 (último válido)
+        [InlineData(1, 2, 200)]    // Raro 1→2
+        [InlineData(1, 4, 400)]    // Épico 1→2
+        [InlineData(1, 8, 800)]    // Lendário 1→2
+        [InlineData(9, 8, 204800)] // Lendário 9→10
+        public void EvolveCoinCost_SegueCurvaCanonicaPorRaridade(int n, int rarityMult, long esperado)
+        {
+            Assert.Equal(esperado, EconomyMath.EvolveCoinCost(n, rarityMult));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(10)]   // nv máx é 10: não há evolução 10→11
+        [InlineData(-1)]
+        public void EvolveCoinCost_NivelForaDaFaixa_RetornaZero(int n)
+        {
+            Assert.Equal(0L, EconomyMath.EvolveCoinCost(n, 1));
+        }
+
+        [Theory]
+        [InlineData(Rarity.Common, 1)]
+        [InlineData(Rarity.Rare, 2)]
+        [InlineData(Rarity.Epic, 4)]
+        [InlineData(Rarity.Legendary, 8)]
+        public void RarityCoinMultiplier_EscadaCanonica(Rarity rarity, int esperado)
+        {
+            Assert.Equal(esperado, EconomyMath.RarityCoinMultiplier(rarity));
+        }
+
+        // ---------- PlayerLevelXpThreshold — doc 07 §3.3 (marcos do CANON §16) ----------
+
+        [Theory]
+        [InlineData(1, 0)]
+        [InlineData(2, 120)]
+        [InlineData(3, 220)]
+        [InlineData(4, 380)]
+        [InlineData(5, 550)]
+        [InlineData(10, 2350)]
+        [InlineData(20, 17400)]
+        public void PlayerLevelXpThreshold_BateNosMarcosCanonicos(int level, int esperado)
+        {
+            Assert.Equal(esperado, EconomyMath.PlayerLevelXpThreshold(level));
+        }
+
+        [Fact]
+        public void PlayerLevelXpThreshold_EhMonotonicaInclusiveAlemDaTabela()
+        {
+            int prev = -1;
+            for (int l = 1; l <= 40; l++)
+            {
+                int xp = EconomyMath.PlayerLevelXpThreshold(l);
+                Assert.True(xp > prev, $"nível {l}: {xp} deveria ser > {prev}");
+                prev = xp;
+            }
+        }
+
+        [Fact]
+        public void PlayerLevelXpToNext_EhODeltaDoLimiar()
+        {
+            Assert.Equal(120, EconomyMath.PlayerLevelXpToNext(1));   // 1→2
+            Assert.Equal(100, EconomyMath.PlayerLevelXpToNext(2));   // 2→3 (220−120)
+            Assert.Equal(160, EconomyMath.PlayerLevelXpToNext(3));   // 3→4 (380−220)
+        }
+
+        // ---------- SpeedRunMultiplier — doc 07 §5.3: +5%/nível, cap +50% (nv 10) ----------
+
+        [Theory]
+        [InlineData(0, 1.00f)]
+        [InlineData(1, 1.05f)]
+        [InlineData(10, 1.50f)]   // cap exato
+        [InlineData(20, 1.50f)]   // além do cap: corrida estabiliza
+        public void SpeedRunMultiplier_CapaEmMais50PorCento(int level, float esperado)
+        {
+            Assert.Equal(esperado, EconomyMath.SpeedRunMultiplier(level), 4);
+        }
+
+        // ---------- ObstacleLossFactor — doc 07 §5.3: composto 0.95^nível, nunca imune ----------
+
+        [Fact]
+        public void ObstacleLossFactor_Composto_NuncaChegaAZero()
+        {
+            Assert.Equal(1f, EconomyMath.ObstacleLossFactor(0), 4);
+            Assert.Equal(0.95f, EconomyMath.ObstacleLossFactor(1), 4);
+            // nv 5 ⇒ 0.95^5 ≈ 0.7738 (≈ −23% de perdas, doc 07 §5.4)
+            Assert.Equal(0.7738f, EconomyMath.ObstacleLossFactor(5), 3);
+            Assert.True(EconomyMath.ObstacleLossFactor(30) > 0f);   // assintótico, nunca imunidade
+        }
     }
 }

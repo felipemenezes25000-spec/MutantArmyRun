@@ -8,5 +8,7 @@ namespace MutantArmy.Domain
                                StartArmy, CritChance, BossDamage, ObstacleResist }
     public enum GameState { Boot, MainMenu, BossScout, Running, BossFight, ReviveOffer, Victory, Defeat }
     public enum CurrencyType { Coin, Gem, Xp }
-    public enum ChestType { None, Common, Rare, Epic }
+    // Ordinais ESTÁVEIS: None=0..Epic=3 preservam o que RewardConfigSO.chest já serializou;
+    // Legendary/World entram no fim (contrato de telas RewardSystem.OpenChest, doc 07 §4).
+    public enum ChestType { None, Common, Rare, Epic, Legendary, World }
 }

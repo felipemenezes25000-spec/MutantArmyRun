@@ -25,6 +25,18 @@ namespace MutantArmy.UI
         [SerializeField] private TMP_Text _gemsText;
         [SerializeField] private TMP_Text _levelText;
 
+        [Header("Telas de meta (push via UIManager) — ligadas pela MetaScreensFactory")]
+        [SerializeField] private Button _troopsButton;
+        [SerializeField] private Button _upgradesButton;
+        [SerializeField] private Button _shopButton;
+        [SerializeField] private Button _mapButton;
+        [SerializeField] private Button _dailyButton;
+        [SerializeField] private TroopsScreen _troopsScreen;
+        [SerializeField] private UpgradesScreen _upgradesScreen;
+        [SerializeField] private ShopScreen _shopScreen;
+        [SerializeField] private MapScreen _mapScreen;
+        [SerializeField] private DailyScreen _dailyScreen;
+
         private const string GameSceneName = "Game";   // const: sem string mágica espalhada (doc 12 §3.3)
 
         // Estático: sobrevive ao unload da cena Main enquanto a Game carrega.
@@ -33,6 +45,53 @@ namespace MutantArmy.UI
         private void Awake()
         {
             if (_playButton != null) _playButton.onClick.AddListener(OnPlayClicked);
+            WireMetaNavigation();
+        }
+
+        /// <summary>
+        /// NAVEGAÇÃO (brief F4 item 6): cada botão faz UIManager.Push da tela; cada tela tem
+        /// VOLTAR (evento BackRequested → Pop). Tudo por evento, sem acoplamento — a tela não
+        /// conhece o menu. O Mapa devolve a fase selecionada e o menu inicia a corrida.
+        /// </summary>
+        private void WireMetaNavigation()
+        {
+            BindNav(_troopsButton, _troopsScreen);
+            BindNav(_upgradesButton, _upgradesScreen);
+            BindNav(_shopButton, _shopScreen);
+            BindNav(_mapButton, _mapScreen);
+            BindNav(_dailyButton, _dailyScreen);
+
+            if (_troopsScreen != null) _troopsScreen.BackRequested += PopScreen;
+            if (_upgradesScreen != null) _upgradesScreen.BackRequested += PopScreen;
+            if (_shopScreen != null) _shopScreen.BackRequested += PopScreen;
+            if (_dailyScreen != null) _dailyScreen.BackRequested += PopScreen;
+            if (_mapScreen != null)
+            {
+                _mapScreen.BackRequested += PopScreen;
+                _mapScreen.WorldSelected += OnWorldSelected;
+            }
+        }
+
+        private void BindNav(Button button, UIScreen screen)
+        {
+            if (button == null || screen == null) return;
+            button.onClick.AddListener(() =>
+            {
+                if (UIManager.Instance != null) UIManager.Instance.Push(screen);
+                else screen.Show();
+            });
+        }
+
+        private static void PopScreen()
+        {
+            if (UIManager.Instance != null) UIManager.Instance.Pop();
+        }
+
+        /// <summary>Mapa: o jogador escolheu um mundo desbloqueado → inicia a fase resolvida.</summary>
+        private void OnWorldSelected(int levelIndex)
+        {
+            if (UIManager.Instance != null) UIManager.Instance.Pop();   // fecha o Mapa
+            StartLevelByIndex(levelIndex);
         }
 
         private void OnEnable()
@@ -69,6 +128,20 @@ namespace MutantArmy.UI
 
         private void OnPlayClicked()
         {
+            GameSettingsSO settings = GameSettingsSO.Load();
+            if (settings == null) return;   // erro já logado pelo Load()
+
+            SaveData save = SaveSystem.Instance != null ? SaveSystem.Instance.Data : null;
+            int nextIndex = settings.NextLevelIndex(save != null ? save.highestLevelCleared : 0);
+            StartLevelByIndex(nextIndex);
+        }
+
+        /// <summary>
+        /// Carrega a cena Game e inicia a fase do índice dado — caminho único do JOGAR (próxima
+        /// fase) e do Mapa (mundo selecionado). Guard anti duplo-clique via s_pendingLevel.
+        /// </summary>
+        private void StartLevelByIndex(int levelIndex)
+        {
             if (s_pendingLevel != null) return;   // load já em andamento: guard anti duplo-clique
 
             if (GameManager.Instance == null)
@@ -79,14 +152,12 @@ namespace MutantArmy.UI
             }
 
             GameSettingsSO settings = GameSettingsSO.Load();
-            if (settings == null) return;   // erro já logado pelo Load()
+            if (settings == null) return;
 
-            SaveData save = SaveSystem.Instance != null ? SaveSystem.Instance.Data : null;
-            int nextIndex = settings.NextLevelIndex(save != null ? save.highestLevelCleared : 0);
-            LevelConfigSO level = settings.GetLevel(nextIndex);
+            LevelConfigSO level = settings.GetLevel(levelIndex);
             if (level == null)
             {
-                Debug.LogError($"[MainMenuController] Fase {nextIndex} ausente no catálogo " +
+                Debug.LogError($"[MainMenuController] Fase {levelIndex} ausente no catálogo " +
                                "(Resources/GameSettings) — rode MAR Tools/Create MVP Content.");
                 return;
             }

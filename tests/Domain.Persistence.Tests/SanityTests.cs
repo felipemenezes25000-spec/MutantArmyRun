@@ -22,10 +22,16 @@ namespace Domain.Persistence.Tests
         }
 
         [Fact]
-        public void ChestType_NoneEhZero_QuatroValores()
+        public void ChestType_NoneEhZero_SeisValores()
         {
+            // None=0 preservado (RewardConfigSO.chest serializado); Legendary/World no fim
+            // para o contrato RewardSystem.OpenChest (doc 07 §4).
             Assert.Equal(0, (int)ChestType.None);
-            Assert.Equal(4, Enum.GetValues(typeof(ChestType)).Length);
+            Assert.Equal(1, (int)ChestType.Common);
+            Assert.Equal(3, (int)ChestType.Epic);
+            Assert.True(Enum.IsDefined(typeof(ChestType), ChestType.Legendary));
+            Assert.True(Enum.IsDefined(typeof(ChestType), ChestType.World));
+            Assert.Equal(6, Enum.GetValues(typeof(ChestType)).Length);
         }
 
         [Fact]

@@ -9,7 +9,7 @@ namespace MutantArmy.Domain
     /// </summary>
     public static class SaveMigration
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
 
         public static void Migrate(SaveData d)
         {
@@ -36,6 +36,15 @@ namespace MutantArmy.Domain
                 if (string.IsNullOrEmpty(d.starterOfferState)) d.starterOfferState = "eligible";
                 if (string.IsNullOrEmpty(d.consentStatus)) d.consentStatus = "unknown";
                 d.schemaVersion = 3;
+            }
+
+            // ---- v4: retenção (login diário, missões, pity de baú) adicionada após a v3 ----
+            // Campos aditivos: listas null (save v1–v3 sem o campo no JSON) normalizam para vazio;
+            // contadores/timestamps já nascem 0 (default do POCO). Nenhum dado anterior é tocado.
+            if (d.schemaVersion < 4)
+            {
+                if (d.dailyMissions == null) d.dailyMissions = new List<MissionProgress>();
+                d.schemaVersion = 4;
             }
 
             // Versão futura (app antigo lendo save de app novo): não rebaixar nem tocar nos dados.

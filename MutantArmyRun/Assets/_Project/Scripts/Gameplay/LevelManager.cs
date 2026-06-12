@@ -99,15 +99,36 @@ namespace MutantArmy.Gameplay
             if (RiskResolver.Instance != null)
                 RiskResolver.Instance.Configure(new System.Random(level.seed * 486187739 + 1));
 
-            if (CrowdAnchor.Instance != null) CrowdAnchor.Instance.ResetTo(Vector3.zero);
-            if (CombatSystem.Instance != null) CombatSystem.Instance.ResetRunStats();
+            // Bônus de meta lidos UMA vez no início da corrida (CANON §9 / doc 07 §5.3). O provider
+            // é preenchido pela Meta (UpgradeSystem); ausente ⇒ neutro. Meta e Gameplay são
+            // camadas-irmãs (§2.3), então o struct trafega por Core (GameManager).
+            RunStartBonuses bonuses = GameManager.Instance != null && GameManager.Instance.RunStartBonusProvider != null
+                ? GameManager.Instance.RunStartBonusProvider()
+                : RunStartBonuses.None;
+
+            if (CrowdAnchor.Instance != null)
+            {
+                CrowdAnchor.Instance.ResetTo(Vector3.zero);
+                // Velocidade de corrida da trilha Speed (já capada em +50% pelo Domain).
+                CrowdAnchor.Instance.SetSpeedMultiplier(bonuses.speedRunMult);
+            }
+            if (CombatSystem.Instance != null)
+            {
+                CombatSystem.Instance.ResetRunStats();
+                // Trilhas BossDamage e CritChance entram no combate agregado da arena.
+                CombatSystem.Instance.SetRunBonuses(bonuses.bossDamage, bonuses.critChance);
+            }
             if (CrowdManager.Instance != null)
             {
                 CrowdManager.Instance.ResetArmy();
-                // fase sempre começa com startingUnits; bônus de meta (Exército inicial)
-                // entra por cima via ReconcileTo chamado pela camada Meta
-                CrowdManager.Instance.ReconcileTo(Mathf.Max(1, level.startingUnits), null);
+                // fase começa com startingUnits + Exército inicial (trilha StartArmy): +1 unidade
+                // a cada 2 níveis, somado ao piso da fase. StartDamage/StartHealth entram nas
+                // stats por tropa (UnitManager), aplicadas no spawn pelo CrowdManager.
+                int startUnits = Mathf.Max(1, level.startingUnits) + Mathf.Max(0, bonuses.extraStartUnits);
+                CrowdManager.Instance.ReconcileTo(startUnits, null);
             }
+            // ObstacleResist (bonuses.obstacleLossFactor) e StartDamage/StartHealth dependem do
+            // CrowdManager ler stats efetivos da Meta — ver avisos de integração.
 
             // ordem fixa de consumo do RNG (gates → obstáculos → segmentos) preserva o determinismo
             if (GateManager.Instance != null) GateManager.Instance.SpawnGates(level, _rng);

@@ -48,6 +48,12 @@ namespace MutantArmy.Domain
         public int loginStreak;
         public int sessionCount;
 
+        // Retenção — login diário e missões (v4, aditivo; doc 07 §2/§3)
+        public long lastLoginRewardUnix;                    // último login diário reivindicado (dia-calendário UTC)
+        public long lastMissionResetUnix;                   // último reset das diárias (UTC); 0 = nunca geradas
+        public List<MissionProgress> dailyMissions = new List<MissionProgress>();
+        public int chestPityCounter;                        // pacotes desde o último Lendário (pity, doc 07 §4)
+
         // Configurações e consentimento
         public bool sfxOn = true, musicOn = true, hapticsOn = true;
         public string consentStatus = "unknown";            // resultado UMP cacheado
@@ -67,6 +73,20 @@ namespace MutantArmy.Domain
     {
         public string trackId;
         public int level;
+    }
+
+    /// <summary>
+    /// Progresso de UMA missão diária no save (doc 07 §2.1). missionId identifica o tipo
+    /// (win_levels / choose_gates / defeat_bosses); o gerador diário (MissionSystem) recria
+    /// a lista no reset de dia-calendário UTC. claimed evita duplo-resgate da recompensa.
+    /// </summary>
+    [Serializable]
+    public class MissionProgress
+    {
+        public string missionId;
+        public int progress;
+        public int target;
+        public bool claimed;
     }
 
     [Serializable]

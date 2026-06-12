@@ -20,7 +20,7 @@ namespace Domain.Gameplay.Tests
         [InlineData(typeof(UpgradeTrack), 8)]
         [InlineData(typeof(GameState), 8)]
         [InlineData(typeof(CurrencyType), 3)]
-        [InlineData(typeof(ChestType), 4)]
+        [InlineData(typeof(ChestType), 6)]   // None + Common/Rare/Epic/Legendary/World (contrato OpenChest, doc 07 §4)
         public void Enums_TemQuantidadeCanonicaDeValores(Type enumType, int expectedCount)
         {
             Assert.Equal(expectedCount, Enum.GetValues(enumType).Length);

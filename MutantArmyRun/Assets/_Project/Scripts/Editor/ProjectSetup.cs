@@ -106,6 +106,7 @@ namespace MutantArmy.Editor
             var upgrade = AddManager<UpgradeSystem>(services, "UpgradeSystem");
             var unit = AddManager<UnitManager>(services, "UnitManager");
             var reward = AddManager<RewardSystem>(services, "RewardSystem");
+            var mission = AddManager<MissionSystem>(services, "MissionSystem");
             var audio = AddManager<AudioManager>(services, "AudioManager");
             var gameManager = AddManager<GameManager>(services, "GameManager");
             var ui = AddManager<UIManager>(services, "UIManager");
@@ -148,7 +149,7 @@ namespace MutantArmy.Editor
             WireSerializedField(bootstrap, "_saveService", save);
             WireSerializedArray(bootstrap, "_managersInOrder", new Component[]
             {
-                remoteConfig, analytics, ads, iap, economy, upgrade, unit, reward, audio, ui
+                remoteConfig, analytics, ads, iap, economy, upgrade, unit, reward, mission, audio, ui
             });
 
             // Splash: orçamento de boot de 2,5 s — gradiente do skin + logo (doc 12 §2.2).
@@ -245,6 +246,10 @@ namespace MutantArmy.Editor
             WireSerializedField(menu, "_coinsText", coins);
             WireSerializedField(menu, "_gemsText", gems);
             WireSerializedField(menu, "_levelText", levelText);
+
+            // Telas de meta (SCR-06/07/08/09 + Diário) + tab bar de navegação, ligadas ao menu
+            // (brief F4): construídas e costuradas em separado pela MetaScreensFactory.
+            MetaScreensFactory.Build(canvas, menu);
 
             string path = ScenesFolder + "/Main.unity";
             EditorSceneManager.SaveScene(scene, path);

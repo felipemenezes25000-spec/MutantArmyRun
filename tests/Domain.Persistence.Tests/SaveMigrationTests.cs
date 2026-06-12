@@ -109,6 +109,32 @@ namespace Domain.Persistence.Tests
         }
 
         [Fact]
+        public void SaveV1_AtravessaAteV4_ComCamposDeRetencaoNormalizados()
+        {
+            // gates incrementais até o atual (v4): a lista de missões nasce vazia, contadores em 0.
+            var d = SaveV1Legado();
+            d.dailyMissions = null;   // campo inexistente na v1 → null no JSON
+            SaveMigration.Migrate(d);
+            Assert.Equal(4, d.schemaVersion);
+            Assert.NotNull(d.dailyMissions);
+            Assert.Empty(d.dailyMissions);
+            Assert.Equal(0, d.chestPityCounter);
+            Assert.Equal(0L, d.lastLoginRewardUnix);
+            Assert.Equal(0L, d.lastMissionResetUnix);
+        }
+
+        [Fact]
+        public void SaveV3_SoRecebeGateV4()
+        {
+            // dados v3 preservados; só o gate v4 roda (lista de missões normalizada).
+            var d = new SaveData { schemaVersion = 3, coins = 777, dailyMissions = null };
+            SaveMigration.Migrate(d);
+            Assert.Equal(4, d.schemaVersion);
+            Assert.Equal(777L, d.coins);
+            Assert.NotNull(d.dailyMissions);
+        }
+
+        [Fact]
         public void SaveDeVersaoFutura_NaoEhRebaixado()
         {
             // app antigo lendo save de app novo: nunca regredir a versão (dados ficam como estão)

@@ -43,6 +43,12 @@ namespace MutantArmy.Core
         public Func<bool> ReviveAlreadyUsed { get; set; }              // SaveSystem.Data.usedReviveThisLevel
         public Action ReviveCrowd { get; set; }                        // CrowdManager.Revive
 
+        // ---- Bônus de meta no início da corrida (CANON §9 / doc 07 §5.3) ----
+        // Owner = Meta (UpgradeSystem.GetRunStartBonuses); consumidor = Gameplay
+        // (LevelManager.BeginRun). Meta e Gameplay são camadas-irmãs (§2.3) — o provider
+        // trafega por aqui. Ausente (provider null) ⇒ RunStartBonuses.None (jogo neutro).
+        public Func<RunStartBonuses> RunStartBonusProvider { get; set; }
+
         /// <summary>Chamado pelo GameBootstrap (§3.3) — a pilha nasce em Boot.</summary>
         public void Init()
         {

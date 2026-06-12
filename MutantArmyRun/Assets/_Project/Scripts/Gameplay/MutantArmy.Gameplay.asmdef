@@ -4,6 +4,7 @@
     "references": [
         "MutantArmy.Domain",
         "MutantArmy.Core",
+        "MutantArmy.UI",
         "Unity.TextMeshPro",
         "Unity.RenderPipelines.Core.Runtime"
     ],

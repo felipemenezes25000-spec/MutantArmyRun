@@ -591,11 +591,13 @@ namespace MutantArmy.Editor
         {
             var set = new RewardSet();
 
-            // CANON §8: boss de mundo dá 10 gemas; §16: fase 7 = boss de mundo M1 + baú grande.
-            // Pool de carta inclui o roster expandido (Raro/Épico/Lendário) — boss de mundo
-            // é a principal fonte grátis de tropas fortes (anti pay-to-win, CANON §11).
+            // CANON §8: boss de mundo dá 10 gemas; §16: fase 7 = boss de mundo M1 + baú "De Mundo".
+            // O baú De Mundo (doc 07 §4: 10 pacotes 40/35/20/5%, 15 gemas, sem moedas) entra por
+            // ChestType.World — RewardSystem.GrantReward abre o reward.chest na hora (não é mais
+            // decorativo). Pool de carta inclui o roster expandido (Raro/Épico/Lendário) — boss de
+            // mundo é a principal fonte grátis de tropas fortes (anti pay-to-win, CANON §11).
             set.WorldBoss = ConfigureReward("Reward_WorldBoss", coins: 0, gems: 10, playerXp: 0,
-                chest: ChestType.Rare, cardDropChance: 0.30f, shardAmount: 10,
+                chest: ChestType.World, cardDropChance: 0.30f, shardAmount: 10,
                 cardPool: new[]
                 {
                     units.Mage, units.Giant, units.Ninja, units.FlameTrooper, units.FrostTrooper,
