@@ -156,8 +156,8 @@ namespace MutantArmy.UI
             int slot = _nextMutationSlot % _mutationSlotTexts.Length;
             _nextMutationSlot = (slot + 1) % _mutationSlotTexts.Length;
             if (_mutationSlotTexts[slot] == null) return;
-            string label = string.IsNullOrEmpty(mutation.displayNameKey) ? mutation.mutationId : mutation.displayNameKey;
-            _mutationSlotTexts[slot].text = string.IsNullOrEmpty(label) ? "?" : label.ToUpperInvariant();
+            // displayName PT-BR (MetaText resolve + fallback humanizado) — nunca a chave crua "MUT_ARMOR_NAME".
+            _mutationSlotTexts[slot].text = MetaText.MutationName(mutation);
         }
 
         private void RenderCoins()

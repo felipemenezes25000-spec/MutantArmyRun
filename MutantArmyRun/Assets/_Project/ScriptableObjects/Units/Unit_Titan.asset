@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_titan
   displayNameKey: unit_titan_name
+  displayName: "Tit\xE3"
   rarity: 3
   supplyCost: 25
   baseHp: 320

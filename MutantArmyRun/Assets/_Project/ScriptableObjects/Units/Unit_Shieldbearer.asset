@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_shieldbearer
   displayNameKey: unit_shieldbearer_name
+  displayName: Escudeiro
   rarity: 0
   supplyCost: 3
   baseHp: 30

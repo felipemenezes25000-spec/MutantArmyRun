@@ -48,6 +48,13 @@ namespace MutantArmy.Domain
         public int loginStreak;
         public int sessionCount;
 
+        // FTUE / onboarding (doc 14 §6): a 1ª corrida da fase 1 mostra dicas visuais não
+        // bloqueantes (arraste + escolha de portal). Campo BOOL aditivo: saves antigos sem o
+        // campo no JSON desserializam como false — o tutorial reaparece UMA vez para eles e
+        // é gravado true ao fim da 1ª fase, jamais voltando. Default false em save novo, então
+        // instalações frescas veem o onboarding exatamente uma vez (contrato do TutorialController).
+        public bool tutorialSeen;
+
         // Retenção — login diário e missões (v4, aditivo; doc 07 §2/§3)
         public long lastLoginRewardUnix;                    // último login diário reivindicado (dia-calendário UTC)
         public long lastMissionResetUnix;                   // último reset das diárias (UTC); 0 = nunca geradas

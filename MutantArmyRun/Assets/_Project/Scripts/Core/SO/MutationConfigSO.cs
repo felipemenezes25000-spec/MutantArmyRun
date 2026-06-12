@@ -11,6 +11,8 @@ namespace MutantArmy.Core
     public class MutationConfigSO : ScriptableObject
     {
         public string mutationId, displayNameKey;    // "wings", "laser", "armor", "size"...
+        public string displayName;                   // nome amigável PT-BR já resolvido (ex.: "Armadura");
+                                                     // o HUD de mutação usa este campo direto — sem chave de loc crua.
         public Rarity rarity;
         public float dpsMult = 1f, hpMult = 1f, speedMult = 1f, sizeMult = 1f;
         public bool grantsFlight;                    // asas: ignora obstáculos de chão

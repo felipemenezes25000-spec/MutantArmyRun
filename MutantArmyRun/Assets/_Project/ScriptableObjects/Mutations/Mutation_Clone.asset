@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.MutationConfigSO
   mutationId: mut_clone
   displayNameKey: mut_clone_name
+  displayName: Clonagem
   rarity: 3
   dpsMult: 1.5
   hpMult: 1.5

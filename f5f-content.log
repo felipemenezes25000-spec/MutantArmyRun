@@ -1,0 +1,655 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.4/staging' branch; Version is '6000.4.8f1 (f8b72d3d7343) revision 16299821'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Channel LicenseClient-Felipe doesn't exist
+OS: 'Windows 11  (10.0.26200) Professional' Language: 'pt' Physical Memory: 32694 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-06-12T16:02:17Z
+[Licensing::Module] Successfully launched the LicensingClient (PId: 16704)
+Starting IPC server.
+
+COMMAND LINE ARGUMENTS:
+D:\6000.4.8f1\Editor\Unity.exe
+-batchmode
+-nographics
+-quit
+-projectPath
+C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+-executeMethod
+MutantArmy.Editor.MvpContentFactory.CreateAll
+-logFile
+C:\Users\Felipe\Downloads\jogo test\f5f-content.log
+Successfully changed project path to: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+C:/Users/Felipe/Downloads/jogo test/MutantArmyRun
+Waiting for clients to connect on \\.\pipe\Unity-LicenseClient-Felipe, press Ctrl-C to exit.
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Player connection [45816]  Target information:
+
+Player connection [45816]  * "[IP] 172.29.112.1 [Port] 55504 [Flags] 2 [Guid] 3584778073 [EditorId] 3584778073 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [45816]  * "[IP] 192.168.56.1 [Port] 55504 [Flags] 2 [Guid] 3584778073 [EditorId] 3584778073 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [45816]  * "[IP] 192.168.15.133 [Port] 55504 [Flags] 2 [Guid] 3584778073 [EditorId] 3584778073 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [45816] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [45816] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Felipe" at "2026-06-12T16:02:17.390717Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 16704, path: "D:/6000.4.8f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Package Manager] Connected to IPC stream "Upm-41808" after 0.3 seconds.
+[Licensing::Module] Licensing is not yet initialized.
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.1+9fbee8e
+  Session Id:              8c4663f889d74b369863eeca4aaea0a3
+  Correlation Id:          1461dff546e46363e86776f2a8d30521
+  External correlation Id: 3435954938534603022
+  Machine Id:              +wcfUDhktwXGsUv466LQ/t6VYpk=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-Felipe" (connect: 0.37s, validation: 0.29s, handshake: 0.10s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Felipe-notifications" at "2026-06-12T16:02:17.7770876Z"
+[Licensing::Module] Connected to LicensingClient (PId: 16704, launch time: 0.00, total connection time: 0.76s)
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 4674205611919-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.01
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.81s
+[Licensing::Module] Licensing is initialized (took 0.15s).
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Initialize engine version: 6000.4.8f1 (f8b72d3d7343)
+[Subsystems] Discovering subsystems at path D:/6000.4.8f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/Felipe/Downloads/jogo test/MutantArmyRun/Assets
+Forcing GfxDevice: Null
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Initialize mono
+Mono path[0] = 'D:/6000.4.8f1/Editor/Data/Managed'
+Mono path[1] = 'D:/6000.4.8f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'D:/6000.4.8f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56808
+CodeReloadManager initialized
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.UWP.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Registered in 0.010422 seconds.
+Native extension for Android target not found
+Native extension for UWP target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.414 seconds
+Domain Reload Profiling: 930ms
+	BeginReloadAssembly (176ms)
+	RebuildCommonClasses (38ms)
+	RebuildNativeTypeToScriptingClass (12ms)
+	initialDomainReloadingComplete (78ms)
+	LoadAllAssembliesAndSetupDomain (210ms)
+		LoadAssemblies (177ms)
+		AnalyzeDomain (199ms)
+			TypeCache.Refresh (198ms)
+				TypeCache.ScanAssembly (184ms)
+	FinalizeReload (416ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (87ms)
+			BeforeProcessingInitializeOnLoad (82ms)
+			ProcessInitializeOnLoadAttributes (106ms)
+			ProcessInitializeOnLoadMethodAttributes (70ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 49 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.searcher@4.9.4 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.searcher@d45a78918735)
+    com.unity.burst@1.8.29 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.burst@6bb9aca3ef38)
+    com.unity.mathematics@1.3.3 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.mathematics@19a9377c4ffa)
+    com.unity.nuget.mono-cecil@1.11.6 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.test-framework.performance@3.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.test-framework.performance@aa81a99c4a75)
+  Built-in packages:
+    com.unity.render-pipelines.universal@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.universal@13e5115b98bf)
+    com.unity.ugui@2.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.ugui@a9ea81766fbd)
+    com.unity.test-framework@1.6.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.test-framework@76560ee600cb)
+    com.unity.modules.accessibility@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.physics2d)
+    com.unity.modules.screencapture@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.terrainphysics)
+    com.unity.modules.tilemap@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.tilemap)
+    com.unity.modules.ui@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.video)
+    com.unity.modules.vr@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vr)
+    com.unity.modules.wind@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.hierarchycore)
+    com.unity.ext.nunit@2.0.5 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.ext.nunit@d8c07649098d)
+    com.unity.render-pipelines.core@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.core@6f62546dd936)
+    com.unity.shadergraph@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.shadergraph@33f3b0a71b9a)
+    com.unity.render-pipelines.universal-config@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.universal-config@0db4263b9e6b)
+    com.unity.collections@6.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.collections@5b6ebd78ccc0)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.04 seconds
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:80
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - 200 - application/grpc 29.9526ms
+Starting: D:\6000.4.8f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: C:/Users/Felipe/Downloads/jogo test/MutantArmyRun
+DisplayProgressbar: Compiling Scripts
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.runtime.interopservices.windowsruntime has duplicate hint path. Ignoring "D:\6000.4.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Runtime.InteropServices.WindowsRuntime.dll" in favor of "D:\6000.4.8f1\Editor\Data\NetStandard\Extensions\2.0.0\System.Runtime.InteropServices.WindowsRuntime.dll"
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.componentmodel.composition has duplicate hint path. Ignoring "D:\6000.4.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\System.ComponentModel.Composition.dll" in favor of "D:\6000.4.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.ComponentModel.Composition.dll"
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Burst.Cecil, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.burst@6bb9aca3ef38\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - 200 - application/grpc 95.1223ms
+ExitCode: 0 Duration: 0s344ms
+[546/688    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+*** Tundra build success (0.31 seconds), 1 items updated, 688 evaluated
+AssetDatabase: script compilation time: 0.792129s
+Begin MonoManager ReloadAssembly
+Assembly Assembly-CSharp-Editor-firstpass.dll at Library/ScriptAssemblies/Assembly-CSharp-Editor-firstpass.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp-Editor.dll at Library/ScriptAssemblies/Assembly-CSharp-Editor.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp-firstpass.dll at Library/ScriptAssemblies/Assembly-CSharp-firstpass.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp.dll at Library/ScriptAssemblies/Assembly-CSharp.dll not valid. Loading of assembly skipped.
+Assembly TestNewCustomAssembly.dll at Library/ScriptAssemblies/TestNewCustomAssembly.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.BurstCompatibilityGen.dll at Library/ScriptAssemblies/Unity.Collections.BurstCompatibilityGen.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.DocCodeSamples.dll at Library/ScriptAssemblies/Unity.Collections.DocCodeSamples.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.PerformanceTests.dll at Library/ScriptAssemblies/Unity.Collections.PerformanceTests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.Tests.dll at Library/ScriptAssemblies/Unity.Collections.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.Tests.Playmode.dll at Library/ScriptAssemblies/Unity.Collections.Tests.Playmode.dll not valid. Loading of assembly skipped.
+Assembly Unity.Mathematics.Tests.dll at Library/ScriptAssemblies/Unity.Mathematics.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Nuget.Mono-Cecil.dll at Library/ScriptAssemblies/Unity.Nuget.Mono-Cecil.dll not valid. Loading of assembly skipped.
+Assembly Unity.PathTracing.Editor.Tests.dll at Library/ScriptAssemblies/Unity.PathTracing.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.PathTracing.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.PathTracing.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Core.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Core.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Config.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Config.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Searcher.EditorTests.dll at Library/ScriptAssemblies/Unity.Searcher.EditorTests.dll not valid. Loading of assembly skipped.
+Assembly Unity.ShaderGraph.Editor.Tests.dll at Library/ScriptAssemblies/Unity.ShaderGraph.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.TextMeshPro.Editor.Tests.dll at Library/ScriptAssemblies/Unity.TextMeshPro.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.TextMeshPro.Tests.dll at Library/ScriptAssemblies/Unity.TextMeshPro.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.UnifiedRayTracing.Editor.Tests.dll at Library/ScriptAssemblies/Unity.UnifiedRayTracing.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly UnityEditor.UI.Common.Tests.dll at Library/ScriptAssemblies/UnityEditor.UI.Common.Tests.dll not valid. Loading of assembly skipped.
+Assembly UnityEditor.UI.EditorTests.dll at Library/ScriptAssemblies/UnityEditor.UI.EditorTests.dll not valid. Loading of assembly skipped.
+Assembly UnityEngine.UI.Tests.dll at Library/ScriptAssemblies/UnityEngine.UI.Tests.dll not valid. Loading of assembly skipped.
+Native extension for Android target not found
+Native extension for UWP target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  2.474 seconds
+Domain Reload Profiling: 3517ms
+	BeginReloadAssembly (576ms)
+		DisableScriptedObjects (43ms)
+		CreateAndSetChildDomain (154ms)
+	RebuildCommonClasses (37ms)
+	RebuildNativeTypeToScriptingClass (12ms)
+	initialDomainReloadingComplete (68ms)
+	LoadAllAssembliesAndSetupDomain (349ms)
+		LoadAssemblies (558ms)
+		AnalyzeDomain (123ms)
+			TypeCache.Refresh (82ms)
+				TypeCache.ScanAssembly (73ms)
+			BuildScriptInfoCaches (31ms)
+			ResolveRequiredComponents (9ms)
+	FinalizeReload (2475ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (44ms)
+			BeforeProcessingInitializeOnLoad (148ms)
+			ProcessInitializeOnLoadAttributes (1886ms)
+			ProcessInitializeOnLoadMethodAttributes (179ms)
+		AwakeInstancesAfterBackupRestoration (36ms)
+(Values over 0.050ms)
+Asset Pipeline Refresh (id=a84e7a3d3e23aef42b26059081aeea4f): Total: 4.745 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=2798 ms
+		Asset DB Callback time: managed=25 ms, native=38 ms
+		Scripting: domain reloads=1, domain reload time=1046 ms, compile time=793 ms, other=40 ms
+		Project Asset Count: scripts=882, non-scripts=2946
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokePackagesCallback: 41.838ms
+	ApplyChangesToAssetFolders: 0.673ms
+	Scan: 76.420ms
+	CategorizeScriptCompilationAssets: 19.747ms
+	ProcessAssetsWithTransientArtifactChanges: 37.090ms
+	CategorizeAssets: 45.561ms
+	CompileScripts: 793.265ms
+	ImportOutOfDateAssets: 2478.996ms (2476.941ms without children)
+		UnloadImportedAssets: 1.205ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.419ms
+		OnDemandSchedulerStart: 0.411ms
+	PostProcessAllAssets: 25.534ms
+		MonoPostProcessAllAssets: 25.476ms
+			UniversalRenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 9.930ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 2.120ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 1.802ms
+			SyncVS.PostprocessSyncProject 1.221ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.801ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.333ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.220ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.160ms
+	UnloadStreamsBegin: 1.113ms
+	PersistCurrentRevisions: 0.093ms
+	GenerateScriptTypeHashes: 2.265ms
+	GenerateScriptTypeSerializationHashes: 4.391ms
+	Untracked: 1212.866ms
+
+Application.AssetDatabase Initial Refresh End
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Scanning for USB devices : 26.520ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-MutantArmyRun
+Unloading 84 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 3423 unused Assets / (10.3 MB). Loaded Objects now: 4203.
+Memory consumption went from 175.7 MB to 165.4 MB.
+Total: 10.636900 ms (FindLiveObjects: 0.238500 ms CreateObjectMapping: 0.203200 ms MarkObjects: 5.453300 ms  DeleteObjects: 4.737700 ms)
+
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_023.asset using Guid(002358227873d4549a0e0cffed3f3238) (NativeFormatImporter) -> (Import Result ID: '473c2c8ce338b07c197be32fee9e47f5') in 0.0082195 seconds [static dependencies only]. Details - ImportResultOutputID=8065d80c35efc5d1853b0d2b1f745ea9 DependenciesID=ceac0f45c64f75ed326728e5eb0b8823 StaticDependenciesID=2d6a7f94279e2dc2f491679e40392609 
+Start importing Assets/_Project/ScriptableObjects/Balance/Rarity_Rare.asset using Guid(00e9115672cf7924192d1b4509b89b57) (NativeFormatImporter) -> (Import Result ID: '912515edc84c9735dc1f1d07955fe989') in 0.0026927 seconds [static dependencies only]. Details - ImportResultOutputID=ab3a5d73747e138a762861e818f03863 DependenciesID=dad3a32388608d15f43eb8a64cfdb306 StaticDependenciesID=5be07262e49bfa692a7e7a359f649c6c 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ElementFire.asset using Guid(00eaa93e54e620d48b5fb754e2e07f1f) (NativeFormatImporter) -> (Import Result ID: 'fb37b20bc5a77b857078aad202247e7a') in 0.0026781 seconds [static dependencies only]. Details - ImportResultOutputID=0207247c46d281ddcf0d0a980aae60c3 DependenciesID=c63762f1873772973b71dc8b52ca8d70 StaticDependenciesID=47dcf1d60522a650fba724cfa4df07ab 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_063.asset using Guid(00bc1ca90ef0b114fa6dab4d37fc1b5d) (NativeFormatImporter) -> (Import Result ID: '34b4081a05d11e6c893abd7532b83922') in 0.0027069 seconds [static dependencies only]. Details - ImportResultOutputID=ad65d6a7052713d588518501feb1f99d DependenciesID=ac694023ff479cdb1bd325afa360338d StaticDependenciesID=a97d7522da11251d44b7c28351869085 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_040.asset using Guid(10a80ab2a5544ca479486eb4b9d2430b) (NativeFormatImporter) -> (Import Result ID: 'cfce648743c66b30658d2faf3f196624') in 0.0025971 seconds [static dependencies only]. Details - ImportResultOutputID=9c9408fe1c17d1766de83d5a9cf4ecef DependenciesID=ebf481cc202a976a4ed4280b36bf7eee StaticDependenciesID=1e607e376e06339198e78888be38e081 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_044.asset using Guid(30d10c32c18b0954d83bd829cd57b812) (NativeFormatImporter) -> (Import Result ID: '319420d5117f87eb270b5184e266833f') in 0.0027133 seconds [static dependencies only]. Details - ImportResultOutputID=2690a607cfed0afad420a67fc0728369 DependenciesID=3353eff0c42735cb0895fe3d79bf591f StaticDependenciesID=af6e5247d5ccf6cbdedf29fe383fb0b6 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M9_WarDrone.asset using Guid(5027020e21c62c640a37b6f61d8ecc8f) (NativeFormatImporter) -> (Import Result ID: 'f1379d3aa14164a2cbf5bbb6df47e29a') in 0.002544 seconds [static dependencies only]. Details - ImportResultOutputID=f5593594245ede326852bf6f913090ca DependenciesID=a7cbc6561c281f4284e4b1e8ef1205c0 StaticDependenciesID=1ea3a6e081a05cb1a301925d87c68901 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_095.asset using Guid(70f18dd447f281446928116c2ef8be5e) (NativeFormatImporter) -> (Import Result ID: '9564b540781bd386848431fc4edb5407') in 0.0026185 seconds [static dependencies only]. Details - ImportResultOutputID=44664a0a8f92b147de7bca67c5613ee3 DependenciesID=12d1b5c7ed4bce1ed4d05a4a8e806425 StaticDependenciesID=059eab92d84d7e5a6fa525f18692078c 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_077.asset using Guid(706b916a9ee519245bde3093033021ef) (NativeFormatImporter) -> (Import Result ID: '6bb4cb27b0d88e7a47aca74d631d93b6') in 0.0025617 seconds [static dependencies only]. Details - ImportResultOutputID=acc6cd00c60e540e64eb6ec49e8dcc7b DependenciesID=6104923f48e2840c5c6d83163ec520e6 StaticDependenciesID=caa0574564cae8b602b8a1f28e56460b 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_076.asset using Guid(90487e944b2127e4c85b6d265bff8fcc) (NativeFormatImporter) -> (Import Result ID: 'f585f90e726ba79057fed585539e46dd') in 0.002691 seconds [static dependencies only]. Details - ImportResultOutputID=008fe8a77505e55ff66d143d3a9848ad DependenciesID=565ad50cc9f1c07dab9fbfd2c666b430 StaticDependenciesID=f4f145c9b7b866208e2c038e8efe04c6 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M7_ColossusKnight.asset using Guid(9009ecfafa8cb7e47962328857e9b0df) (NativeFormatImporter) -> (Import Result ID: '3b1c95007b68524f91089409cc98bd58') in 0.0028242 seconds [static dependencies only]. Details - ImportResultOutputID=a9c672c21a4da7afed7dc2ff319e9461 DependenciesID=96c31a99a368f276577abb6b7d8314d1 StaticDependenciesID=7d0b8a9a635e460bb42b3f063abb5f55 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_Add10.asset using Guid(b076fdd235389054aa34b310df31a68f) (NativeFormatImporter) -> (Import Result ID: '74579d37682d5487c3a60bb17dca2269') in 0.0028214 seconds [static dependencies only]. Details - ImportResultOutputID=a2e1509867206f9b1f2a93cde8b102dc DependenciesID=42b79f1ce802f6882f0162e68fc44467 StaticDependenciesID=08432598374ecc7990510ac4740a1633 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ClassArcher.asset using Guid(c04b9ecbc215f6940a114db28178eb39) (NativeFormatImporter) -> (Import Result ID: 'dfe4fbdd97716dfeb20197191a67a400') in 0.0027271 seconds [static dependencies only]. Details - ImportResultOutputID=eeaac136e7faf2c6e1aaf056f5b32847 DependenciesID=64772427441b4a06cce5a626e55f98dc StaticDependenciesID=1c47af1eb0b70e3f56a9a40f801b7113 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Laser.asset using Guid(c0bc8cc622aaa394e8ea30d773b3a794) (NativeFormatImporter) -> (Import Result ID: '9f0e9507e7f57a76af16760c9911488f') in 0.0025772 seconds [static dependencies only]. Details - ImportResultOutputID=a3435e372554a70cb521b61026f1414a DependenciesID=fccece9c888b08ebfac334e0f15154a3 StaticDependenciesID=5dc9a3fa7f0269c2aacb9f7a74f4df91 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_033.asset using Guid(d06bced2ba73fb644b5f81e02fa35b23) (NativeFormatImporter) -> (Import Result ID: '3caba326d08781099a9912e0aef304e5') in 0.0027184 seconds [static dependencies only]. Details - ImportResultOutputID=062e40fbfb35548e690e227b49c4e458 DependenciesID=f95017b8047b18094dace48be71e3987 StaticDependenciesID=cc950919e16a2b9f1520be2b0d641af6 
+Start importing Assets/_Project/ScriptableObjects/Rewards/Reward_WorldBoss.asset using Guid(e07383de2fb4c12469b4c1e1f6a7e311) (NativeFormatImporter) -> (Import Result ID: '5bb0364742c4792c8abced687685c2c7') in 0.0026146 seconds [static dependencies only]. Details - ImportResultOutputID=221c92e1edb79e2679d3a959ad4e390d DependenciesID=2180929d4a2cc1e362fdf424adc04842 StaticDependenciesID=36244fc399d025efd227df383b545f47 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M1_GolemStone.asset using Guid(f014fe0b697b9644b9b67dde425ba453) (NativeFormatImporter) -> (Import Result ID: '7dc934f7664b3e669f13b679c41ed3f0') in 0.0026421 seconds [static dependencies only]. Details - ImportResultOutputID=7d3f6712d0fc9153232060688b6c2cbc DependenciesID=a40e3cebdf67094bd7b5a4903b89fa51 StaticDependenciesID=e9d76aa86b3aba4cae62b404f9f5d549 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_092.asset using Guid(01cae23d567fd934fbb9547b423c2e9e) (NativeFormatImporter) -> (Import Result ID: 'bf3f01ad33c9c0ad02e14953bbfe0684') in 0.0027628 seconds [static dependencies only]. Details - ImportResultOutputID=dddfc0e8736a547f90e00adcb647eb1b DependenciesID=09ecb3fb25e7764a5dd1f7ebfaf7b852 StaticDependenciesID=32fd7445f2c6e93c0f3145ad2e009730 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_064.asset using Guid(11b5f299ed9917543a0fc5f00dee7d5f) (NativeFormatImporter) -> (Import Result ID: '838535f0df0d6931f567a61f48f1bde2') in 0.0025158 seconds [static dependencies only]. Details - ImportResultOutputID=21c25e5f1854abfd583745da89e953f2 DependenciesID=012e61b9db65f8ef81a343067825f2a1 StaticDependenciesID=7849bd6f59f7aaf98cd0f223c659c1b4 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Dragon.asset using Guid(11fffe3fdb68ca5418f51762f0d806fe) (NativeFormatImporter) -> (Import Result ID: '8247d30f6b0ba37856ed7a4a7412ef60') in 0.002557 seconds [static dependencies only]. Details - ImportResultOutputID=6c7d46301ee8aa5bd626ed7022a6c49b DependenciesID=8994898d486cf9e2adbafcaed14c1d89 StaticDependenciesID=0109d8495cce8efacffa5fc9826c8ea5 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Wings.asset using Guid(516e1cfab582fac409b501aa55ab9aff) (NativeFormatImporter) -> (Import Result ID: '50475839a63539099a3abeae72116dcb') in 0.002655 seconds [static dependencies only]. Details - ImportResultOutputID=373ea22786c3fef3a40ac46fbcc4146c DependenciesID=338d1b70c4ad04c424d045461f4f7b7c StaticDependenciesID=a2a264ca3b509096c131b92f8001191a 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_043.asset using Guid(61b42bb900384b042bb2fd4592e16be8) (NativeFormatImporter) -> (Import Result ID: '2a1cbc3bafc108bc39049b0a5a16c04d') in 0.0028718 seconds [static dependencies only]. Details - ImportResultOutputID=96caac957ff030cde335e857ed28158a DependenciesID=9f86833cb324d8ce381650fdd4938602 StaticDependenciesID=c76e4ae3db62f574759ccba2eac8b185 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_025.asset using Guid(b1c590d061160c04e963bea577625f61) (NativeFormatImporter) -> (Import Result ID: 'd5b119878a29ecde8892b82fdda31fce') in 0.0025736 seconds [static dependencies only]. Details - ImportResultOutputID=995805ed77c427b5d316e56b718c3037 DependenciesID=06449769774317b81aef8706c9f983fa StaticDependenciesID=85afed8220acfe12ca238eba1bfdc1e7 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_MutArmor.asset using Guid(c18e685bb2c7b2f4b9331b990ee2344c) (NativeFormatImporter) -> (Import Result ID: 'c6fcf92d9d1017d2c0f1758b18f71607') in 0.0025136 seconds [static dependencies only]. Details - ImportResultOutputID=2aab451f03d7c87b9f0e2019b1b24ae1 DependenciesID=f534499a2707ab11f4d172af010571f5 StaticDependenciesID=f8b9d9c8156167c957b7ef3f7db326e8 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Engineer.asset using Guid(12fec6676e7c64048a76f7a70bf039d2) (NativeFormatImporter) -> (Import Result ID: '13f8a143db6d60673ee0cce2699539e9') in 0.0025876 seconds [static dependencies only]. Details - ImportResultOutputID=7f5dc5e59be5914210a1bd80dab76b3c DependenciesID=ae63e4fe6470c845e49ddf77168723d1 StaticDependenciesID=40d167628ae3db797e0c80ed660e4664 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_090.asset using Guid(32725a28ce5fd7c4ebcfde354f1e3bb3) (NativeFormatImporter) -> (Import Result ID: 'cfd26406898111f912767dea252a8d7b') in 0.0028235 seconds [static dependencies only]. Details - ImportResultOutputID=2de90688f949c07d0e9492f3b4a8ab18 DependenciesID=c64697b4546ac18609a3958f0042e9e3 StaticDependenciesID=93b2b4a2a1acb73be4276858fc72dc1e 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_093.asset using Guid(52816501dd8b8d3448c236bfae14668f) (NativeFormatImporter) -> (Import Result ID: '6d6c90b881bd60606d30318fac1c46a6') in 0.0026714 seconds [static dependencies only]. Details - ImportResultOutputID=d676c15e0d3ad25d95a770aac69fb408 DependenciesID=30ed714c211f83a8087e1eb32558f6b8 StaticDependenciesID=0c4915daf2e6cb49e847add39d8ed7f9 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_096.asset using Guid(52ab3827a49c2334c8058e329e3b14e1) (NativeFormatImporter) -> (Import Result ID: '707cd25a62e44e705cd47b2b6a8b62bd') in 0.002712 seconds [static dependencies only]. Details - ImportResultOutputID=d14925d03f59a72e011903580e494075 DependenciesID=e01d8b31fb41156bb123d4784d6d100b StaticDependenciesID=08beef17cbefb016fb188f9372325bdf 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_013.asset using Guid(52fbff6027ea2ab459652e2fa022d311) (NativeFormatImporter) -> (Import Result ID: '75ee067c074ffe4239bbab106b7d8eb6') in 0.00257 seconds [static dependencies only]. Details - ImportResultOutputID=f386bccf9d4b26353a85ba10b8078481 DependenciesID=57ab59f4d994ae54fc952d238353ec8c StaticDependenciesID=cb00a0e75a46a58af2481a3c36898367 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_042.asset using Guid(82d6f42dc2efe0f47803be9dc4a3efac) (NativeFormatImporter) -> (Import Result ID: 'b588b88d6aa7153f36edaee444c6da22') in 0.0026153 seconds [static dependencies only]. Details - ImportResultOutputID=9fff09227dfdc33358519345fbbea248 DependenciesID=1b6e05a8381b4901eabbdd7653e1313f StaticDependenciesID=f9aebed6155ab9a9142a1098b54fa3d8 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Mage.asset using Guid(b23c7c69ea0fd88499450245d4ebedc1) (NativeFormatImporter) -> (Import Result ID: 'fdee08a2d1ff7afd52ad37ea0ef215ce') in 0.0026134 seconds [static dependencies only]. Details - ImportResultOutputID=f4be0d47a79137684f8468e194614d98 DependenciesID=20ef6557c9a1246b96812f2cc5a49278 StaticDependenciesID=1872910379a2bc682d912ecb5bbaa93f 
+Start importing Assets/_Project/ScriptableObjects/Balance/ElementChart_Default.asset using Guid(23c3ece3f88db6a4bbccfff7214ff243) (NativeFormatImporter) -> (Import Result ID: '9d394da7826df9b69083458f0ce82034') in 0.0025899 seconds [static dependencies only]. Details - ImportResultOutputID=99a00cbc01ac925d51fcf8b156022c44 DependenciesID=4b73ec5cc476d217188ca9314114b7b3 StaticDependenciesID=6fa3d13edce6d67b9a996c80830015de 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_041.asset using Guid(23f6d6474161fec42ba5d2309dae3f3e) (NativeFormatImporter) -> (Import Result ID: 'c2d002892821bef0e74a0ab1acf8c608') in 0.0027348 seconds [static dependencies only]. Details - ImportResultOutputID=bc89119c4863344d8cc5b459f766515a DependenciesID=8e604e53345219e37ef96226c328dc77 StaticDependenciesID=ec445123f031308fb1154274311855a2 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ClassNinja.asset using Guid(33aa962e86d255f43a34ab704ed18e0f) (NativeFormatImporter) -> (Import Result ID: '4dcb53b950d4b1b07a09ce673b535832') in 0.0025717 seconds [static dependencies only]. Details - ImportResultOutputID=9a62f639db6ca3fbe09647599ebd5553 DependenciesID=f82636b931a48e2d2d5ccd169d762da0 StaticDependenciesID=b259352487ef588e437c823f3388d6b7 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_072.asset using Guid(33cb4083ecdabc947a523c32f93cd79b) (NativeFormatImporter) -> (Import Result ID: 'ea88fe285f02a27c369a36757efd0033') in 0.0025684 seconds [static dependencies only]. Details - ImportResultOutputID=22f04eafbe938a04dc1db4a23aa5f1aa DependenciesID=63ea33d637751838953bdb5c502572b3 StaticDependenciesID=88edc2b85817cd94c1c0df39161f474e 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_009.asset using Guid(63a97e6863b59304abcae1e2a9f31273) (NativeFormatImporter) -> (Import Result ID: '12559089388749dfe37202312cfec6c6') in 0.0027089 seconds [static dependencies only]. Details - ImportResultOutputID=ba5f499000ba7f9fb22ad0888bdd00a3 DependenciesID=d1f69e5e5d2c828f36a4c6e5696cc0d0 StaticDependenciesID=4b0f321c9ae6527887e3401af7738f2b 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Necromancer.asset using Guid(638a3e16507c8294d9d575b2d9c6242f) (NativeFormatImporter) -> (Import Result ID: '575915c891819a2dc2f1c715ddf60716') in 0.0053566 seconds [static dependencies only]. Details - ImportResultOutputID=26b9273e6273479e3d7795aa00f5dae9 DependenciesID=cbde17eec2b21c825c41c05deb59f283 StaticDependenciesID=ffe1cb9dfffae0c545f9f439d88b43db 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_082.asset using Guid(7388030575d638f4f83372c4b13c780b) (NativeFormatImporter) -> (Import Result ID: '933ae02b57137729e80c7c53ee9b3814') in 0.0036529 seconds [static dependencies only]. Details - ImportResultOutputID=33b961f3764bf6516ba873d3bb7381a3 DependenciesID=3024cacc26056b68f8fb5d7e1157c27d StaticDependenciesID=24ae7e8dec1e60b2135d0eb4510c680b 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ClassMage.asset using Guid(73b9604b9defb144eb3f79cd94826601) (NativeFormatImporter) -> (Import Result ID: 'a846c45bea256dfce02a57ae1b2ba24b') in 0.002955 seconds [static dependencies only]. Details - ImportResultOutputID=5dc337592ac0d7f7d7deec0f100987b2 DependenciesID=e23d1d03cbc376feef396ecea75eb228 StaticDependenciesID=54e5416a138ea2e397a2222d995ebb1f 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_049.asset using Guid(a3cbd1eda1ef3b747b60482ac4df5e8a) (NativeFormatImporter) -> (Import Result ID: '5592ddae963a021605e29532f7620bef') in 0.0029843 seconds [static dependencies only]. Details - ImportResultOutputID=410b30a40a43e96e2bbf8db78a3662b9 DependenciesID=8a40db0840be56f93f1bdb6a28c945cd StaticDependenciesID=58b4fb9f0767c333a2bf50cc1dce2f2a 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_094.asset using Guid(a38de7eb0e3baad4b914f280bb4a58d7) (NativeFormatImporter) -> (Import Result ID: 'f14e7637ae0ba73a53c89307f49c11a0') in 0.0028753 seconds [static dependencies only]. Details - ImportResultOutputID=36c365763dd3ff2fd32ebaaad407de3e DependenciesID=3e96f7d692112c51dd48348d3307b76c StaticDependenciesID=de9844b4b2529bf214e83c78ef754281 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_084.asset using Guid(b3d814245cf409b4c81f680d22cdad58) (NativeFormatImporter) -> (Import Result ID: '65132ddb48263523c093f68af138015e') in 0.0030512 seconds [static dependencies only]. Details - ImportResultOutputID=82fe908529974b476ee9e66b7b467175 DependenciesID=ca1cc307c832798b1c942bf7d1feaeb0 StaticDependenciesID=06e9f6ed01a43a8e27a5084659b2052b 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_005.asset using Guid(c34dd10e04f761b41abf8cab84ffc4c8) (NativeFormatImporter) -> (Import Result ID: 'f083e6b22c654998cb4a88758284d858') in 0.0029809 seconds [static dependencies only]. Details - ImportResultOutputID=a59ef6e4d3c2e3d11a9d41ccc442074a DependenciesID=7011fb31dfd4647bb443b09a9a3dd130 StaticDependenciesID=a4e0c56562c4c7248b31fa0dd42186d7 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Shield.asset using Guid(e3b5fa3c31b3f93428366f2c0b92c3a7) (NativeFormatImporter) -> (Import Result ID: 'd973865e2cb3e7829d1f33651b5920bc') in 0.0025914 seconds [static dependencies only]. Details - ImportResultOutputID=728a79d58a8279487528ec635242bdd1 DependenciesID=4676c2cc4671e59c2e09457c582f1b5c StaticDependenciesID=3f1b174e4211802cd9f1da3620077060 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_004.asset using Guid(e388cc1918c54e14bbc34b795e06afe9) (NativeFormatImporter) -> (Import Result ID: '121187c7554fe433447b283694bd37a5') in 0.0027292 seconds [static dependencies only]. Details - ImportResultOutputID=4e68587cfba7f2dad18f7b348484d6e1 DependenciesID=cbacd5d18acc6d9acdd2d7768334bd5d StaticDependenciesID=bb52b70ac639c6e74411bd4c2f388a38 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_048.asset using Guid(e3c9276cb01c47f4d95d5f2d12bcf175) (NativeFormatImporter) -> (Import Result ID: 'e8d8c2bf3035a2714830a60d94ba9613') in 0.0025762 seconds [static dependencies only]. Details - ImportResultOutputID=2619c67576aae1a14247b77bff9b1c25 DependenciesID=25cf698d518f9a00f91a6e3f4a530809 StaticDependenciesID=19a076eea27778ad8c5f4469f9610ff7 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_AreaBlast.asset using Guid(e30e81e431b92764aa856d9a0e5268fe) (NativeFormatImporter) -> (Import Result ID: 'd4467f7928b3476d855079f5e522c98f') in 0.0026151 seconds [static dependencies only]. Details - ImportResultOutputID=c6a93db3f7505514d4f6b53386d5abf2 DependenciesID=b57cd25e2158e86918b5c97fece4aeea StaticDependenciesID=457dc7f7c91b9937d460e7bdad4beb15 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Shieldbearer.asset using Guid(f3359ee4d9c4a4d468fbef0431786626) (NativeFormatImporter) -> (Import Result ID: 'c30d01c60282ebdf17245e68dcc143f2') in 0.0026842 seconds [static dependencies only]. Details - ImportResultOutputID=046d49b75f073c264cb5bf2a3f4f3610 DependenciesID=00984ebe62eb52cb4a9c9c7e694cec90 StaticDependenciesID=9cb93a75e1113af239755413ecd67646 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Alien.asset using Guid(142fa305fc24bfc4eb1c8968d07c6757) (NativeFormatImporter) -> (Import Result ID: '82b6e363e6a61ff441aa7aa808eedc86') in 0.0026529 seconds [static dependencies only]. Details - ImportResultOutputID=c28a2df70cb32ea5ccd6b5658894ecf1 DependenciesID=86f21541809d71f029c28f7d34b516e5 StaticDependenciesID=79dbe40cc8e18477d3d0af63b8fcbbc4 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_069.asset using Guid(449b5afc55d9c434aaa7f23e72f4be2f) (NativeFormatImporter) -> (Import Result ID: '36734a2ffc71d64bf5f7e6766b6970f3') in 0.0028369 seconds [static dependencies only]. Details - ImportResultOutputID=f85fc53fb82fb94d54f14e277a8fdb1c DependenciesID=d95c20917f3836cf6e544d93397e3578 StaticDependenciesID=b2140d623bdab20f5b138f76626227c5 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M2_ZombieBruiser.asset using Guid(54b645c9c399fb740a47cc29d76fcc3a) (NativeFormatImporter) -> (Import Result ID: '81d71563370e1f00db321b04ce3676df') in 0.0025704 seconds [static dependencies only]. Details - ImportResultOutputID=12d194ed1ed5bd2f1148bff316f492ec DependenciesID=01160691b164454826cbae05c0de0744 StaticDependenciesID=72e202c3a562a30e95b0885792f5be1b 
+Start importing Assets/_Project/ScriptableObjects/Upgrades/Upgrade_StartDamage.asset using Guid(74c5705a709320f41b96966bcc3d16d4) (NativeFormatImporter) -> (Import Result ID: '6fb89eba2e016ade88699b5f798fa934') in 0.0025767 seconds [static dependencies only]. Details - ImportResultOutputID=7e2268990e48d9b56e7cbeb8968c5be0 DependenciesID=63769458bbb805973572a1775db20391 StaticDependenciesID=e384decc5b1d1febda17284a1b997a4f 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_WarAngel.asset using Guid(b498cd2bb9b2c4240aac690b106e887e) (NativeFormatImporter) -> (Import Result ID: 'cdcbb3955d9a559a708e66d17894483b') in 0.0028039 seconds [static dependencies only]. Details - ImportResultOutputID=f0f45b480719dad6e69cbac9fdb8e7bd DependenciesID=303c20fed32307d46d6ba5500a3d74ab StaticDependenciesID=497caf3e296f8355f24772cc8bcc6517 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_059.asset using Guid(b4cc4031683ed7a4f831da4b8cb9a5d9) (NativeFormatImporter) -> (Import Result ID: '6359105e951eadcc54b51444cf9547b9') in 0.0026761 seconds [static dependencies only]. Details - ImportResultOutputID=59a56b03e895fa5e5e7eb57706ff286d DependenciesID=b54e893272956f90a77abbc72744fe39 StaticDependenciesID=04b05bbb6eca81ef6b015ca59cabb335 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_008.asset using Guid(c45f28be94eca0a4f8ec2760a18e7df3) (NativeFormatImporter) -> (Import Result ID: '0c445f4eba337e1d33adfb0728e7ea85') in 0.002582 seconds [static dependencies only]. Details - ImportResultOutputID=caf24139a0780f7e7b45269d5ae9408f DependenciesID=b1cbf7b59c1c5c8766fba69bc19dd40a StaticDependenciesID=b6c748ae790ee29cb55a506af480699a 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_089.asset using Guid(d4b20bbf7bdfda74cbb3db16dd819671) (NativeFormatImporter) -> (Import Result ID: 'd4774c4585309b1842848bb60677e4d2') in 0.0032021 seconds [static dependencies only]. Details - ImportResultOutputID=23cb48d9eefde38c97e9ea2e073a5b0d DependenciesID=a14a74248b19489463f466208d521ab9 StaticDependenciesID=ac23101c7161c6400ea415a2c14ebc33 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W10_DimensaoFinal.asset using Guid(e462aafc2eb7b8b489c45c60eed95a71) (NativeFormatImporter) -> (Import Result ID: '8791ff5b70abae6e6a5c9b20b87d3704') in 0.0028258 seconds [static dependencies only]. Details - ImportResultOutputID=9e159437fd42b378f62f705df4befe37 DependenciesID=de0cba039e179abc3eea8c6f5bcd99ff StaticDependenciesID=128994c062dd5dd91e2c6e3bcbf2e25e 
+Start importing Assets/_Project/ScriptableObjects/Rewards/Reward_BossDefault.asset using Guid(1531c095ef3bfa8439b41b1643e6c3cc) (NativeFormatImporter) -> (Import Result ID: '36b1f898b7163e0d373406f8d37ba21d') in 0.0029399 seconds [static dependencies only]. Details - ImportResultOutputID=05cc1d4663433e6da806caa2dc98e368 DependenciesID=75e7bb84c68442a76fac20a5f85540e1 StaticDependenciesID=d55cbf4f8888d0b9fbeed193144ea917 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Titan.asset using Guid(35f7eadedb73af442b19a31907fa1ebe) (NativeFormatImporter) -> (Import Result ID: 'a46047f86933f33a11cbdf2266f5458e') in 0.0026109 seconds [static dependencies only]. Details - ImportResultOutputID=40e77df06a7bce0305a2a725dc264471 DependenciesID=907302e7361a3e3e6efe33d2682c676c StaticDependenciesID=9dd1828046c7d0e6acdabbea569c19cc 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Robot.asset using Guid(55b48b847079e524fa0c24bcc694d173) (NativeFormatImporter) -> (Import Result ID: '0bb1dd740a9ebb9b59bea86103a6364d') in 0.0025765 seconds [static dependencies only]. Details - ImportResultOutputID=27995d7b31220979cf408333cff04c47 DependenciesID=f6996e55153c15ce53a209a0f941cc30 StaticDependenciesID=11f95a5c6c972d03fa60b872aa0c24b8 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_019.asset using Guid(553f9da55aa15614b82ffa299d2797a7) (NativeFormatImporter) -> (Import Result ID: '21edcc2bb93d039665906733cfb9ac28') in 0.0026548 seconds [static dependencies only]. Details - ImportResultOutputID=051cfe23576529e7f961e811f79b76d9 DependenciesID=06ae550f97f2bb4135017a161a46680e StaticDependenciesID=be09e7a5789fed33f3db6551873c208a 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Mecha.asset using Guid(a534994da0950f04e95e581df344a6d1) (NativeFormatImporter) -> (Import Result ID: '19e8d338bd05f3e5f0843fff24e58fb2') in 0.0026044 seconds [static dependencies only]. Details - ImportResultOutputID=ace08515a7a060c363b8a957f3c6c9d0 DependenciesID=3de760c9a1463c0175316ee71b185869 StaticDependenciesID=32375aa538811bc6d9e0ad171d48e0cb 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Clone.asset using Guid(a5cedade51bd88f48899e38fb99518dd) (NativeFormatImporter) -> (Import Result ID: 'ce0671c9c862fe15be918523fbcbf4c6') in 0.0025827 seconds [static dependencies only]. Details - ImportResultOutputID=988a1296be2685e42c32b0a0d5044314 DependenciesID=03d160d40bfeee6424d18c4f92b7acdf StaticDependenciesID=728a32b832e21c627aad273965b73260 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_010.asset using Guid(d5ed2d5144b107d43b1945aca3c1631d) (NativeFormatImporter) -> (Import Result ID: '3dce188d0bf0cc3dd867b9273c27e752') in 0.0026942 seconds [static dependencies only]. Details - ImportResultOutputID=6ec561304bfa20fc5e5c395cb4ac75f5 DependenciesID=26b7ceb923625a9f6d3bb75533be62fb StaticDependenciesID=8c1399a8a4412e680a1c176d2af78645 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M4_CarnivorousPlant.asset using Guid(e552c246a9808294f8c8631e9694b012) (NativeFormatImporter) -> (Import Result ID: '724f0dd478bbe17766e9de38dc326670') in 0.0025844 seconds [static dependencies only]. Details - ImportResultOutputID=26a619fb213cd44af15d8df9435282a2 DependenciesID=912093c3718fa813f37538e97b4a06ca StaticDependenciesID=fac8f0046d912b1cc810f12888b15a68 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_Minus10.asset using Guid(e58bf920109a9784d87bd6ffc328730e) (NativeFormatImporter) -> (Import Result ID: '36ed09e50f3fcd954cb28b4d1f30f9c2') in 0.0027997 seconds [static dependencies only]. Details - ImportResultOutputID=21e6167b3fce3abae855f563380be3a7 DependenciesID=022dcd6d4df1a71c276d964d0237032a StaticDependenciesID=7aba6f681038ce13bfae15d2dc283f5a 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Archer.asset using Guid(f55b01a8f10b4ea408cccbd75259a0c7) (NativeFormatImporter) -> (Import Result ID: '39d381f58f9de3da839baf115be0e3e4') in 0.0026078 seconds [static dependencies only]. Details - ImportResultOutputID=80e22f9b506863000512cf44795724e0 DependenciesID=ccdfef4f1d2061c8ce1cea5757981a0b StaticDependenciesID=9962f9186062b70c2c481ab8e9946172 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_071.asset using Guid(06990d25cca40e54fb5268f5de41fa49) (NativeFormatImporter) -> (Import Result ID: 'd6191491552094b6fa108e67cf587cf6') in 0.0026787 seconds [static dependencies only]. Details - ImportResultOutputID=a896965f34fbf58a3d56c7e4455a17cf DependenciesID=c17d54e5c252b98e663d71d545285e32 StaticDependenciesID=f3c0c1975b1d0f712ae3fcae5b20e12b 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_MutSpeed.asset using Guid(2680f7cb42570c94683231411af2db11) (NativeFormatImporter) -> (Import Result ID: '188d59945557e289fab5d6d11650acc6') in 0.0025338 seconds [static dependencies only]. Details - ImportResultOutputID=d47354f1c14610d3d08698e58e171c7a DependenciesID=92968ca5a35b2ee0a9ce2e6dd1f8fc13 StaticDependenciesID=002d62d1e9eee6c4c2c914c9ae2c4ca1 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W05_VulcaoGigantes.asset using Guid(36abc86a5a1a905488f394f86c8ae50b) (NativeFormatImporter) -> (Import Result ID: '0f54d5cd551d18d8d5ac0199ed95c5fe') in 0.0026183 seconds [static dependencies only]. Details - ImportResultOutputID=c4c63b7ced8b023254302e8b23b79000 DependenciesID=ef48010b18f0c399a695c25f05488c6b StaticDependenciesID=e8c5a520fcd063f5919ff72706272ec5 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_035.asset using Guid(363d3ac6c763bf5408a1d1916d3646c8) (NativeFormatImporter) -> (Import Result ID: 'cae8f6892c7581fc90c0c9e5fb249fee') in 0.0026091 seconds [static dependencies only]. Details - ImportResultOutputID=b742d9df41bbb61e9dab6bdfdc429323 DependenciesID=f461aa3dce2c95198cbdc35088a75396 StaticDependenciesID=51c2269db08870b73ed8e75f570ddad9 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_056.asset using Guid(46a716dc7b242b94ba9a70a51490834e) (NativeFormatImporter) -> (Import Result ID: '743ee1515075684093d368008515b11e') in 0.0026476 seconds [static dependencies only]. Details - ImportResultOutputID=0fe542961312da74e5e3ff90ecb5572b DependenciesID=e692ca8ca64f8e7f17b727f1b73d4b26 StaticDependenciesID=bb72402bf29befe25d1f14384c713651 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_098.asset using Guid(666887b51adb23f438e1793bac04d725) (NativeFormatImporter) -> (Import Result ID: '165373afccbd72766819ccd61ac69adb') in 0.0025251 seconds [static dependencies only]. Details - ImportResultOutputID=c4e26352b3deec931ec78f6b2b1d3922 DependenciesID=cbf1a0a673acab08593dcbc6c979e61a StaticDependenciesID=3d3dbe637dc0f96d996e5502e93800f9 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M4_CarnivorousSprout.asset using Guid(66c926289ec9a6143b8ae259e168258c) (NativeFormatImporter) -> (Import Result ID: '37dfcfe5165ada2ae945c9face23b449') in 0.0025535 seconds [static dependencies only]. Details - ImportResultOutputID=d04c2372dc0974df3bc1e2d8b4fd49a8 DependenciesID=b37d3e18abd7bc6bb2ab695373d5aa0d StaticDependenciesID=12267b78d2d0986747b4e57fcbe9ab05 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_MutRegen.asset using Guid(668b1cc4a1162f14ea1b0530a4fbdcd3) (NativeFormatImporter) -> (Import Result ID: '9996c7d1d9b2ff354ddc3771853703cd') in 0.0025597 seconds [static dependencies only]. Details - ImportResultOutputID=1be35499fb0f667582cfb9340adcc5ad DependenciesID=11b625e2a4a0b5c7edd19d5532604722 StaticDependenciesID=0985fa7b7fc1a3cad9cc29449e99b1df 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W07_ArenaMedieval.asset using Guid(86989292b1f9ef54c83314b3903ea7df) (NativeFormatImporter) -> (Import Result ID: '3ae94cb2bfa4cf760bedcae1364e0240') in 0.0028664 seconds [static dependencies only]. Details - ImportResultOutputID=f7bc7da84fa6bad924b03cdff19c0283 DependenciesID=290195222ee4befa979a93bc28ecb980 StaticDependenciesID=0325d76c3c6c9849f7247dac27cb0f72 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_058.asset using Guid(a690b7ab2e7ce73488be4a9413b33585) (NativeFormatImporter) -> (Import Result ID: 'becfcd90151e79c8fe7d6b2c0e49c019') in 0.0027959 seconds [static dependencies only]. Details - ImportResultOutputID=be877d812b5f10b3059d708187a6174f DependenciesID=56c13de64ce589731f59a55dc9957870 StaticDependenciesID=3c281d86cff5135bbc86bca8cf7e71c1 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_097.asset using Guid(a6ddd69739d62c544881e3e27dcd412e) (NativeFormatImporter) -> (Import Result ID: '2d9911b0746f4ca91fba4f62e7083590') in 0.0027068 seconds [static dependencies only]. Details - ImportResultOutputID=b8bf6d836c506ccb6a59b687f2f300ec DependenciesID=acf90df8a9d5b51dd6eb2f275f598034 StaticDependenciesID=01438135f7c7d60468875a72689ce423 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Soldier.asset using Guid(b62330503bdd9e643967758ddd46e014) (NativeFormatImporter) -> (Import Result ID: 'fedde45c635e44cb4e79f1ed6c37f6b1') in 0.0025859 seconds [static dependencies only]. Details - ImportResultOutputID=cc8cc3e3aca558ce2db2f575260af2ec DependenciesID=046efffd4b885b4a009c61a981224b4a StaticDependenciesID=0bf066e26d42c496a641684911df7e8b 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_088.asset using Guid(b6be01aa526bd4340afae3d3b1c9e61c) (NativeFormatImporter) -> (Import Result ID: '62e467ba0687fd41cfb5cc1b2627803e') in 0.0028573 seconds [static dependencies only]. Details - ImportResultOutputID=d401fc2f87f07e858ebff5bb6d0f4e5b DependenciesID=b0a53cce0856e971758ca74a63392a26 StaticDependenciesID=94cf29678651b4e46c69f2731323b911 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_065.asset using Guid(f6d85620140cadd48b6aa90b38c3b050) (NativeFormatImporter) -> (Import Result ID: '320141f3d318c81a7e178e01b82bbe50') in 0.0028319 seconds [static dependencies only]. Details - ImportResultOutputID=c3b0adb534df4b7d5fcd9451ffbb3ffe DependenciesID=a480e6b92331b1de26753079ac740c76 StaticDependenciesID=cd5f9c2f779ad608b1f0f4b6caab8a24 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_007.asset using Guid(073e7d42564e1c24db2e028b7ac3b881) (NativeFormatImporter) -> (Import Result ID: '9c8dcbb2d29a92cfe466cc1b9bd3d459') in 0.0026825 seconds [static dependencies only]. Details - ImportResultOutputID=5c45a94eb33d85f9acc33abd72ba187b DependenciesID=4fb8d23e2956f16f83732b013631b2dc StaticDependenciesID=bb17d980e3c970b63ca47ad4a81a1f7c 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_099.asset using Guid(073fd217f393b174ebd4bdb99ae2d860) (NativeFormatImporter) -> (Import Result ID: 'c101ab59c24e6d300ce3e788f97080e8') in 0.0026643 seconds [static dependencies only]. Details - ImportResultOutputID=e0525b43f9a4f2b93de1c1a6fe520f5e DependenciesID=c2fdc946f11a328c2e19043af102a4e9 StaticDependenciesID=6be4a659d19bdae596e68ea19ba0945f 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_068.asset using Guid(2733c6d8bb35fb14b88bd2653b9557d1) (NativeFormatImporter) -> (Import Result ID: '6d054d7f891eb1b2b67c62c4587d05c7') in 0.0026332 seconds [static dependencies only]. Details - ImportResultOutputID=3f787cb0c0976c4515547203fa20c312 DependenciesID=118b3fe755b668c2623f36d291edb357 StaticDependenciesID=e6c283c0f0676dc91b40b9169d413a11 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ElementIce.asset using Guid(27df6a20740bde345b2e1df545e74386) (NativeFormatImporter) -> (Import Result ID: '13e9d45f8a15556dbfc1f93fdda3b7ca') in 0.0028009 seconds [static dependencies only]. Details - ImportResultOutputID=6dff594827338b72cad1d5496423314a DependenciesID=36751c6e250a23f761e5ca34790fd3af StaticDependenciesID=a0ac517dd90ccc3aa1772ec4cb44441a 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_086.asset using Guid(772101983aed5224e851a696a194bbaa) (NativeFormatImporter) -> (Import Result ID: 'bebc52a87e33170edc18c8e5132820ec') in 0.0028586 seconds [static dependencies only]. Details - ImportResultOutputID=4400132c1875766821e73bb4f7caa6d6 DependenciesID=35927724adffd5eed6bffab01b836e5d StaticDependenciesID=c1d1e8d74c35a43678f9dd798025183f 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_014.asset using Guid(87238c3cf6827d442acd2d2895aa6815) (NativeFormatImporter) -> (Import Result ID: 'eeaa412c6ab0a3084c67b6211f673ed3') in 0.0026878 seconds [static dependencies only]. Details - ImportResultOutputID=00a27c0dd85f0fad9fedf3cd930de397 DependenciesID=ecb2748019c71dbf0bb168ed56cde916 StaticDependenciesID=fe16db39a6d46cc82d17b91048edd8ef 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Medic.asset using Guid(879456582826abb43936a6066cf1d253) (NativeFormatImporter) -> (Import Result ID: 'ba524268ebb3582fd176ed43d64292f7') in 0.0024878 seconds [static dependencies only]. Details - ImportResultOutputID=0b03401101213df8b8c7aa3262985fde DependenciesID=efc30319aa56ceb87e0c763ef57579aa StaticDependenciesID=21ac801c3edba3c14debfc1510068bd6 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_032.asset using Guid(879d513ad6f86af419d1c08764ab32d8) (NativeFormatImporter) -> (Import Result ID: '11d75baf8b282a929b8de049dc65b9e1') in 0.0025283 seconds [static dependencies only]. Details - ImportResultOutputID=127a2aa9903c7daa277fdc21ccf3e637 DependenciesID=dda2b905c944ca7f68be951ac5a9438e StaticDependenciesID=64a1449e872e3301f7a0caa6b1ea8030 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_055.asset using Guid(b7588cc03de418644aa225fe237a3173) (NativeFormatImporter) -> (Import Result ID: '230a8361f48a962539e0eda0540c7398') in 0.0024252 seconds [static dependencies only]. Details - ImportResultOutputID=1b462a665a8ed78e2b5b73ff6ebb15a7 DependenciesID=6a9f72a06dd8a4b788c06f5067e0b0ab StaticDependenciesID=9c23aa74a5ac86dce022ef6b670f36c8 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W02_CidadeZumbi.asset using Guid(b70f6ac4800907841a04f2d6a6da0788) (NativeFormatImporter) -> (Import Result ID: '566acc172403b8922b049447b255d10b') in 0.0025282 seconds [static dependencies only]. Details - ImportResultOutputID=3558f9b798931ac2109b74d01bf0ce29 DependenciesID=3b434d0a160f1e954c703b06e15d355a StaticDependenciesID=053ff85cefd93f5801c433e0520358c4 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_083.asset using Guid(c7a3d4497901bb244a18dc962ea5dc64) (NativeFormatImporter) -> (Import Result ID: 'c3a89fa37aa00faa671ca6e6e0fdb034') in 0.0026131 seconds [static dependencies only]. Details - ImportResultOutputID=8844d3af4d3f5c27514043626ea6b761 DependenciesID=16c3b3a1501854a71c663c37d3e93f19 StaticDependenciesID=8a77ecf5ecfebf91599e77fa8578a6d4 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_016.asset using Guid(c76c9d73a1234bf4685dc1c2f169481c) (NativeFormatImporter) -> (Import Result ID: 'adabaae34de7b85843ea5e71564f1f57') in 0.0025951 seconds [static dependencies only]. Details - ImportResultOutputID=a2fb5ff583f390acc8d92b07d3e83cc5 DependenciesID=581068cdc3587a0022d67ee32cce3983 StaticDependenciesID=67aa6bf096d67d81004cd18881c32e11 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_FlameTrooper.asset using Guid(f7f3201c68f602c46adaafd3d4512196) (NativeFormatImporter) -> (Import Result ID: 'd87bb1793873bec08687248ecf46befc') in 0.0025175 seconds [static dependencies only]. Details - ImportResultOutputID=03fbc77da5da2b51931d0e491d60f17e DependenciesID=5e4b158326cfeed022c78c29eb06cdce StaticDependenciesID=7f3f48bf797f9504368f5ba3a48fab3a 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_052.asset using Guid(28cd745ea1a97354ab852a8cb7941cfc) (NativeFormatImporter) -> (Import Result ID: '003b5b0d1b499f81e1657dd74b28bbfd') in 0.0025724 seconds [static dependencies only]. Details - ImportResultOutputID=bf3b44d80b0c50c889cca76b403ee906 DependenciesID=f6c4a0a314ef1253417363d05739b8eb StaticDependenciesID=f34eaf40daa0222b94dd16fc54e5ca46 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_RiskTitan.asset using Guid(38603cdfda72a3041b88b71668e5cd74) (NativeFormatImporter) -> (Import Result ID: '268295b5b995abc08cacb553f17607c0') in 0.0025951 seconds [static dependencies only]. Details - ImportResultOutputID=d92a03b2f3940562c144d2eea5d31de8 DependenciesID=431870d9ebd1ea94af45721e7d990407 StaticDependenciesID=373746a18b4fba0e4b4305be8e603b93 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W08_LaboratorioAlienigena.asset using Guid(38e4b84e1c98c0f47955513b588612b8) (NativeFormatImporter) -> (Import Result ID: 'd6254999cd51ce6142951823c6c4b17a') in 0.0026771 seconds [static dependencies only]. Details - ImportResultOutputID=2866d379a42cd75d6f41dac7a17f6c0c DependenciesID=ce05736a51098dbddf17036d24703eae StaticDependenciesID=d5bf9d13c40eddc85c11250ca72dc4bc 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_RiskX10.asset using Guid(8861a7567fa4267439b3564a259f259f) (NativeFormatImporter) -> (Import Result ID: 'a65fe42295b558ae816c7be7c02414dd') in 0.0026688 seconds [static dependencies only]. Details - ImportResultOutputID=135409802a6f267f2316fa03501a3b54 DependenciesID=e95f37b9fbb5e3ef19ac93880f98520f StaticDependenciesID=acf8181a8f58ed8a17083eb30fc94df8 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_017.asset using Guid(886c70dcd60c4854ea8e55de4a5f97f9) (NativeFormatImporter) -> (Import Result ID: 'c2eee1827f07ef75b5b5b77eb621c63c') in 0.0024522 seconds [static dependencies only]. Details - ImportResultOutputID=e345af394eb6350c2842fdd6dc34054b DependenciesID=d05b81c54f75ce254a90b7149cd5f517 StaticDependenciesID=a36ff53a6a6dbe4959ce663c6d027ca8 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_022.asset using Guid(b8d41ce373eefd5469fcf99a19362333) (NativeFormatImporter) -> (Import Result ID: '386d2104c76ff3384b229d740b424d61') in 0.0025222 seconds [static dependencies only]. Details - ImportResultOutputID=84ed308934777f795817b1d7955fbc17 DependenciesID=0155a358f8c4040422827e4cf1107c8a StaticDependenciesID=66a8b5f78a9fe5e6e540125dfcce759f 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_006.asset using Guid(b82ae8624cfab0d46a5b06d76ba5c6d0) (NativeFormatImporter) -> (Import Result ID: '4442e9becfe1f85096e652a511246713') in 0.0027918 seconds [static dependencies only]. Details - ImportResultOutputID=06bbdbe697ea7ac6dbbf2888aacc7bf8 DependenciesID=b8c7f5eb69d9d06a5d378615415bbbbd StaticDependenciesID=944b90c49f25ba5d38ddea74b7e4e52d 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_Add50.asset using Guid(e811d4939ac4d6d478c734c21efb73c7) (NativeFormatImporter) -> (Import Result ID: '8305e50852f05dc7e32d1674ec6f02f9') in 0.0026976 seconds [static dependencies only]. Details - ImportResultOutputID=29abd91ad01f8ec174d4c527fc2324b7 DependenciesID=fe9c78fef84a6b0735a3d94901f35106 StaticDependenciesID=8b8f8f47ea5e78ac1d5881c7f396e2ac 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Size.asset using Guid(e8af89c7013fbf542a90549718c07fde) (NativeFormatImporter) -> (Import Result ID: '81b4b5153ff47963f485006ac4049beb') in 0.0024455 seconds [static dependencies only]. Details - ImportResultOutputID=7247abb87ca4dc3623aa4e8e93580728 DependenciesID=2d366f12ddbe516406b7d3ba7bfb16db StaticDependenciesID=295d44fbc9140298a5e2343a11ca5486 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_026.asset using Guid(195415bec4d7a094ab28f4b943df766e) (NativeFormatImporter) -> (Import Result ID: '914364d09c3dd5caae1a607172db678c') in 0.0025116 seconds [static dependencies only]. Details - ImportResultOutputID=f82fc067cf4a2c26fb26c00704fb2d89 DependenciesID=88beb481aba60d56656e0ff092365fdc StaticDependenciesID=343d242d439bb134cbf3ecb074bd22ae 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Regen.asset using Guid(292925542611c554582f5823c1e76740) (NativeFormatImporter) -> (Import Result ID: '135a26f51b064693341ee97633790277') in 0.0027804 seconds [static dependencies only]. Details - ImportResultOutputID=ce13a3469b7dd7faa531ad92db3e1a31 DependenciesID=aa6289eccdaabb1d30e64c1c7017f3e7 StaticDependenciesID=49c3ca22bf36dc9a32fe2a9e519eee43 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ClassGiant.asset using Guid(29e927f0949ad9947a9842de9481c2b1) (NativeFormatImporter) -> (Import Result ID: 'd653b3cd5bd1cbdb45e7afab4970d49f') in 0.0024762 seconds [static dependencies only]. Details - ImportResultOutputID=70cc2c6edb2e8bf89db16f8b5e88effe DependenciesID=9d0b875ae729d4e9be88e0d23c4b7b96 StaticDependenciesID=4166729c816089056213aebbc761fb9c 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_047.asset using Guid(298e167ba82321145a05fe8c51ba94e6) (NativeFormatImporter) -> (Import Result ID: '1be41c61138965d355cee90d8ad83c1c') in 0.0024914 seconds [static dependencies only]. Details - ImportResultOutputID=df6e5ff79bf7aa69a04d84c3650556cf DependenciesID=b7c0a88a7d89818d766606dc7e44b742 StaticDependenciesID=78c552ecf45d9ac821eee916bff9e79f 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_060.asset using Guid(393e43a970c3d484cbd1d2658e9007d3) (NativeFormatImporter) -> (Import Result ID: 'f73d46c57b9a84ec40d5d76f173ef794') in 0.0025124 seconds [static dependencies only]. Details - ImportResultOutputID=13850594dabe361a41029ec6b60355e9 DependenciesID=a022cbab69c58c1ad3d4c3f726fda80c StaticDependenciesID=8fcbd116c93cc30daa71e218bba8cfcd 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M6_IceKing.asset using Guid(4929a0673780c9a4a9a79e599e23bd16) (NativeFormatImporter) -> (Import Result ID: '279bd1c545ecb2400449d7c392d631f2') in 0.0025557 seconds [static dependencies only]. Details - ImportResultOutputID=8eb8054b4cc207ba82c3eb7ce0b38466 DependenciesID=20493fe5b16e1eb6b575363202c76304 StaticDependenciesID=4fc4c079c04755bfec9b3d28852fc509 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_RiskSacrifice.asset using Guid(490ea1ec55a82ce40b7481e47abbaf10) (NativeFormatImporter) -> (Import Result ID: '2466ed7955ec8050f21fc8565d76285e') in 0.0027651 seconds [static dependencies only]. Details - ImportResultOutputID=caafcfecd751c9b398e4749e6d9d2ae5 DependenciesID=fae97dc123cb6da3e6e10f00e333e047 StaticDependenciesID=043bba0baeada3abc3507dc9837a6087 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_X3.asset using Guid(490f1bc6585471c4eb998ddb318ec5a3) (NativeFormatImporter) -> (Import Result ID: 'fa8aa0750019c1f61df6e61bac1e2563') in 0.0026461 seconds [static dependencies only]. Details - ImportResultOutputID=f3dc60aff3684c95accb211206b5ede6 DependenciesID=d5b8b3b3b642dabaa7735f090a3dcb79 StaticDependenciesID=b9976c3b9ee721f47a0d4a9e3fd49742 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_045.asset using Guid(591f8c8cdbe3d7c4a8d8fd4373bf5cfb) (NativeFormatImporter) -> (Import Result ID: '49ca578803682f894397c2018fcc9dff') in 0.0026124 seconds [static dependencies only]. Details - ImportResultOutputID=8720d903d3512666ff8f2be53ad9c446 DependenciesID=68cc18340f89b72895d0202dc1c7a5f2 StaticDependenciesID=d071387a9bb57ce72e46c6647323ecd7 
+Start importing Assets/_Project/Resources/GameSettings.asset using Guid(79e681e7535882445a4ff44320774752) (NativeFormatImporter) -> (Import Result ID: '2adcab154cf31d10f9f08c116c5885e4') in 0.0029007 seconds [static dependencies only]. Details - ImportResultOutputID=278c83fe5f87d3890f4cf281fc60500c DependenciesID=2caaeee2afe10a60e6d35ea3fb2f5786 StaticDependenciesID=c8e63ea1a91b8350ec5920433c806c67 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Runner.asset using Guid(790bb93c8f2cb534881bad5fc8419fdb) (NativeFormatImporter) -> (Import Result ID: '8268d664503d4eb410b2916a416be0c8') in 0.0026145 seconds [static dependencies only]. Details - ImportResultOutputID=3aa54691a2effeb384ef691b58f766ea DependenciesID=c7326f44a197ace547bd1dd376c14324 StaticDependenciesID=1d35ea0afebb32f71ef21c6860ffe72b 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_018.asset using Guid(99f019206e132784987bcd04b0b2341e) (NativeFormatImporter) -> (Import Result ID: '6bb848ef91d3cd2b6cb1414c084aa597') in 0.0025895 seconds [static dependencies only]. Details - ImportResultOutputID=87c50b22dbfc743b13baef470b019144 DependenciesID=50b14254136aec460508890634aaa22e StaticDependenciesID=899b8b3aa7f364d204c4a79eb0c8c772 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_037.asset using Guid(a939336e802aa074a80887763c03f660) (NativeFormatImporter) -> (Import Result ID: '29092c98042d437bc46d0a934741c317') in 0.0025644 seconds [static dependencies only]. Details - ImportResultOutputID=846c860bc4f8dafcbf29ca1f4f0ecd5d DependenciesID=5cb96cf1d34926115901d616110f9602 StaticDependenciesID=02ddbd5ee225c9eaad13cb1830d52c3c 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ElementLightning.asset using Guid(b9c2c0e8b1a67654194c7caf58a78b50) (NativeFormatImporter) -> (Import Result ID: '179ce834a40206d41e3ad3d07204d372') in 0.0026682 seconds [static dependencies only]. Details - ImportResultOutputID=f564c5777bb4a70383e5ee291d1a4231 DependenciesID=146deff8c9501cebfaf2c85724b21d94 StaticDependenciesID=748032faed5b31229001d2c0c68b258c 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_080.asset using Guid(c960fb2ab95faf649b20ea714fb4c329) (NativeFormatImporter) -> (Import Result ID: '0131ee58ec1d20303f29558239ad20f9') in 0.0026916 seconds [static dependencies only]. Details - ImportResultOutputID=6e554143ebd8eb7462a4bcb38160ef6b DependenciesID=444f8f7cd502f7790e28708efb2b4254 StaticDependenciesID=cf6071c276233a46be0f8bf498a7e35b 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W01_CampoInicial.asset using Guid(d998e8483071db446bef1799d70d0ac8) (NativeFormatImporter) -> (Import Result ID: 'e653da441f0e73ac6010cc5416fdd3cd') in 0.0026591 seconds [static dependencies only]. Details - ImportResultOutputID=23cdf513ca2021bc1bb4740aac12bc75 DependenciesID=8db4035bac65e74b5f092009f4817875 StaticDependenciesID=9bca516b33a67198bbbebf61a36d142e 
+Start importing Assets/_Project/ScriptableObjects/Balance/Rarity_Epic.asset using Guid(f9b70c471269ace4b86c5a6f43f30f1c) (NativeFormatImporter) -> (Import Result ID: '7fce43ae3f35a89cf22090950d069d4d') in 0.0025235 seconds [static dependencies only]. Details - ImportResultOutputID=5ecf426ec83f09a4668628daf379209e DependenciesID=ed7e9b3f1d3caf5abb453c73bd605a39 StaticDependenciesID=070c65584477a59960c58cd841d32460 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M7_ArmoredKnight.asset using Guid(0ad1686b7fa134544bd95787be576da4) (NativeFormatImporter) -> (Import Result ID: 'ba5c3c037822aa7dee2fe482b82ac3a5') in 0.0027388 seconds [static dependencies only]. Details - ImportResultOutputID=ad403054cda5e352ca182324c27274bc DependenciesID=50552b78f0942f66e32597ccaa6665f0 StaticDependenciesID=845321c5ec4fd1c177f7a83f9b119db9 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_066.asset using Guid(1ae1e8cae0f9cf84490e2850aec99cad) (NativeFormatImporter) -> (Import Result ID: '7d19a18e5a210d05ced63fb4dbee22f9') in 0.0027521 seconds [static dependencies only]. Details - ImportResultOutputID=a3e9360824621782dbc1b54760ef69a9 DependenciesID=3d9eacd9cc049d941b4e49c80709970e StaticDependenciesID=93fe19e88309313ac638a7e9c99956f0 
+Start importing Assets/_Project/ScriptableObjects/Balance/Rarity_Legendary.asset using Guid(2a06dd4dda7f32c4e838ac062252bdad) (NativeFormatImporter) -> (Import Result ID: '3816b64f8e70cdf29f8bc15a0cd9204f') in 0.0024691 seconds [static dependencies only]. Details - ImportResultOutputID=2f2b1b61c71c471045048c4f392e1448 DependenciesID=1c68b5aedd1d36450dfa1672d3786674 StaticDependenciesID=7630ed2aacedac12ebd313f6c818fa10 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M8_AlienSupreme.asset using Guid(4a1b021bafc785a4598aeb9eda102f6c) (NativeFormatImporter) -> (Import Result ID: '8f7e72e5cdf0979ae5775ec6a08fd8d7') in 0.0026081 seconds [static dependencies only]. Details - ImportResultOutputID=16912ed6b52c8dd8f527e5a78f1d0d69 DependenciesID=e64c3b796dffa706450e0534eec2a568 StaticDependenciesID=552ef1cd4d5374ebf7fbf53041bf4160 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Armor.asset using Guid(5a11e36f4701c0049b556381aac24715) (NativeFormatImporter) -> (Import Result ID: '1126211251c2a7c745e1bea86930adfd') in 0.0024766 seconds [static dependencies only]. Details - ImportResultOutputID=f7ee17e8ddf414ae8bbc83a981cd0620 DependenciesID=2e95c864001f10e0d65422f32757687b StaticDependenciesID=71429e57c2fe9ddd4d9fa72fb8fccbd1 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M3_ScorpionMech.asset using Guid(5ab3faf0ac858344da939957ad7e2f4c) (NativeFormatImporter) -> (Import Result ID: '449d49da1c1e03e8e73659d6c354cabc') in 0.0025155 seconds [static dependencies only]. Details - ImportResultOutputID=a34ca4fbb02ff06d4a5680fe08812ceb DependenciesID=5b7633da1d35ace9e85ae1bc54f4d456 StaticDependenciesID=1d1362b5966d59ac7ad1507c0ea21372 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_070.asset using Guid(5af5b1a114c91f0408759018f75d33bc) (NativeFormatImporter) -> (Import Result ID: '738969c6bf42ce967c163632fb05a9a4') in 0.0024688 seconds [static dependencies only]. Details - ImportResultOutputID=bb074f845562aae3ce0b109153dfccef DependenciesID=b3e6b644bd68ef39f3740fedb8f242cf StaticDependenciesID=0798237dfb6afeb28d80c0ebcdb0c8bb 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_MutLaser.asset using Guid(6ac95bece3db1d34ab4dafc6878a06af) (NativeFormatImporter) -> (Import Result ID: '840a38d39410aac679f63101c6cdde6b') in 0.0025248 seconds [static dependencies only]. Details - ImportResultOutputID=a9f05947dc4e33becad40ecc38c77702 DependenciesID=44c9772e5357d9dd9dafd78523cf9569 StaticDependenciesID=c9055a8361a734c3366597c215ed114c 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M5_LavaDragon.asset using Guid(8acd369ebd0d2a241b952ac09fc66771) (NativeFormatImporter) -> (Import Result ID: '14413e77dd4e322e7293adeee2f3a4d6') in 0.0025077 seconds [static dependencies only]. Details - ImportResultOutputID=e31d3a4f13118c118f151d28c8340f43 DependenciesID=9e439ff34a0a07745c3da743b68e0ea4 StaticDependenciesID=7778e8f44682fc1a4100523fd8930380 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_MutWings.asset using Guid(aa2727e84acd0a2468ff34b5f5ea0a9b) (NativeFormatImporter) -> (Import Result ID: '8c54703f001b6e724aa19c7a61045c23') in 0.0026026 seconds [static dependencies only]. Details - ImportResultOutputID=365411a76059b4317f305c19d4b42a5f DependenciesID=2f139d467be519eb3c587e3afd3b4bf7 StaticDependenciesID=07f9f6feb5d9c6e80e170a0cfc2eda81 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_079.asset using Guid(bacfc10613bfab2499656d9baf94bb05) (NativeFormatImporter) -> (Import Result ID: '2315ec99241465d970e650a0aa4631fa') in 0.0025729 seconds [static dependencies only]. Details - ImportResultOutputID=f4eac5d9dc2b53e9750cefc47c98c9d3 DependenciesID=5784dd3e072981f48e4b8c4e38576583 StaticDependenciesID=c5986619ae4c9398a549d06225b200fa 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_087.asset using Guid(ca06999f77eb8fe4d979887e5ade5818) (NativeFormatImporter) -> (Import Result ID: '0467e23e7e856016105fa550709e40ac') in 0.002606 seconds [static dependencies only]. Details - ImportResultOutputID=53c3c6565ee52ce220559eb68cc308ac DependenciesID=dc7e055f8bfa2948c183f7ddcb13c24b StaticDependenciesID=22dde7865bb37d393848f8a7a4c1b947 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ElementPoison.asset using Guid(ca996084ee59e56428d2f29f737d7778) (NativeFormatImporter) -> (Import Result ID: 'bcfdaed0c4dfa69b19bc431c1843c388') in 0.00268 seconds [static dependencies only]. Details - ImportResultOutputID=09639b411f191caa0f4a31f819cad7ef DependenciesID=b268f3259b3d057aaafd5ab830a368f3 StaticDependenciesID=8330eef70914088562472e549125b5ee 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_029.asset using Guid(0bebbf4095b44544e9ed92b4bf691138) (NativeFormatImporter) -> (Import Result ID: 'ef1f0f42adbc420556c1f42e13afe9c8') in 0.0026417 seconds [static dependencies only]. Details - ImportResultOutputID=8d175ab785024e2ec920df76065fe200 DependenciesID=99e26db45f15bc2fc8c4c0670dabff05 StaticDependenciesID=264fc5fa215504d912c97e2f52f5e904 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M8_AlienHybrid.asset using Guid(0b3d9164cb0b6a14e9765eb606a76788) (NativeFormatImporter) -> (Import Result ID: '76ddc20567844bc64d6827410dd3baa0') in 0.0025481 seconds [static dependencies only]. Details - ImportResultOutputID=f21b1b4c8dae329bad5c083b6982ac31 DependenciesID=b4fdeb5e7e46a0d9d7bdf77f2dbfca27 StaticDependenciesID=2263b6af3a66c122d184d34e68c2293e 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Demon.asset using Guid(3b40f8b5b4d7226428c8b05399fdc220) (NativeFormatImporter) -> (Import Result ID: '6d3de0045d54f61ceebe22f45f1790ae') in 0.0026254 seconds [static dependencies only]. Details - ImportResultOutputID=7a1b35f6d149867d6a029cb295676aed DependenciesID=dc059a6664fa2bc35744ff003c782e68 StaticDependenciesID=23e000d4b73ba808031b1dd9f83c4a0d 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_051.asset using Guid(3bb7090fc7bacde489b8a05faae7ea67) (NativeFormatImporter) -> (Import Result ID: 'de01041e7ae0cf363ff5f4624eb95fa2') in 0.0025955 seconds [static dependencies only]. Details - ImportResultOutputID=ed2f924e58e92e9b41fcd156c292ad5d DependenciesID=d040bee632ec82433beb6ac12fb1383c StaticDependenciesID=d38c9c38f0249219f32a0868c52aff07 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_067.asset using Guid(3b6b4df2054eb814fb36fc13a5183134) (NativeFormatImporter) -> (Import Result ID: 'fa07b5dbd8911a79bf941a0ddf8e004c') in 0.0025042 seconds [static dependencies only]. Details - ImportResultOutputID=d4364768505dc0d1f2283768de00107c DependenciesID=2ca842ed208555a9fe0927b75d015087 StaticDependenciesID=1dbf9a4d2bb53d08229eda978376e528 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_002.asset using Guid(3b0f2d9c135469244b87ef187be5f4cb) (NativeFormatImporter) -> (Import Result ID: '867330782832e1313c51abd6d7f28689') in 0.0026229 seconds [static dependencies only]. Details - ImportResultOutputID=c379e00b77731444c04b217b208f361b DependenciesID=0833bafa999c26b34629bdcdae955a06 StaticDependenciesID=0c42326db30ef8f7d1807a693c3b668e 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_027.asset using Guid(5b62e5d4cd3ced745a76e2e9831ed1f8) (NativeFormatImporter) -> (Import Result ID: '2bf98003ed5e289a9e22683827003f00') in 0.0026197 seconds [static dependencies only]. Details - ImportResultOutputID=f74a191b3789b02ce6a1e09c0d51f553 DependenciesID=74e2374995b19b8859a350a9c0e9ea92 StaticDependenciesID=7ced0b881eed78f4a720f73dd46ff47e 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_078.asset using Guid(5bacb830d3b88e54aa45699ab23b0e44) (NativeFormatImporter) -> (Import Result ID: '0aec5076f5386d5bc8ede9de052d6972') in 0.0026493 seconds [static dependencies only]. Details - ImportResultOutputID=4dbeeb6cbeb102b45aad2c75970b8b6e DependenciesID=0e9430c37124c120ba20d96986ab189a StaticDependenciesID=3a68acf920ddab078e0c554ef158f0fc 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_034.asset using Guid(5b2f539bb9b335643a12025032d88a73) (NativeFormatImporter) -> (Import Result ID: '4be711e43f48d466bc1ed652a3445380') in 0.0025976 seconds [static dependencies only]. Details - ImportResultOutputID=1b4c7294b0b83cc3de72477845d0e59c DependenciesID=7a83a878392b18f85ab1f83af0ae4b1e StaticDependenciesID=34995346a3b2a55760bdf6d894637917 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_046.asset using Guid(7b0694dcba2b8ea408c29bf6ce6ff779) (NativeFormatImporter) -> (Import Result ID: 'ff1dc2bdd3902ef11e312322af3fd5bb') in 0.0025042 seconds [static dependencies only]. Details - ImportResultOutputID=493c8855a2cebc919bc3e000b03049fa DependenciesID=c9b1f251fbe076efe8142f1348773396 StaticDependenciesID=3ef3f61cb7c156561c5705bdfe026491 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_020.asset using Guid(8be75f24a48401746a6ac9b644db6960) (NativeFormatImporter) -> (Import Result ID: '6cf080c9debeb3af2ddb35fc87933bce') in 0.0026892 seconds [static dependencies only]. Details - ImportResultOutputID=16bab581a60da75f2aaa6b58761b3d84 DependenciesID=3f76160eb9a89024a55cdaec750e0f16 StaticDependenciesID=ee55db2ea15acf04f7afe6a4974ce991 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_X2.asset using Guid(9b7ea4758f63f434abd773b87d301872) (NativeFormatImporter) -> (Import Result ID: '71df9a86a1298d3485a5d3cdea6b3b53') in 0.002704 seconds [static dependencies only]. Details - ImportResultOutputID=a4717187562276be84db7fb4b660fd75 DependenciesID=5ba0d9dc734020ca88c569241b33dd9b StaticDependenciesID=92ffe77558a2751fe60fb9ca44c88efa 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_050.asset using Guid(abbf48082b980db43a207fe838caecc3) (NativeFormatImporter) -> (Import Result ID: '8936c01819986916ba7bab4e3d8c725b') in 0.0026659 seconds [static dependencies only]. Details - ImportResultOutputID=dd723886b8911e39ee6dd28fa0a706b8 DependenciesID=dcfc396fe0bb215f0c5fc01c73c526ee StaticDependenciesID=cc6c185077e869afe429feed30fd0568 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_Add25.asset using Guid(bb8488b415f5ba54f86fe8d9210fee64) (NativeFormatImporter) -> (Import Result ID: '8c62a6b84c5a45da2c2f670deb7d907b') in 0.002467 seconds [static dependencies only]. Details - ImportResultOutputID=528cd289224bb5a5d6ae6074a0c520b6 DependenciesID=368fd915bb0ee53b19ec94d3601d79b7 StaticDependenciesID=729afa8b09df34e1c8705363abec2dc6 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_ClassKnight.asset using Guid(0c54d46301b1c4b409a5952ca5f70c21) (NativeFormatImporter) -> (Import Result ID: '507e58e63a2d284c32cd70005986047e') in 0.0026201 seconds [static dependencies only]. Details - ImportResultOutputID=37ebd5d7a0f412efea0884e00032c42c DependenciesID=f951122ac901cfa6d16e30dec5ad3a8a StaticDependenciesID=be038450500fd33a1c30e6df39dc6518 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_074.asset using Guid(5c4ad8013d0756a459b3f7dd3050cf53) (NativeFormatImporter) -> (Import Result ID: '57c69990f7874f4bca4f9241a52b0089') in 0.0026945 seconds [static dependencies only]. Details - ImportResultOutputID=8c6f108eb09b7250e80e9187429767d2 DependenciesID=c80e2bb3f31def8108b558517eec1bb4 StaticDependenciesID=3575bb9a238e035cc3962973458b524f 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M10_DimensionalEntity.asset using Guid(6ced2e55e0e680145883651519ac135f) (NativeFormatImporter) -> (Import Result ID: '8baa7e03372bd1fcab6b4d6c76eb2851') in 0.0025038 seconds [static dependencies only]. Details - ImportResultOutputID=2152c459f57930ac9331cb668bb208c9 DependenciesID=a64e04704357050fb552725f0f3d2048 StaticDependenciesID=ce7798103012440ebe23e1e563def426 
+Start importing Assets/_Project/ScriptableObjects/Upgrades/Upgrade_StartArmy.asset using Guid(7c48d4d9fdda043468ce47e3c5eb49ed) (NativeFormatImporter) -> (Import Result ID: 'c6a031bbdf88a5a9ee13316f2e39993c') in 0.0024866 seconds [static dependencies only]. Details - ImportResultOutputID=67a7e51821c6c22c084cf6e61497364a DependenciesID=6a6f0a9b328092c75dabf5973058aed8 StaticDependenciesID=b6f99e586ca7ff40854acc5908503be4 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_012.asset using Guid(8cd721d6280fee9428bc8f6d7dd27504) (NativeFormatImporter) -> (Import Result ID: 'bbca64d3cc597bbe0500f32c454e78bf') in 0.0025867 seconds [static dependencies only]. Details - ImportResultOutputID=73bc947cb5e4287b6e39503b79e399ea DependenciesID=823511e68712f7f03fe419f7ab9b27b2 StaticDependenciesID=7b79e26292adf6ea6422620c730d30e7 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_021.asset using Guid(8ca99635cc8156b43a9e6793b37815ef) (NativeFormatImporter) -> (Import Result ID: 'bdc5782ffa1a56d77c7453e109d20534') in 0.0025505 seconds [static dependencies only]. Details - ImportResultOutputID=fcf9bcb7d10227bedd4dd7fbc9caca34 DependenciesID=dfab5780793da52b96370c0074941a51 StaticDependenciesID=8ba439362dea15152a0fa419281882fa 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M10_DimRift.asset using Guid(8cdd49825c5d4964dad322437846b792) (NativeFormatImporter) -> (Import Result ID: 'f86a88aef72c131a72d0a9ca79fde28b') in 0.0025637 seconds [static dependencies only]. Details - ImportResultOutputID=065d8cc651a60235d7117cd676776489 DependenciesID=d0f737d46a5e18200ca3278b7d986f9e StaticDependenciesID=66e0b45e70e961c36f5a4b24a4b196c6 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_Div2.asset using Guid(8c8eab48d0a36b147b1a6133ee3274c9) (NativeFormatImporter) -> (Import Result ID: '5e3e3834a5e7cc7228448bddecc38099') in 0.0026962 seconds [static dependencies only]. Details - ImportResultOutputID=9da333da1c94eeb19a60208a33c83525 DependenciesID=b61d7f0e48693658cea48c838b1a3687 StaticDependenciesID=921b412418623d7e4837957a3773e72e 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W06_ReinoCongelado.asset using Guid(9ce6de04ba5e9b641a9108c9b2254801) (NativeFormatImporter) -> (Import Result ID: 'eb69407b8e2ebc93321c256a2bf93576') in 0.002838 seconds [static dependencies only]. Details - ImportResultOutputID=d0c1442f98f82b7f5efc44eed94b79d8 DependenciesID=dc7dc15ada75c7374244ac00d6799830 StaticDependenciesID=9abd3f13f99cadcabcb73de94b7f0247 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_054.asset using Guid(9c1b76ea32f5f184cb22fe158738ab10) (NativeFormatImporter) -> (Import Result ID: 'c5f5ff84718ad1179f25ca212b719cb6') in 0.0025972 seconds [static dependencies only]. Details - ImportResultOutputID=99de7a8b1a92ee20e39fe4ba4e364fb3 DependenciesID=500debac748e6428ce040644f1ec9ed1 StaticDependenciesID=ca4dc2f51ed10e2e6c52ddb768500bee 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M9_MechaSupreme.asset using Guid(9c8fc2467196a97489386c0c92637f42) (NativeFormatImporter) -> (Import Result ID: '05d446784fea0abec5f586d50043c2a3') in 0.002736 seconds [static dependencies only]. Details - ImportResultOutputID=808616010d9350f856d10bec011e9c4f DependenciesID=ad3b5dbed047811d96fb54d1336efb33 StaticDependenciesID=375d72193b5a816b6f9f1dd9ac104c7d 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Giant.asset using Guid(acf0d3f24decf7345ba1243c87709cb6) (NativeFormatImporter) -> (Import Result ID: 'd550529c544b97c028fc449bdd7a257b') in 0.0025839 seconds [static dependencies only]. Details - ImportResultOutputID=ea49aecafb07bcb74ffc81f745246719 DependenciesID=0d3d61d5e9345ae157645ce6a15d086d StaticDependenciesID=849fc4ca17655b30c557e217cfae036a 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_062.asset using Guid(bcc05757aa62c8841a859743b64e65ae) (NativeFormatImporter) -> (Import Result ID: 'eff43e3bf32cd29d03ec4aa7448e327f') in 0.0025529 seconds [static dependencies only]. Details - ImportResultOutputID=f582b4eca742a3a036bfb4249fb96466 DependenciesID=83d8389eacedfb036936114e278bb851 StaticDependenciesID=97787ac28b67998ed3ea71bb35c760d5 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_FrostTrooper.asset using Guid(dccac7e50c4d49b46a1ba959337014ef) (NativeFormatImporter) -> (Import Result ID: 'c8a728f0bd019c29f62d53e97e159d71') in 0.0025908 seconds [static dependencies only]. Details - ImportResultOutputID=06f9e0199e99bf2f1d5667ee76a04d2f DependenciesID=f4f416f0a3eebdb40acd212f0bef5708 StaticDependenciesID=1529e564d07a3bcbe39dae67f0dce701 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_031.asset using Guid(dc1c6bb2071912242b8ce7baa41646aa) (NativeFormatImporter) -> (Import Result ID: '6cad4fbf17ac33c2012af29809c1798a') in 0.00266 seconds [static dependencies only]. Details - ImportResultOutputID=de0d92b54a4d3abae959a688c8261932 DependenciesID=fbf67ff6f087a9baeaabc94e0d4244b2 StaticDependenciesID=93d77263d34f85cfb60337809c9214bd 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_061.asset using Guid(0dbf5bb57123d2345b7e633ad50c14a3) (NativeFormatImporter) -> (Import Result ID: 'e997bd8a96d8d5c45b38a10718eed2d8') in 0.0026014 seconds [static dependencies only]. Details - ImportResultOutputID=a89a676909bbb29933328874d0305611 DependenciesID=6e6dc0694a8c5232ab0ab77ec1767592 StaticDependenciesID=0b3facc06d450200488a55009c8acb60 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_039.asset using Guid(1d3d2f0c94e2bcb4b9a17b4bf1d73d76) (NativeFormatImporter) -> (Import Result ID: '8bd8081b8c1538296db9a1f723d21012') in 0.0027046 seconds [static dependencies only]. Details - ImportResultOutputID=83f58fa969ef7e4656b31bb430c5b167 DependenciesID=9bd06568dbebed79001063de78c9df2f StaticDependenciesID=3f687134348c0cbaa566b7f0f6790b88 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_X5.asset using Guid(4d8f14c4160aa54419ab88ff89e6e518) (NativeFormatImporter) -> (Import Result ID: '51d14e38c52f340057b71913612b2c23') in 0.0026739 seconds [static dependencies only]. Details - ImportResultOutputID=0542eef418dbc5740fcbcff19b0b6c59 DependenciesID=9c037d4bcb95beecf7c1f8c2fae06aa0 StaticDependenciesID=a092d854bd3df60568edf4ffc5e7a95e 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_011.asset using Guid(4def2aa4807028a4f970816a13a99625) (NativeFormatImporter) -> (Import Result ID: '3e786921df1a214e9368a8cb076478bd') in 0.0027514 seconds [static dependencies only]. Details - ImportResultOutputID=379fdafec88599af71fe4a22b357f409 DependenciesID=1b5213b7d8b74507135985319d08242b StaticDependenciesID=629d9493b317ce4a8666b0412c680715 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_028.asset using Guid(5d51485b26b939247a11af9913356f56) (NativeFormatImporter) -> (Import Result ID: '68e23818dcb3b93297b1c74f7d6f9487') in 0.0025783 seconds [static dependencies only]. Details - ImportResultOutputID=5933784aa685c9d7b0ca9776e926b8af DependenciesID=99663f5ef625c14d447373b009f50178 StaticDependenciesID=d398323d1772341c3addf10268594597 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M5_LavaWhelp.asset using Guid(5de6c48e005b689499ec86f8fd2edc91) (NativeFormatImporter) -> (Import Result ID: '0767d085789e407b2cab2b71fd2294c3') in 0.0027275 seconds [static dependencies only]. Details - ImportResultOutputID=c74faf1c9c2766af17f9f083c65305ae DependenciesID=894aa624c93a0918044e01fb34b32093 StaticDependenciesID=439fbd1cd9e0419b5012b256360f7f67 
+Start importing Assets/_Project/ScriptableObjects/Mutations/Mutation_Speed.asset using Guid(5defa96692fc5c94f92abf3d5b992e25) (NativeFormatImporter) -> (Import Result ID: '52e47553ca16d0684f698f164601dafd') in 0.0026201 seconds [static dependencies only]. Details - ImportResultOutputID=eb4c77cd2d27494e6872d8d5ac00d696 DependenciesID=4e741286d9b13669fc997e9dd329b630 StaticDependenciesID=bca7b0529a478d0434ca8244c6a4cb90 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_053.asset using Guid(6dc1126f1e3fbfa4abb3003f7bd5280e) (NativeFormatImporter) -> (Import Result ID: 'f15c48ebed383f43724349c7cedbc1ed') in 0.0028725 seconds [static dependencies only]. Details - ImportResultOutputID=cf1fc212ac921b6e1608e15b3d9fd4c9 DependenciesID=da886b4b9787dabf3bfa8e28a7f2907e StaticDependenciesID=a1312a7ce0aa9afe12a45d5e8ea934b7 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M2_ZombieTitan.asset using Guid(7da27fb2794390749ad67f96ba6abf8b) (NativeFormatImporter) -> (Import Result ID: '17ec920a410874ac2c19f32aceffd087') in 0.0026482 seconds [static dependencies only]. Details - ImportResultOutputID=ad5286fc685524ef28b589ed2c131858 DependenciesID=3de31e9420499560544b32ba2a253008 StaticDependenciesID=b23d349d0bcaa17c4f9a5ec387bc751e 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_075.asset using Guid(9d767645b498bbc40a18503279e40670) (NativeFormatImporter) -> (Import Result ID: 'f5660cacf2c5766fa3899c24e4e9ecbd') in 0.0025798 seconds [static dependencies only]. Details - ImportResultOutputID=f4849055cb4463d76f38d1991ea1753b DependenciesID=6dc16730af0f18beda0a395009e3ef5f StaticDependenciesID=a5bf6afb8b9f88058b23c1630b465dfb 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M1_WoodGiant.asset using Guid(ad185b2c82a4fd5438e02aa81388e908) (NativeFormatImporter) -> (Import Result ID: 'a4aba994adcd0eb18745633cbf4f7860') in 0.0027363 seconds [static dependencies only]. Details - ImportResultOutputID=e3453440e4b2fcb8a57a68c566ac4fba DependenciesID=c212421dfd38171125d4cc18c8243f74 StaticDependenciesID=ce140652f366865a496486342cc8a860 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W03_DesertoRobotico.asset using Guid(bd94224d60b3fca4cba1d059bd98ed4b) (NativeFormatImporter) -> (Import Result ID: 'ec548f089d742051c7354eba643fdb23') in 0.0027153 seconds [static dependencies only]. Details - ImportResultOutputID=ada089bd30eef042db7a76aa1c9c9a7e DependenciesID=ef0ed3c4806c013345767036f2df7756 StaticDependenciesID=44b90cdfd2b500235854131adcc96b06 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_057.asset using Guid(cd68a23bda941b948b60acc56e3228bf) (NativeFormatImporter) -> (Import Result ID: 'bcf3da7c877402d7ba0aa09c5fc2833e') in 0.0026442 seconds [static dependencies only]. Details - ImportResultOutputID=5d4ca0bf426ef57c73a22db91cdc667d DependenciesID=0db2033eb3cf911bcb78d68f741619ce StaticDependenciesID=1e8404e471cc2e165c1256baff5ffd3e 
+Start importing Assets/_Project/ScriptableObjects/Bosses/Boss_M6_FrostSentinel.asset using Guid(ed5e41be009bb2e4da5c270c2f68fcc7) (NativeFormatImporter) -> (Import Result ID: '0fb3985efa3c01fe01b0b2e21fee01c1') in 0.002565 seconds [static dependencies only]. Details - ImportResultOutputID=e795ecbd269c05796a803d41c1c16b1d DependenciesID=49b7609f344f573cd438dc3b1d1a07d9 StaticDependenciesID=81b375d3f3b844f550365afde1c1ad3a 
+Start importing Assets/_Project/ScriptableObjects/Balance/Rarity_Common.asset using Guid(0e757b9574f5460469d67276c70b5bdb) (NativeFormatImporter) -> (Import Result ID: '845e5833d4ac3a5470a43fa7d25237a6') in 0.0026167 seconds [static dependencies only]. Details - ImportResultOutputID=4b7199c944cdfe1789fcfa9d08f8ea7b DependenciesID=bcfd05b167ea96f0a0722bf3cb9e2056 StaticDependenciesID=4735a052d28c5099983c0dec20d7431f 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_081.asset using Guid(1e6404a9eacf85543b8985732603d026) (NativeFormatImporter) -> (Import Result ID: '801fef007cae363e72ea8410c7c3c969') in 0.0027572 seconds [static dependencies only]. Details - ImportResultOutputID=91d5989887f17276c7328daf04d507ce DependenciesID=94e02bc8156969dc199dfc6a6065cfc3 StaticDependenciesID=7ee163c569c5734f7d4efb6646b967b4 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_091.asset using Guid(2ef811a2dec427a468cd6d784bb03a97) (NativeFormatImporter) -> (Import Result ID: '7beea046fdaf50ab4796eb01370f2696') in 0.0025608 seconds [static dependencies only]. Details - ImportResultOutputID=ec829f82c18a74bb05322d81a1e233c7 DependenciesID=0c94ce87f0dd4c26e2f249fc7ae8b601 StaticDependenciesID=cb60beb6a8d4c925fa1107265af41c2d 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_038.asset using Guid(7ee623e27be3b124e8fdbe7927fb9307) (NativeFormatImporter) -> (Import Result ID: '787066bc3e279c4e2c46563b61351dc1') in 0.002574 seconds [static dependencies only]. Details - ImportResultOutputID=7c10b25d63196d4ebbfc1c4abdc3a16e DependenciesID=3cb4adc538671ca2b840097a9a137906 StaticDependenciesID=a8521207ec322e419ea5c2044394c798 
+Start importing Assets/_Project/ScriptableObjects/Upgrades/Upgrade_StartHealth.asset using Guid(8e6653b46e200e9498f349a99256655f) (NativeFormatImporter) -> (Import Result ID: '857a8ee513662b8b1d955b42b9aea5ad') in 0.0026678 seconds [static dependencies only]. Details - ImportResultOutputID=77d0f70b50b54049195d81a6c521696f DependenciesID=9cc96744079d7fd2cd9b8e321282b421 StaticDependenciesID=a32f2731b972c52d162444605054a423 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W04_FlorestaMutante.asset using Guid(9e11c160e40d2a34db945be0f2f7744a) (NativeFormatImporter) -> (Import Result ID: '4d5f5c8f964aacbf79b2bf2caaef37cc') in 0.0027664 seconds [static dependencies only]. Details - ImportResultOutputID=1ba4bab66bfb9bb579777ef766d17f2f DependenciesID=06125e98d2a00b231b973806ac596050 StaticDependenciesID=f405ebf9158bbe66a2940aadc6688b63 
+Start importing Assets/_Project/ScriptableObjects/Rewards/Reward_Level10.asset using Guid(9ec962e0ca89e354baf2aee4b8ce8fbe) (NativeFormatImporter) -> (Import Result ID: 'bdbf1dd04f6196c5724207285a4b4e99') in 0.002599 seconds [static dependencies only]. Details - ImportResultOutputID=b9bb61bdb3c9d91dae9ad438b84d8786 DependenciesID=3a75cabc3e450277b141c87d241de5bb StaticDependenciesID=895dd74d9055a655d0787d0efa0ed5cc 
+Start importing Assets/_Project/ScriptableObjects/Units/Unit_Ninja.asset using Guid(aed24fab43ff3cc4f93e9cf7302a56ab) (NativeFormatImporter) -> (Import Result ID: 'e857a5d61157d4fc47a14ef83e278c46') in 0.0025353 seconds [static dependencies only]. Details - ImportResultOutputID=7be1ea75978b8453bbd742d1a46bb8af DependenciesID=f379056704fe71d597900f081f09631b StaticDependenciesID=0c36175ff6d5ab6b7f7393189df34c06 
+Start importing Assets/_Project/ScriptableObjects/Worlds/W09_PlanetaMecanico.asset using Guid(ced8177d627a2af4bb4aaef57771010c) (NativeFormatImporter) -> (Import Result ID: '74010812d778babdbacca24b1cde34cd') in 0.0026509 seconds [static dependencies only]. Details - ImportResultOutputID=972e62cff9d78d419e10e899fd0d4584 DependenciesID=ae40ea2e4cdc17a5cad29c331fc20fe2 StaticDependenciesID=8b64fd440a7120e406037fc01d80ceea 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_085.asset using Guid(ce6d537c42b5af74592f0e88b0656772) (NativeFormatImporter) -> (Import Result ID: '9aaf10d15fbbc0a50f8e0fa84e739606') in 0.0025881 seconds [static dependencies only]. Details - ImportResultOutputID=615faa19429f8c346b3d827f25229a85 DependenciesID=012091411bb69c5678eb1ace8b53aae3 StaticDependenciesID=9b301d6260d55e3a302b05b9b67cc310 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_036.asset using Guid(fe21123f94644a54a85b07473a65832a) (NativeFormatImporter) -> (Import Result ID: '8ccfa8824a0d672f9c0b68f9af362d69') in 0.0025747 seconds [static dependencies only]. Details - ImportResultOutputID=f064ee0c777a7a703b17ea994e5900ec DependenciesID=6f1be4f0369fa387c57b046e6d9aa94f StaticDependenciesID=f300ed022643c5394de123cbe8243cd2 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_073.asset using Guid(2f7fad59e5427ba40a278b85bbf4c745) (NativeFormatImporter) -> (Import Result ID: '1377f5a28bea739bf987b8d113106204') in 0.0027363 seconds [static dependencies only]. Details - ImportResultOutputID=6f692a446560610d4a4867f1c0ac6e4b DependenciesID=d8c6747d25e000b1718b48efaa01b8ea StaticDependenciesID=021ffda9a80583f47ef8caff39911905 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_003.asset using Guid(3f64f4baa9a4d8e43a9b3100e5b31efb) (NativeFormatImporter) -> (Import Result ID: '0b4faa70f033e02f7da58495a0239848') in 0.0027372 seconds [static dependencies only]. Details - ImportResultOutputID=ddc790e3cbd282e451db4c9e70252daa DependenciesID=0f6a69b14d55c478426823a82ffd15f0 StaticDependenciesID=80f5dbd96a57048d0bb24ff0c4541fde 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_024.asset using Guid(4f2aa05c4eb12e847a45d8ab1ece8642) (NativeFormatImporter) -> (Import Result ID: '112fbf337430ae12e6d99282b60d29dd') in 0.0027012 seconds [static dependencies only]. Details - ImportResultOutputID=f5bc9672a3f6eb4d914e6a10eb80ac4b DependenciesID=8f5577cc2101b762a3a38141cd14efec StaticDependenciesID=90a31dd5fbd56f7b8ca79dd80a10e557 
+Start importing Assets/_Project/ScriptableObjects/Gates/Gate_MutSize.asset using Guid(7f92dbf1f04563545a9cca9826af493c) (NativeFormatImporter) -> (Import Result ID: '0d7bf8ecf2cb30eb35f886ab2fc1654e') in 0.0026298 seconds [static dependencies only]. Details - ImportResultOutputID=53e084930e096a836146144018a98078 DependenciesID=2b85bb0e8ab52afa90d3a26c055fa57f StaticDependenciesID=38c4bbe273ac0ab0816723eff7c5ce4a 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_001.asset using Guid(afc3861719699b54881c0f02cd1eec2a) (NativeFormatImporter) -> (Import Result ID: '666fa487a817f94e12074af439c7b7c4') in 0.0027514 seconds [static dependencies only]. Details - ImportResultOutputID=848e6a7be2d2d8882713b3fd75e3001e DependenciesID=fdf96e9e859ce55a178a82bbe9cf0c17 StaticDependenciesID=3cec853de3227ac5aac2828fc609af7b 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_015.asset using Guid(cfc015845bac33445ad86844cbfe5d8d) (NativeFormatImporter) -> (Import Result ID: '4ac973f35676b910ce4f60ec462d8f07') in 0.0027341 seconds [static dependencies only]. Details - ImportResultOutputID=a13fed07074d348c675c0c276e775bd1 DependenciesID=2587c8a8c86dec33589854fff78214ed StaticDependenciesID=d3f67e9e95440f46159f0fab9da8d398 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_100.asset using Guid(efa0ec41deb0a3b49801eb258cf7df96) (NativeFormatImporter) -> (Import Result ID: '7248652aec4167137be9d31d855bdfc7') in 0.0025551 seconds [static dependencies only]. Details - ImportResultOutputID=9875ea112bc85cdffc4efb376b3c36b3 DependenciesID=27dc67fd75b1e0bc9e73d94fe6e7709c StaticDependenciesID=e5fe5b4abcd8e6f6326fc72de74ee830 
+Start importing Assets/_Project/ScriptableObjects/Upgrades/Upgrade_RewardMultiplier.asset using Guid(efe3d07eae2f9b543ae8842029c4e404) (NativeFormatImporter) -> (Import Result ID: '69a127fcc7761e665511cc5578c08126') in 0.0026416 seconds [static dependencies only]. Details - ImportResultOutputID=dff20f5af0560ceeba3952ad1f7d9b07 DependenciesID=60ee05fe07651ac23409ec7d86a2ed7b StaticDependenciesID=c532160d556c5270f335247ac33eee76 
+Start importing Assets/_Project/ScriptableObjects/Levels/Level_030.asset using Guid(efef429d9d688ba4ea91ed240c86f0c9) (NativeFormatImporter) -> (Import Result ID: '1a2730d62368fa7bd24b36bc4b178122') in 0.0025965 seconds [static dependencies only]. Details - ImportResultOutputID=7fce35a4af7ea34eabde7c86fb3fb8a8 DependenciesID=0cdc0ac83d51a15edba22631d903a611 StaticDependenciesID=d2d1af4b8acd6ab1ea2863c900d381a9 
+(Values over 0.050ms)
+Asset Pipeline Refresh (id=d1c3da036a035d740a712fd19e99e780): Total: 0.754 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+	Summary:
+		Imports: total=196 (actual=196, local cache=0, cache server=0)
+		Asset DB Process Time: managed=9 ms, native=645 ms
+		Asset DB Callback time: managed=84 ms, native=14 ms
+		Scripting: domain reloads=0, domain reload time=0 ms, compile time=0 ms, other=0 ms
+		Project Asset Count: scripts=882, non-scripts=2946
+		Asset File Changes: new=0, changed=28, moved=0, deleted=0
+		Scan Filter Count: 209
+	ApplyChangesToAssetFolders: 0.097ms
+	Scan: 24.456ms
+	OnSourceAssetsModified: 0.855ms
+	CategorizeScriptCompilationAssets: 0.150ms
+	CategorizeAssets: 25.954ms
+	ImportOutOfDateAssets: 595.932ms (0.219ms without children)
+		ImportManagerImport: 594.745ms (3.525ms without children)
+			UpdateCategorizedAssets: 0.849ms
+		ReloadNativeAssets: 0.164ms
+		UnloadImportedAssets: 0.192ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.318ms
+		OnDemandSchedulerStart: 0.287ms
+	PostProcessAllAssets: 97.346ms
+		RaytracingShaderImportPostprocess 0.197ms
+		ShaderAssetModifiedCallback 0.194ms
+		ComputeShaderImportPostprocess 0.189ms
+		PostProcessCallbackCreateDeferredMaterials 0.173ms
+		SpeedTreeImporter.PostprocessAllAssets 0.164ms
+		LocalizationDatabase.AssetDatabasePostprocessCallback 0.093ms
+		AssemblyValidation.PostprocessAllAssets 0.092ms
+		BlockShaderImporter.PostprocessAllAssets 0.090ms
+		MonoPostProcessAllAssets: 83.692ms
+			AssetPostprocessor.OnPostprocessAllAssets 43.918ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 13.971ms
+			ShaderGraphAssetPostProcessor.OnPostprocessAllAssets 7.418ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 6.368ms
+			PostProcessor.OnPostprocessAllAssets 1.807ms
+			AssetChangedListener.OnPostprocessAllAssets 1.622ms
+			MaterialPostprocessor.OnPostprocessAllAssets 1.449ms
+			TMPro_TexturePostProcessor.OnPostprocessAllAssets 1.251ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 1.121ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 0.902ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.522ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.272ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.249ms
+			AssetEvents.OnPostprocessAllAssets 0.196ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.188ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.155ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.145ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 0.089ms
+			SyncVS.PostprocessSyncProject 0.084ms
+			AudioContainerPostProcessor.OnPostprocessAllAssets 0.071ms
+	PostAssetChangesProfiler: 0.872ms
+	GatherAllCurrentPrimaryImportResultRevisions: 0.307ms
+	UnloadStreamsBegin: 3.591ms
+	PersistCurrentRevisions: 0.355ms
+	Untracked: 4.320ms
+
+Asset Pipeline Refresh (id=80cc7d69487e8784083e192213c21eb3): Total: 0.022 seconds - Initiated by RefreshV2(NoUpdateAssetOptions)
+MAR Tools: conteúdo criado/atualizado — 25 portais, 19 tropas, 9 mutações, 19 bosses (10 arquétipos regionais + 10 bosses de mundo, com sobreposição dos 5 do MVP), chart elemental, 4 raridades, 4 trilhas de upgrade, 3 recompensas, 10 mundos, 100 fases (+ endless procedural além da 100) e o catálogo Resources/GameSettings.asset.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+MutantArmy.Editor.MvpContentFactory:CreateAll () (at Assets/_Project/Scripts/Editor/MvpContentFactory.cs:105)
+
+(Filename: Assets/_Project/Scripts/Editor/MvpContentFactory.cs Line: 105)
+
+Batchmode quit successfully invoked - shutting down!
+Killing ADB server in 2,0987549 seconds.
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-Felipe-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-Felipe channel disconnected successfully.
+AcceleratorClientConnectionCallback - disconnected - :0
+Shut down.
+Cleanup mono
+CodeReloadManager destroyed
+abort_threads: Failed aborting id: 000000000000A138, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000B0A8, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000B238, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000A138, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000B0A8, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000B238, mono_thread_manage will ignore it
+
+debugger-agent: Unable to listen on 3448
+Exiting batchmode successfully now!
+Exiting without the bug reporter. Application will terminate with return code 0

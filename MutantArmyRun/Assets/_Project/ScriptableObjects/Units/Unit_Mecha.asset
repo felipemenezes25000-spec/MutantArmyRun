@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_mecha
   displayNameKey: unit_mecha_name
+  displayName: Mecha Supremo
   rarity: 3
   supplyCost: 25
   baseHp: 300

@@ -159,7 +159,7 @@ namespace MutantArmy.UI
                 new Vector2(_cardSize - 16f, 36f), Gold, TextAlignmentOptions.Center);
 
             // Barra de fragmentos.
-            Image shardFill = ShardBar(rect, new Vector2(0.5f, 0.08f), new Vector2(_cardSize - 40f, 24f));
+            RectTransform shardFill = ShardBar(rect, new Vector2(0.5f, 0.08f), new Vector2(_cardSize - 40f, 24f));
 
             // Cadeado (bloqueada).
             var lockGo = new GameObject("Lock", typeof(RectTransform), typeof(Image));
@@ -288,7 +288,9 @@ namespace MutantArmy.UI
             return t;
         }
 
-        private Image ShardBar(Transform parent, Vector2 anchor, Vector2 sizeDelta)
+        // Barra de fragmentos ANCORADA (largura via anchorMax.x), não Image.Type.Filled: uma Image
+        // sem sprite ignora fillAmount e renderia a barra sempre cheia. Refresh seta a fração.
+        private RectTransform ShardBar(Transform parent, Vector2 anchor, Vector2 sizeDelta)
         {
             var bgGo = new GameObject("ShardBar", typeof(RectTransform), typeof(Image));
             var bgRect = (RectTransform)bgGo.transform;
@@ -300,14 +302,15 @@ namespace MutantArmy.UI
             var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(Image));
             var fillRect = (RectTransform)fillGo.transform;
             fillRect.SetParent(bgRect, false);
-            Stretch(fillRect);
+            // ancora à esquerda; anchorMax.x = fração → preenchimento 0..1 sem depender de sprite.
+            fillRect.anchorMin = new Vector2(0f, 0f); fillRect.anchorMax = new Vector2(0f, 1f);
+            fillRect.pivot = new Vector2(0f, 0.5f);
+            fillRect.offsetMin = Vector2.zero; fillRect.offsetMax = Vector2.zero;
             var fill = fillGo.GetComponent<Image>();
             fill.color = new Color(0.55f, 0.80f, 1f);
-            fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal;
-            fill.fillAmount = 0f;
+            fill.type = Image.Type.Simple;
             fill.raycastTarget = false;
-            return fill;
+            return fillRect;
         }
 
         private static void Place(RectTransform rect, Vector2 anchor, Vector2 sizeDelta)
@@ -328,7 +331,7 @@ namespace MutantArmy.UI
             public string unitId;
             public TMP_Text level;
             public TMP_Text name;
-            public Image shardFill;
+            public RectTransform shardFill;   // largura = fração de fragmentos (anchorMax.x)
             public GameObject lockRoot;
 
             public void Refresh()
@@ -336,7 +339,12 @@ namespace MutantArmy.UI
                 MetaBridge.TroopView v = MetaBridge.GetTroop(unitId);
                 if (level != null) level.text = v.maxed ? "MAX" : "nv " + v.level;
                 if (shardFill != null)
-                    shardFill.fillAmount = v.shardsToNext > 0 ? Mathf.Clamp01((float)v.shards / v.shardsToNext) : 1f;
+                {
+                    float frac = v.shardsToNext > 0 ? Mathf.Clamp01((float)v.shards / v.shardsToNext) : 1f;
+                    shardFill.anchorMax = new Vector2(frac, 1f);
+                    shardFill.offsetMin = Vector2.zero;
+                    shardFill.offsetMax = Vector2.zero;
+                }
                 if (lockRoot != null) lockRoot.SetActive(!v.unlocked);
             }
         }

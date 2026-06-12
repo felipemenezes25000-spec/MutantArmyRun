@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_runner
   displayNameKey: unit_runner_name
+  displayName: Corredor
   rarity: 0
   supplyCost: 1
   baseHp: 7

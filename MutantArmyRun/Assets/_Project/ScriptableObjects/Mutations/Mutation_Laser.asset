@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.MutationConfigSO
   mutationId: mut_laser
   displayNameKey: mut_laser_name
+  displayName: Laser
   rarity: 2
   dpsMult: 1.3
   hpMult: 1

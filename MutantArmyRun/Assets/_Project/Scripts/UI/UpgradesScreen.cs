@@ -99,7 +99,7 @@ namespace MutantArmy.UI
                 new Vector2(0f, 1f), new Vector2(30f, -70f), new Vector2(640f, 44f),
                 TextSoft, TextAlignmentOptions.TopLeft);
 
-            Image levelFill = Bar(rect, new Vector2(0f, 1f), new Vector2(30f, -120f), new Vector2(560f, 18f));
+            RectTransform levelFill = Bar(rect, new Vector2(0f, 1f), new Vector2(30f, -120f), new Vector2(560f, 18f));
 
             TMP_Text buyLabel;
             Button buy = Btn(rect, "Buy", "MELHORAR", 32f,
@@ -144,7 +144,9 @@ namespace MutantArmy.UI
             return t;
         }
 
-        private Image Bar(Transform parent, Vector2 anchor, Vector2 pos, Vector2 sizeDelta)
+        // Barra ANCORADA (largura via anchorMax.x), não Image.Type.Filled: uma Image sem sprite
+        // ignora fillAmount e renderia a barra sempre cheia. Refresh seta a fração (nível/máx).
+        private RectTransform Bar(Transform parent, Vector2 anchor, Vector2 pos, Vector2 sizeDelta)
         {
             var bgGo = new GameObject("LevelBar", typeof(RectTransform), typeof(Image));
             var bgRect = (RectTransform)bgGo.transform;
@@ -157,12 +159,12 @@ namespace MutantArmy.UI
             var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(Image));
             var fillRect = (RectTransform)fillGo.transform;
             fillRect.SetParent(bgRect, false);
-            fillRect.anchorMin = Vector2.zero; fillRect.anchorMax = Vector2.one;
+            fillRect.anchorMin = new Vector2(0f, 0f); fillRect.anchorMax = new Vector2(0f, 1f);
+            fillRect.pivot = new Vector2(0f, 0.5f);
             fillRect.offsetMin = Vector2.zero; fillRect.offsetMax = Vector2.zero;
             var fill = fillGo.GetComponent<Image>();
-            fill.color = Green; fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal; fill.fillAmount = 0f; fill.raycastTarget = false;
-            return fill;
+            fill.color = Green; fill.type = Image.Type.Simple; fill.raycastTarget = false;
+            return fillRect;
         }
 
         private Button Btn(Transform parent, string name, string label, float size, Vector2 anchor,
@@ -186,7 +188,8 @@ namespace MutantArmy.UI
         {
             public UpgradeTrack track;
             public TMP_Text levelText, effect, buyLabel;
-            public Image levelFill, buyImage;
+            public RectTransform levelFill;   // largura = fração nível/máx (anchorMax.x)
+            public Image buyImage;
             public Button buy;
 
             public void Refresh()
@@ -197,7 +200,13 @@ namespace MutantArmy.UI
                 float effNow = MetaBridge.GetUpgradeEffect(track);
 
                 if (levelText != null) levelText.text = "nv " + level;
-                if (levelFill != null) levelFill.fillAmount = max > 0 ? Mathf.Clamp01((float)level / max) : 0f;
+                if (levelFill != null)
+                {
+                    float frac = max > 0 ? Mathf.Clamp01((float)level / max) : 0f;
+                    levelFill.anchorMax = new Vector2(frac, 1f);
+                    levelFill.offsetMin = Vector2.zero;
+                    levelFill.offsetMax = Vector2.zero;
+                }
 
                 if (effect != null)
                 {

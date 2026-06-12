@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_medic
   displayNameKey: unit_medic_name
+  displayName: "M\xE9dico"
   rarity: 1
   supplyCost: 4
   baseHp: 38

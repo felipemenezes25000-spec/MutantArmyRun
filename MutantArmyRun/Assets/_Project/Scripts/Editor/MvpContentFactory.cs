@@ -120,72 +120,73 @@ namespace MutantArmy.Editor
             var set = new UnitSet
             {
                 // ---- MVP (NÃO QUEBRAR — valores idênticos ao baseline travado) ----
-                Soldier = ConfigureUnit("Unit_Soldier", "unit_soldier", Rarity.Common, 1,
+                Soldier = ConfigureUnit("Unit_Soldier", "unit_soldier", "Soldado", Rarity.Common, 1,
                     hp: 10f, dps: 2f, speed: 5.0f, range: 1.5f, ability: "cohesion"),
-                Archer = ConfigureUnit("Unit_Archer", "unit_archer", Rarity.Common, 2,
+                Archer = ConfigureUnit("Unit_Archer", "unit_archer", "Arqueiro", Rarity.Common, 2,
                     hp: 14f, dps: 8f, speed: 5.0f, range: 8.0f, ability: "sure_shot"),
-                Shieldbearer = ConfigureUnit("Unit_Shieldbearer", "unit_shieldbearer", Rarity.Common, 3,
+                Shieldbearer = ConfigureUnit("Unit_Shieldbearer", "unit_shieldbearer", "Escudeiro", Rarity.Common, 3,
                     hp: 30f, dps: 4f, speed: 4.5f, range: 1.0f, ability: "shield_wall"),
-                Mage = ConfigureUnit("Unit_Mage", "unit_mage", Rarity.Rare, 4,
+                Mage = ConfigureUnit("Unit_Mage", "unit_mage", "Mago", Rarity.Rare, 4,
                     hp: 25f, dps: 16f, speed: 4.5f, range: 6.0f, ability: "arcane_nova"),
-                Giant = ConfigureUnit("Unit_Giant", "unit_giant", Rarity.Epic, 12,
+                Giant = ConfigureUnit("Unit_Giant", "unit_giant", "Gigante", Rarity.Epic, 12,
                     hp: 120f, dps: 40f, speed: 3.5f, range: 2.0f, ability: "seismic_slam")
             };
 
             // ---- COMUNS restantes (CANON §5) ----
-            set.Runner = ConfigureUnit("Unit_Runner", "unit_runner", Rarity.Common, 1,
+            set.Runner = ConfigureUnit("Unit_Runner", "unit_runner", "Corredor", Rarity.Common, 1,
                 hp: 7f, dps: 3f, speed: 6.5f, range: 1.2f, ability: "dodge_traps",
                 element: ElementType.None, body: BodyType.Organic);   // rápido, desvia, frágil
 
             // ---- RAROS (CANON §5) ----
-            set.Ninja = ConfigureUnit("Unit_Ninja", "unit_ninja", Rarity.Rare, 3,
+            set.Ninja = ConfigureUnit("Unit_Ninja", "unit_ninja", "Ninja", Rarity.Rare, 3,
                 hp: 22f, dps: 19f, speed: 6.0f, range: 1.5f, ability: "dodge_traps",
                 element: ElementType.None, body: BodyType.Organic);
-            set.FlameTrooper = ConfigureUnit("Unit_FlameTrooper", "unit_flametrooper", Rarity.Rare, 4,
+            set.FlameTrooper = ConfigureUnit("Unit_FlameTrooper", "unit_flametrooper", "Lança-Chamas", Rarity.Rare, 4,
                 hp: 30f, dps: 25f, speed: 4.5f, range: 3.0f, ability: "dot_fire",
                 element: ElementType.Fire, body: BodyType.Organic);
-            set.FrostTrooper = ConfigureUnit("Unit_FrostTrooper", "unit_frosttrooper", Rarity.Rare, 4,
+            set.FrostTrooper = ConfigureUnit("Unit_FrostTrooper", "unit_frosttrooper", "Tropa Glacial", Rarity.Rare, 4,
                 hp: 34f, dps: 21f, speed: 4.5f, range: 5.0f, ability: "slow",
                 element: ElementType.Ice, body: BodyType.Organic);
-            set.Medic = ConfigureUnit("Unit_Medic", "unit_medic", Rarity.Rare, 4,
+            set.Medic = ConfigureUnit("Unit_Medic", "unit_medic", "Médico", Rarity.Rare, 4,
                 hp: 38f, dps: 8f, speed: 4.8f, range: 4.0f, ability: "heal_allies",
                 element: ElementType.None, body: BodyType.Organic);
 
             // ---- ÉPICOS (CANON §5) ----
-            set.Robot = ConfigureUnit("Unit_Robot", "unit_robot", Rarity.Epic, 8,
+            set.Robot = ConfigureUnit("Unit_Robot", "unit_robot", "Robô", Rarity.Epic, 8,
                 hp: 90f, dps: 38f, speed: 4.0f, range: 3.0f, ability: "armor_plating",
                 element: ElementType.None, body: BodyType.Machine);   // imune a Veneno via bodyType
-            set.Necromancer = ConfigureUnit("Unit_Necromancer", "unit_necromancer", Rarity.Epic, 8,
+            set.Necromancer = ConfigureUnit("Unit_Necromancer", "unit_necromancer", "Necromante", Rarity.Epic, 8,
                 hp: 76f, dps: 30f, speed: 4.0f, range: 5.0f, ability: "revive_dead",
                 element: ElementType.Shadow, body: BodyType.Organic);
-            set.Engineer = ConfigureUnit("Unit_Engineer", "unit_engineer", Rarity.Epic, 8,
+            set.Engineer = ConfigureUnit("Unit_Engineer", "unit_engineer", "Engenheiro", Rarity.Epic, 8,
                 hp: 84f, dps: 34f, speed: 4.0f, range: 4.0f, ability: "build_turret",
                 element: ElementType.None, body: BodyType.Organic);
-            set.Alien = ConfigureUnit("Unit_Alien", "unit_alien", Rarity.Epic, 8,
+            set.Alien = ConfigureUnit("Unit_Alien", "unit_alien", "Alien", Rarity.Epic, 8,
                 hp: 80f, dps: 36f, speed: 4.5f, range: 4.0f, ability: "chain",
                 element: ElementType.Alien, body: BodyType.Organic);
 
             // ---- LENDÁRIOS (CANON §5) ----
-            set.Dragon = ConfigureUnit("Unit_Dragon", "unit_dragon", Rarity.Legendary, 20,
+            set.Dragon = ConfigureUnit("Unit_Dragon", "unit_dragon", "Dragão", Rarity.Legendary, 20,
                 hp: 200f, dps: 110f, speed: 4.5f, range: 6.0f, ability: "flight",
                 element: ElementType.Fire, body: BodyType.Organic);   // dano em área + voo
-            set.Titan = ConfigureUnit("Unit_Titan", "unit_titan", Rarity.Legendary, 25,
+            set.Titan = ConfigureUnit("Unit_Titan", "unit_titan", "Titã", Rarity.Legendary, 25,
                 hp: 320f, dps: 110f, speed: 3.0f, range: 2.5f, ability: "seismic_slam",
                 element: ElementType.None, body: BodyType.Organic);   // enorme, forte, lento
-            set.WarAngel = ConfigureUnit("Unit_WarAngel", "unit_warangel", Rarity.Legendary, 18,
+            set.WarAngel = ConfigureUnit("Unit_WarAngel", "unit_warangel", "Anjo de Guerra", Rarity.Legendary, 18,
                 hp: 210f, dps: 80f, speed: 5.0f, range: 6.0f, ability: "heal_allies",
                 element: ElementType.Light, body: BodyType.Organic);  // cura + dano de Luz
-            set.Demon = ConfigureUnit("Unit_Demon", "unit_demon", Rarity.Legendary, 20,
+            set.Demon = ConfigureUnit("Unit_Demon", "unit_demon", "Demônio Mutante", Rarity.Legendary, 20,
                 hp: 230f, dps: 130f, speed: 4.2f, range: 3.0f, ability: "dot_shadow",
                 element: ElementType.Shadow, body: BodyType.Organic); // dano brutal de Sombra
-            set.Mecha = ConfigureUnit("Unit_Mecha", "unit_mecha", Rarity.Legendary, 25,
+            set.Mecha = ConfigureUnit("Unit_Mecha", "unit_mecha", "Mecha Supremo", Rarity.Legendary, 25,
                 hp: 300f, dps: 150f, speed: 3.5f, range: 7.0f, ability: "area_damage",
                 element: ElementType.Lightning, body: BodyType.Machine); // laser + mísseis em área
 
             return set;
         }
 
-        private static UnitConfigSO ConfigureUnit(string assetName, string unitId, Rarity rarity, int supply,
+        private static UnitConfigSO ConfigureUnit(string assetName, string unitId, string displayName,
+                                                  Rarity rarity, int supply,
                                                   float hp, float dps, float speed, float range, string ability,
                                                   ElementType element = ElementType.None,
                                                   BodyType body = BodyType.Organic)
@@ -193,6 +194,7 @@ namespace MutantArmy.Editor
             var unit = LoadOrCreate<UnitConfigSO>(Root + "/Units/" + assetName + ".asset");
             unit.unitId = unitId;
             unit.displayNameKey = unitId + "_name";
+            unit.displayName = displayName;      // nome amigável PT-BR (CANON §5) — a UI exibe este campo
             unit.rarity = rarity;
             unit.supplyCost = supply;
             unit.baseHp = hp;
@@ -228,61 +230,63 @@ namespace MutantArmy.Editor
             var set = new MutationSet();
 
             // asas: voo (ignora obstáculos de chão), leve ganho de velocidade.
-            set.Wings = ConfigureMutation("Mutation_Wings", "mut_wings", Rarity.Rare,
+            set.Wings = ConfigureMutation("Mutation_Wings", "mut_wings", "Asas", Rarity.Rare,
                 dps: 1f, hp: 1f, speed: 1.15f, size: 1f, flight: true,
                 element: ElementType.None, bit: 0);
 
             // armadura: +50% HP (CANON: hpMult 1.5).
-            set.Armor = ConfigureMutation("Mutation_Armor", "mut_armor", Rarity.Rare,
+            set.Armor = ConfigureMutation("Mutation_Armor", "mut_armor", "Armadura", Rarity.Rare,
                 dps: 1f, hp: 1.5f, speed: 1f, size: 1.05f, flight: false,
                 element: ElementType.None, bit: 1);
 
             // laser: adiciona dano de Raio + dpsMult 1.3 (CANON).
-            set.Laser = ConfigureMutation("Mutation_Laser", "mut_laser", Rarity.Epic,
+            set.Laser = ConfigureMutation("Mutation_Laser", "mut_laser", "Laser", Rarity.Epic,
                 dps: 1.3f, hp: 1f, speed: 1f, size: 1f, flight: false,
                 element: ElementType.Lightning, bit: 2);
 
             // tamanho: sizeMult 1.4, hpMult 1.3 (CANON), leve perda de velocidade.
-            set.Size = ConfigureMutation("Mutation_Size", "mut_size", Rarity.Epic,
+            set.Size = ConfigureMutation("Mutation_Size", "mut_size", "Gigantismo", Rarity.Epic,
                 dps: 1.15f, hp: 1.3f, speed: 0.95f, size: 1.4f, flight: false,
                 element: ElementType.None, bit: 3);
 
             // velocidade: speedMult 1.4 (CANON).
-            set.Speed = ConfigureMutation("Mutation_Speed", "mut_speed", Rarity.Rare,
+            set.Speed = ConfigureMutation("Mutation_Speed", "mut_speed", "Velocidade", Rarity.Rare,
                 dps: 1f, hp: 1f, speed: 1.4f, size: 0.95f, flight: false,
                 element: ElementType.None, bit: 4);
 
             // clonagem: ganho agressivo de dano/HP (o "dobra o exército" visual fica a cargo
             // do runtime; aqui o efeito honesto é statístico) — lendária, momento de vídeo.
-            set.Clone = ConfigureMutation("Mutation_Clone", "mut_clone", Rarity.Legendary,
+            set.Clone = ConfigureMutation("Mutation_Clone", "mut_clone", "Clonagem", Rarity.Legendary,
                 dps: 1.5f, hp: 1.5f, speed: 1f, size: 1f, flight: false,
                 element: ElementType.None, bit: 5);
 
             // regeneração: HP extra (proxy de cura contínua), épica.
-            set.Regen = ConfigureMutation("Mutation_Regen", "mut_regen", Rarity.Epic,
+            set.Regen = ConfigureMutation("Mutation_Regen", "mut_regen", "Regeneração", Rarity.Epic,
                 dps: 1f, hp: 1.6f, speed: 1f, size: 1f, flight: false,
                 element: ElementType.None, bit: 6);
 
             // escudo: muito HP, leve perda de dano — defensiva pura.
-            set.Shield = ConfigureMutation("Mutation_Shield", "mut_shield", Rarity.Rare,
+            set.Shield = ConfigureMutation("Mutation_Shield", "mut_shield", "Escudo", Rarity.Rare,
                 dps: 0.95f, hp: 1.7f, speed: 1f, size: 1.05f, flight: false,
                 element: ElementType.None, bit: 7);
 
             // ataque em área: dpsMult forte, adiciona Fogo (estética de explosão), épica.
-            set.AreaBlast = ConfigureMutation("Mutation_AreaBlast", "mut_area_blast", Rarity.Epic,
+            set.AreaBlast = ConfigureMutation("Mutation_AreaBlast", "mut_area_blast", "Onda de Choque", Rarity.Epic,
                 dps: 1.4f, hp: 1f, speed: 1f, size: 1f, flight: false,
                 element: ElementType.Fire, bit: 8);
 
             return set;
         }
 
-        private static MutationConfigSO ConfigureMutation(string assetName, string mutationId, Rarity rarity,
+        private static MutationConfigSO ConfigureMutation(string assetName, string mutationId, string displayName,
+                                                          Rarity rarity,
                                                           float dps, float hp, float speed, float size,
                                                           bool flight, ElementType element, int bit)
         {
             var m = LoadOrCreate<MutationConfigSO>(Root + "/Mutations/" + assetName + ".asset");
             m.mutationId = mutationId;
             m.displayNameKey = mutationId + "_name";
+            m.displayName = displayName;        // nome amigável PT-BR (CANON §3.3) — o HUD de mutação exibe este campo
             m.rarity = rarity;
             m.dpsMult = dps;
             m.hpMult = hp;

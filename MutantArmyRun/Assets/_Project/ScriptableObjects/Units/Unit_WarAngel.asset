@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_warangel
   displayNameKey: unit_warangel_name
+  displayName: Anjo de Guerra
   rarity: 3
   supplyCost: 18
   baseHp: 210

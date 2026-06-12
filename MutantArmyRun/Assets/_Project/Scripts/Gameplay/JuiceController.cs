@@ -9,16 +9,23 @@ using UnityEngine.Rendering;
 namespace MutantArmy.Gameplay
 {
     /// <summary>
-    /// Orquestrador de JUICE da corrida (doc 09 §4 / doc 14 §7) — 100% cosmético, assina o
+    /// Orquestrador de JUICE da corrida (doc 09 §4 / doc 14 §5/§7) — 100% cosmético, assina o
     /// bus (GameEvents) e NUNCA muta estado de jogo. Reações:
     /// · portal consumido → ScalePop no rótulo + flash no frame + burst tintado (VFXManager);
-    /// · multiplicação ×2+ → cascata de pops com stagger sobre a formação;
+    /// · multiplicação ×2+ → cascata de pops com stagger; ×3+ (grande) → screen shake + soco
+    ///   de FOV + vibração média (doc 14 §5);
+    /// · mutação ativada (OnMutationGained) → burst magenta no centróide + pulso de câmera +
+    ///   vibração média (o selo textual e o slot do HUD são de outras camadas);
     /// · estouro de Supply → burst dourado no centróide (as moedas até o HUD são do
     ///   FloatingTextSpawner, camada UI);
     /// · dano no boss → micro shake + flash vermelho (MaterialPropertyBlock — nunca
-    ///   instancia material) + JuiceEvents p/ o SFX (Services não é visível daqui, §2.3);
-    /// · fase de vida do boss → shake forte + zoom punch de FOV;
-    /// · vitória → confete; derrota → dessaturação rápida (Volume.weight 0→1).
+    ///   instancia material) + JuiceEvents p/ o SFX (Services não é visível daqui, §2.3) +
+    ///   vibração leve por pulso;
+    /// · fase de vida do boss → shake forte + zoom punch de FOV + vibração forte;
+    /// · vitória → confete + vibração forte (o slow-mo 0,3/0,8 do golpe final é disparado pelo
+    ///   BossManager.Die via VFXManager.SlowMotion); derrota → dessaturação rápida (Volume 0→1).
+    /// Vibração via Core.Haptics: hooks PREPARADOS, no-op fora de Android/iOS (build Windows/
+    /// headless) e respeitando SaveData.hapticsOn — nunca atrapalha o autoteste.
     /// Dano no boss é detectado por POLLING do BossRuntime.Hp: o combate agregado roda a
     /// 10 Hz contínuo (doc 12 §4.4) — não existe (nem deve existir) 1 evento por hit; a
     /// regra "UI sem polling" (§3.2) é sobre UI/dados, não sobre leitura cosmética local.
@@ -37,6 +44,12 @@ namespace MutantArmy.Gameplay
         [SerializeField] private int _cascadeMaxPops = 8;
         [SerializeField] private float _cascadeStagger = 0.05f;
 
+        [Header("Punch / shake de portal (doc 14 §5)")]
+        [SerializeField] private float _bigMultiplyValue = 3f;      // ×3+ é "grande": ganha shake + punch
+        [SerializeField] private float _bigMultiplyShake = 1.2f;    // graus de shake na multiplicação grande
+        [SerializeField] private float _strongPortalFovPunch = -4f; // estreita o FOV num soco curto
+        [SerializeField] private float _mutationShake = 0.8f;       // mutação ativada: pulso leve + burst
+
         private bool _subscribedToGameManager;
         private BossRuntime _trackedBoss;
         private float _lastBossHp;
@@ -54,6 +67,7 @@ namespace MutantArmy.Gameplay
         {
             GameEvents.OnGateConsumed += HandleGateConsumed;
             GameEvents.OnSupplyOverflow += HandleSupplyOverflow;
+            GameEvents.OnMutationGained += HandleMutationGained;
             GameEvents.OnBossPhaseChanged += HandleBossPhaseChanged;
             GameEvents.OnLevelFinished += HandleLevelFinished;
             TrySubscribeGameManager();
@@ -64,6 +78,7 @@ namespace MutantArmy.Gameplay
             // bus estático sobrevive a cenas — sempre limpar (doc 12 §3.2)
             GameEvents.OnGateConsumed -= HandleGateConsumed;
             GameEvents.OnSupplyOverflow -= HandleSupplyOverflow;
+            GameEvents.OnMutationGained -= HandleMutationGained;
             GameEvents.OnBossPhaseChanged -= HandleBossPhaseChanged;
             GameEvents.OnLevelFinished -= HandleLevelFinished;
             if (GameManager.Instance != null)
@@ -116,8 +131,18 @@ namespace MutantArmy.Gameplay
             if (VFXManager.Instance != null)
                 VFXManager.Instance.PlayGateBurst(burstPos, GateBurstColor(gate));
 
+            // Multiplicação ×2+: cascata de pops sobre a formação. ×3/×5 (big) sobe o
+            // espetáculo — screen shake + soco de FOV + vibração média (doc 14 §5).
             if (gate.gateType == GateType.Multiply && gate.value >= 2f)
+            {
                 StartCoroutine(CascadePops(result.newCount));
+                if (gate.value >= _bigMultiplyValue)
+                {
+                    Tween.ShakeCamera(_bigMultiplyShake, 0.22f);
+                    PunchCameraFov(_strongPortalFovPunch, 0.25f);
+                    Core.Haptics.Medium();
+                }
+            }
         }
 
         private static Color GateBurstColor(GateConfigSO gate)
@@ -212,10 +237,29 @@ namespace MutantArmy.Gameplay
             VFXManager.Instance.PlayGateBurst(center + Vector3.up * 1.2f, new Color(1f, 0.84f, 0.25f));
         }
 
+        // Mutação ativada (CANON §3.3): burst colorido no centróide + pulso leve de câmera +
+        // vibração média. O selo textual "MUTATION!" e o slot do HUD são de outras camadas
+        // (FeedbackTextController/HudController, via OnMutationGained) — aqui só o espetáculo.
+        private void HandleMutationGained(MutationConfigSO mutation)
+        {
+            CrowdManager crowd = CrowdManager.Instance;
+            Vector3 center = crowd != null ? crowd.Centroid : CrowdAnchor.Position;
+            if (VFXManager.Instance != null)
+                VFXManager.Instance.PlayGateBurst(center + Vector3.up * 1.4f, MutationBurstColor);
+            Tween.ShakeCamera(_mutationShake, 0.18f);
+            PunchCameraFov(-3f, 0.22f);
+            Core.Haptics.Medium();
+        }
+
+        // Mutação "brilha" num magenta vivo, distinto de qualquer portal — leitura clara de
+        // que algo raro e permanente aconteceu (CANON §3.3). O MutationConfigSO não carrega cor.
+        private static readonly Color MutationBurstColor = new Color(0.85f, 0.35f, 1f);
+
         private void HandleBossPhaseChanged(BossPhase phase)
         {
             Tween.ShakeCamera(2.5f, 0.5f);   // shake FORTE: virada de fase é evento maiúsculo
             PunchCameraFov(-7f, 0.5f);
+            Core.Haptics.Heavy();            // virada de fase do boss: vibração forte (doc 14 §5)
         }
 
         private void HandleLevelFinished(LevelResult result)
@@ -223,6 +267,7 @@ namespace MutantArmy.Gameplay
             if (result.won)
             {
                 if (VFXManager.Instance != null) VFXManager.Instance.PlayConfetti();
+                Core.Haptics.Heavy();   // golpe final/vitória: junto do slow-mo do BossManager.Die
             }
             else
             {
@@ -277,6 +322,7 @@ namespace MutantArmy.Gameplay
                 if (_bossFlashRoutine != null) StopCoroutine(_bossFlashRoutine);
                 _bossFlashRoutine = StartCoroutine(FlashBossRed());
                 JuiceEvents.RaiseBossHitPulse(BossViewPosition());
+                Core.Haptics.Light();             // tap leve por pulso de dano (rate-limited acima)
             }
             _lastBossHp = boss.Hp;
         }

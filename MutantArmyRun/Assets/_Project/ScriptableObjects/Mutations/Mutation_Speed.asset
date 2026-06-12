@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.MutationConfigSO
   mutationId: mut_speed
   displayNameKey: mut_speed_name
+  displayName: Velocidade
   rarity: 1
   dpsMult: 1
   hpMult: 1

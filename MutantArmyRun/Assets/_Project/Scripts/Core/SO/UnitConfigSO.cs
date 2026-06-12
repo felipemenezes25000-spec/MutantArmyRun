@@ -12,6 +12,8 @@ namespace MutantArmy.Core
     {
         public string unitId;                  // "soldier", "archer"... (chave de save/analytics)
         public string displayNameKey;          // localização
+        public string displayName;             // nome amigável PT-BR já resolvido (ex.: "Arqueiro");
+                                               // a UI usa este campo direto — sem passar pela tabela de loc.
         public Rarity rarity;
         public int supplyCost;                 // Soldado 1 · Mago 4 · Gigante 12 (CANON §5)
         public float baseHp, baseDps, moveSpeed, attackRange;     // baseline Soldado: 10/2/5

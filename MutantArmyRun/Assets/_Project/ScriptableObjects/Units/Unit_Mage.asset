@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_mage
   displayNameKey: unit_mage_name
+  displayName: Mago
   rarity: 1
   supplyCost: 4
   baseHp: 25

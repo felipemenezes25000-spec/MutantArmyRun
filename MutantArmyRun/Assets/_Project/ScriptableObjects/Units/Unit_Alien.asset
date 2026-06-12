@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_alien
   displayNameKey: unit_alien_name
+  displayName: Alien
   rarity: 2
   supplyCost: 8
   baseHp: 80

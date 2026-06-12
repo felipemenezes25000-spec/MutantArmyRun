@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_frosttrooper
   displayNameKey: unit_frosttrooper_name
+  displayName: Tropa Glacial
   rarity: 1
   supplyCost: 4
   baseHp: 34

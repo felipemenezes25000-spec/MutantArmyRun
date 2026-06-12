@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.MutationConfigSO
   mutationId: mut_armor
   displayNameKey: mut_armor_name
+  displayName: Armadura
   rarity: 1
   dpsMult: 1
   hpMult: 1.5

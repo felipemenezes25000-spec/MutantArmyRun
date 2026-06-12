@@ -4,6 +4,7 @@ using MutantArmy.Core;
 using MutantArmy.Gameplay;
 using MutantArmy.Services;
 using MutantArmy.UI;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -25,9 +26,9 @@ namespace MutantArmy.Editor
     /// 4. AudioCatalogSO preenchido por nome (clip ausente fica null — no-op silencioso).
     /// 5. Volume profile de derrota (ColorAdjustments saturation −100) p/ o JuiceController.
     /// 6. Cena Boot: catálogo no AudioManager + AudioListener/AudioSources garantidos.
-    /// 7. Cena Game: JuiceController + DevScreenshotRig + FloatingTextSpawner adicionados e
-    ///    ligados; VFXManager recebe os prefabs novos + decal de telegraph; câmera com
-    ///    post-processing ligado (dessaturação precisa).
+    /// 7. Cena Game: JuiceController + DevScreenshotRig + FloatingTextSpawner + TutorialController
+    ///    (FTUE: dicas ARRASTE/ESCOLHA no HudCanvas) adicionados e ligados; VFXManager recebe os
+    ///    prefabs novos + decal de telegraph; câmera com post-processing ligado (dessaturação).
     /// Idempotente: re-rodar atualiza no lugar, nunca duplica.
     /// </summary>
     public static class JuiceFactory
@@ -113,7 +114,7 @@ namespace MutantArmy.Editor
             AssetDatabase.Refresh();
             Debug.Log("MAR Tools: juice pronto — áudio importado + catálogo, 5 prefabs de partícula, " +
                       "telegraph pulsante, volume de derrota e cenas Boot/Game costuradas " +
-                      "(JuiceController, DevScreenshotRig, FloatingTextSpawner).");
+                      "(JuiceController, DevScreenshotRig, FloatingTextSpawner, TutorialController FTUE).");
         }
 
         // ------------------------------------------------------------------ 1/2. import do staging
@@ -583,6 +584,9 @@ namespace MutantArmy.Editor
             // --- FloatingTextSpawner no HudCanvas ---
             WireFloatingTextSpawner(scene);
 
+            // --- TutorialController (FTUE) no HudCanvas ---
+            WireTutorialController(scene);
+
             EnsureAudioListener();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -669,6 +673,151 @@ namespace MutantArmy.Editor
             WireField(spawner, "_layer", spawner.transform as RectTransform);
             WireField(spawner, "_coinTarget", coinTarget);
             WireField(spawner, "_coinSprite", coinSprite);
+        }
+
+        // ------------------------------------------------------------------ FTUE (tutorial)
+
+        // Monta a camada de onboarding (doc 14 §6) no HudCanvas: um [Tutorial] com a dica de
+        // ARRASTE (dedo deslizando + rótulo) e o callout ESCOLHA!. Tudo raycastTarget OFF para
+        // o AutoPilot continuar jogando por baixo. Idempotente: re-roda atualiza no lugar.
+        private static void WireTutorialController(Scene scene)
+        {
+            GameObject hudCanvas = FindInScene(scene, "HudCanvas");
+            if (hudCanvas == null)
+            {
+                Debug.LogWarning("MAR Tools: HudCanvas não existe na cena Game — TutorialController pulado.");
+                return;
+            }
+
+            var controller = hudCanvas.GetComponentInChildren<TutorialController>(true);
+            RectTransform root;
+            if (controller == null)
+            {
+                var rootGo = new GameObject("[Tutorial]", typeof(RectTransform));
+                root = (RectTransform)rootGo.transform;
+                root.SetParent(hudCanvas.transform, false);
+                StretchRect(root);
+                root.SetAsLastSibling();   // dicas SOBRE o HUD, sob as moedas voadoras
+                controller = rootGo.AddComponent<TutorialController>();
+            }
+            else
+            {
+                root = (RectTransform)controller.transform;
+            }
+
+            // (a) ARRASTE: dedo (círculo) + 2 setas + rótulo, ancorado no terço inferior central.
+            (RectTransform dragHint, CanvasGroup dragGroup) = EnsureHintHolder(root, "DragHint",
+                new Vector2(0f, 340f));
+            BuildDragHintVisuals(dragHint);
+
+            // (b) ESCOLHA!: callout com setas ◄ ► acima do centro — onde o 1º par de portais surge.
+            (RectTransform chooseHint, CanvasGroup chooseGroup) = EnsureHintHolder(root, "ChooseHint",
+                new Vector2(0f, 60f));
+            BuildChooseHintVisuals(chooseHint);
+
+            WireField(controller, "_dragHint", dragHint);
+            WireField(controller, "_dragHintGroup", dragGroup);
+            WireField(controller, "_chooseHint", chooseHint);
+            WireField(controller, "_chooseHintGroup", chooseGroup);
+        }
+
+        // Holder de uma dica: RectTransform centrado (âncora inferior) + CanvasGroup p/ fade.
+        // Limpa os filhos antigos para o rebuild ser determinístico ao re-rodar a factory.
+        private static (RectTransform, CanvasGroup) EnsureHintHolder(RectTransform parent, string name,
+                                                                     Vector2 anchoredPos)
+        {
+            Transform existing = FindChildRecursive(parent, name);
+            GameObject go = existing != null ? existing.gameObject : new GameObject(name, typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = new Vector2(0.5f, 0f);
+            rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = anchoredPos;
+            rect.sizeDelta = new Vector2(700f, 220f);
+
+            for (int i = rect.childCount - 1; i >= 0; i--)   // rebuild limpo
+                Object.DestroyImmediate(rect.GetChild(i).gameObject);
+
+            var group = go.GetComponent<CanvasGroup>();
+            if (group == null) group = go.AddComponent<CanvasGroup>();
+            group.alpha = 0f;
+            group.interactable = false;
+            group.blocksRaycasts = false;   // nunca rouba o toque do AutoPilot/jogador
+            go.SetActive(false);            // o controller ativa por evento
+            return (rect, group);
+        }
+
+        // Dedo deslizante: um disco (vfx_circle) com 2 chevrons e o rótulo "ARRASTE".
+        private static void BuildDragHintVisuals(RectTransform holder)
+        {
+            var circle = AssetDatabase.LoadAssetAtPath<Sprite>(VfxTexturesFolder + "/vfx_circle.png");
+            Image finger = CreateHintImage(holder, "Finger", circle, new Color(1f, 1f, 1f, 0.95f),
+                new Vector2(0f, 10f), new Vector2(120f, 120f));
+            // halo levemente maior atrás do dedo, dá volume sem asset extra
+            CreateHintImage(finger.rectTransform, "Halo", circle, new Color(0.30f, 0.85f, 1f, 0.35f),
+                Vector2.zero, new Vector2(180f, 180f)).rectTransform.SetAsFirstSibling();
+
+            CreateHintLabel(holder, "Label", "ARRASTE  ◄ ►", 56f,
+                new Vector2(0f, -90f), new Vector2(640f, 80f), new Color(0.95f, 0.98f, 1f));
+        }
+
+        // Callout de escolha: rótulo "ESCOLHA!" com setas para os dois lados (os 2 portais).
+        private static void BuildChooseHintVisuals(RectTransform holder)
+        {
+            CreateHintLabel(holder, "Label", "◄  ESCOLHA!  ►", 64f,
+                Vector2.zero, new Vector2(680f, 110f), new Color(1f, 0.86f, 0.35f));
+        }
+
+        private static Image CreateHintImage(Transform parent, string name, Sprite sprite, Color color,
+                                             Vector2 anchoredPos, Vector2 size)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = anchoredPos;
+            rect.sizeDelta = size;
+            var image = go.AddComponent<Image>();
+            image.sprite = sprite;
+            image.color = color;
+            image.raycastTarget = false;
+            return image;
+        }
+
+        private static TMP_Text CreateHintLabel(Transform parent, string name, string content, float fontSize,
+                                                Vector2 anchoredPos, Vector2 size, Color color)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = anchoredPos;
+            rect.sizeDelta = size;
+
+            var text = go.AddComponent<TextMeshProUGUI>();
+            text.text = content;
+            text.fontSize = fontSize;
+            text.alignment = TextAlignmentOptions.Center;
+            text.fontStyle = FontStyles.Bold;
+            text.color = color;
+            text.raycastTarget = false;
+
+            // mesma cascata de fonte do ProjectSetup: skin premium → LiberationSans fallback.
+            TMP_FontAsset font = UiSkin.FontAsset;
+            if (font == null) font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+            if (font != null) text.font = font;
+            return text;
+        }
+
+        private static void StretchRect(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
         }
 
         // ------------------------------------------------------------------ infra

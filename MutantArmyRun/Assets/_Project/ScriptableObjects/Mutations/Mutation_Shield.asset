@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.MutationConfigSO
   mutationId: mut_shield
   displayNameKey: mut_shield_name
+  displayName: Escudo
   rarity: 1
   dpsMult: 0.95
   hpMult: 1.7

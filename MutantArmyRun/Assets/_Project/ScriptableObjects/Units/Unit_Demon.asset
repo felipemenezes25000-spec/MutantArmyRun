@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_demon
   displayNameKey: unit_demon_name
+  displayName: "Dem\xF4nio Mutante"
   rarity: 3
   supplyCost: 20
   baseHp: 230

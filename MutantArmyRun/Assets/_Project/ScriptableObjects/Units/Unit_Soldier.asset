@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_soldier
   displayNameKey: unit_soldier_name
+  displayName: Soldado
   rarity: 0
   supplyCost: 1
   baseHp: 10

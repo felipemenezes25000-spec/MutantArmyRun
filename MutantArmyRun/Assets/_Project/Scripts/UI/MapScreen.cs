@@ -95,7 +95,7 @@ namespace MutantArmy.UI
             TMP_Text progress = Label(rect, "Progress", "", 34f, new Vector2(1f, 1f),
                 new Vector2(-40f, -20f), new Vector2(260f, 50f), Gold, TextAlignmentOptions.TopRight);
 
-            Image progressFill = Bar(rect, new Vector2(0f, 0f), new Vector2(48f, 100f), new Vector2(640f, 22f));
+            RectTransform progressFill = Bar(rect, new Vector2(0f, 0f), new Vector2(48f, 100f), new Vector2(640f, 22f));
 
             TMP_Text cta = Label(rect, "Cta", "", 32f, new Vector2(1f, 0f),
                 new Vector2(-40f, 40f), new Vector2(320f, 60f), Green, TextAlignmentOptions.BottomRight);
@@ -131,7 +131,11 @@ namespace MutantArmy.UI
             return t;
         }
 
-        private Image Bar(Transform parent, Vector2 anchor, Vector2 pos, Vector2 sizeDelta)
+        // Barra de progresso ANCORADA (largura proporcional via anchorMax.x), não Image.Type.Filled:
+        // uma Image sem sprite IGNORA fillAmount e renderiza o quad branco inteiro — por isso a barra
+        // aparecia sempre cheia. A âncora esquerda→direita funciona sem sprite. O Refresh do card seta
+        // a fração em SetProgress (ver WorldCard).
+        private RectTransform Bar(Transform parent, Vector2 anchor, Vector2 pos, Vector2 sizeDelta)
         {
             var bgGo = new GameObject("ProgressBar", typeof(RectTransform), typeof(Image));
             var bgRect = (RectTransform)bgGo.transform;
@@ -144,19 +148,21 @@ namespace MutantArmy.UI
             var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(Image));
             var fillRect = (RectTransform)fillGo.transform;
             fillRect.SetParent(bgRect, false);
-            fillRect.anchorMin = Vector2.zero; fillRect.anchorMax = Vector2.one;
+            // ancora à esquerda; anchorMax.x = fração da largura → preenchimento real 0..1 sem sprite.
+            fillRect.anchorMin = new Vector2(0f, 0f); fillRect.anchorMax = new Vector2(0f, 1f);
+            fillRect.pivot = new Vector2(0f, 0.5f);
             fillRect.offsetMin = Vector2.zero; fillRect.offsetMax = Vector2.zero;
             var fill = fillGo.GetComponent<Image>();
-            fill.color = Green; fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal; fill.fillAmount = 0f; fill.raycastTarget = false;
-            return fill;
+            fill.color = Green; fill.type = Image.Type.Simple; fill.raycastTarget = false;
+            return fillRect;
         }
 
         /// <summary>Card vivo de um mundo.</summary>
         private class WorldCard
         {
             public Button root;
-            public Image bg, stripe, progressFill;
+            public Image bg, stripe;
+            public RectTransform progressFill;   // largura = fração do progresso (anchorMax.x)
             public TMP_Text name, boss, progress, cta;
             public MetaBridge.WorldView current;
 
@@ -181,7 +187,13 @@ namespace MutantArmy.UI
 
                 if (progress != null) progress.text = w.clearedInWorld + "/" + MetaBridge.LevelsPerWorld;
                 if (progressFill != null)
-                    progressFill.fillAmount = Mathf.Clamp01((float)w.clearedInWorld / MetaBridge.LevelsPerWorld);
+                {
+                    // fração REAL clearedNoMundo/10 → largura da barra (anchorMax.x). 0/10 = vazia.
+                    float frac = Mathf.Clamp01((float)w.clearedInWorld / MetaBridge.LevelsPerWorld);
+                    progressFill.anchorMax = new Vector2(frac, 1f);
+                    progressFill.offsetMin = Vector2.zero;
+                    progressFill.offsetMax = Vector2.zero;
+                }
 
                 if (bg != null) bg.color = w.unlocked ? UnlockedBg : LockedBg;
                 if (cta != null)

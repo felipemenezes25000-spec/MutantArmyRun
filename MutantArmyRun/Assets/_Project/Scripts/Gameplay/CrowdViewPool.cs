@@ -24,9 +24,15 @@ namespace MutantArmy.Gameplay
         // tint da mutação via MaterialPropertyBlock (zero-alloc, reusado): -1 = nunca aplicado,
         // 0 = sem tint (restaurado), 1 = tintado. Só toca o renderer quando o estado MUDA.
         private Renderer[] _renderers;
+        private Color[] _baseColors;        // _BaseColor original do sharedMaterial por renderer (cor de classe)
         private MaterialPropertyBlock _mpb;
         private int _appliedTintState = -1;
         private Color _appliedTint;
+
+        // Quanto a mutação MISTURA na cor base (CANON §3.3: o exército continua colorido/legível E
+        // comunica a mutação). 0 = só emissão; 1 = sobrescreve. 0.40 = leve viés de hue + glow.
+        private const float TintMixStrength = 0.40f;
+        private const float TintEmissionStrength = 0.55f;
 
         public void Cache(int stateParamHash)
         {
@@ -37,6 +43,17 @@ namespace MutantArmy.Gameplay
             if (CachedAnimator != null && !HasIntParam(CachedAnimator, stateParamHash))
                 CachedAnimator = null;
             _renderers = GetComponentsInChildren<Renderer>(true);   // aloca 1× no Cache, nunca por frame
+
+            // guarda a cor de classe original (sharedMaterial._BaseColor) por renderer — o tint da
+            // mutação faz Lerp DESSA cor para a cor da mutação, nunca sobrescreve (não fica tudo branco).
+            _baseColors = new Color[_renderers.Length];
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                Material mat = _renderers[i] != null ? _renderers[i].sharedMaterial : null;
+                _baseColors[i] = mat != null && mat.HasProperty(BaseColorId)
+                    ? mat.GetColor(BaseColorId)
+                    : Color.white;
+            }
         }
 
         /// <summary>SetActive(false→true) reseta o Animator ao estado de entrada — força reaplicar.</summary>
@@ -61,15 +78,25 @@ namespace MutantArmy.Gameplay
             _appliedTint = tint;
 
             if (_mpb == null) _mpb = new MaterialPropertyBlock();
-            _mpb.Clear();
-            if (active)
-            {
-                _mpb.SetColor(BaseColorId, tint);
-                _mpb.SetColor(EmissionColorId, tint * 0.6f);   // brilho sutil — leitura clara da mutação
-            }
-            // bloco vazio quando inativo: limpa qualquer override anterior (restaura o material)
+
             for (int i = 0; i < _renderers.Length; i++)
-                if (_renderers[i] != null) _renderers[i].SetPropertyBlock(_mpb);
+            {
+                Renderer r = _renderers[i];
+                if (r == null) continue;
+                _mpb.Clear();
+                if (active)
+                {
+                    // MISTURA com a cor de classe (Lerp), nunca sobrescreve: a tropa continua
+                    // colorida/legível E comunica a mutação. O brilho vem da emissão (cor pura da
+                    // mutação), reforçando a leitura sem apagar a identidade da tropa (CANON §3.3).
+                    Color baseColor = i < _baseColors.Length ? _baseColors[i] : Color.white;
+                    Color mixed = Color.Lerp(baseColor, tint, TintMixStrength);
+                    _mpb.SetColor(BaseColorId, mixed);
+                    _mpb.SetColor(EmissionColorId, tint * TintEmissionStrength);
+                }
+                // bloco vazio quando inativo: limpa qualquer override anterior (restaura o material)
+                r.SetPropertyBlock(_mpb);
+            }
         }
 
         /// <summary>1 chamada por frame por unidade viva: posição+rotação em lote, escala/anim só em mudança.</summary>

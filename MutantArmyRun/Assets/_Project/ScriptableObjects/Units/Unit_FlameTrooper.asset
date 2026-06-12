@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.UnitConfigSO
   unitId: unit_flametrooper
   displayNameKey: unit_flametrooper_name
+  displayName: "Lan\xE7a-Chamas"
   rarity: 1
   supplyCost: 4
   baseHp: 30

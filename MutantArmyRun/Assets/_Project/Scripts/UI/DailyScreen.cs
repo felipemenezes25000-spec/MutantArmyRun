@@ -180,7 +180,7 @@ namespace MutantArmy.UI
                 new Vector2(30f, -68f), new Vector2(620f, 40f), Gold, TextAlignmentOptions.TopLeft);
             ((RectTransform)reward.transform).pivot = new Vector2(0f, 1f);
 
-            Image progressFill = Bar(rect, new Vector2(0f, 0f), new Vector2(30f, 24f), new Vector2(620f, 20f));
+            RectTransform progressFill = Bar(rect, new Vector2(0f, 0f), new Vector2(30f, 24f), new Vector2(620f, 20f));
 
             // Botão RESGATAR à direita (habilita só quando completa e não reclamada).
             TMP_Text claimLabel;
@@ -220,7 +220,9 @@ namespace MutantArmy.UI
             return t;
         }
 
-        private Image Bar(Transform parent, Vector2 anchor, Vector2 pos, Vector2 sizeDelta)
+        // Barra ANCORADA (largura via anchorMax.x), não Image.Type.Filled: uma Image sem sprite
+        // ignora fillAmount e renderia a barra sempre cheia. Refresh seta a fração (progresso/alvo).
+        private RectTransform Bar(Transform parent, Vector2 anchor, Vector2 pos, Vector2 sizeDelta)
         {
             var bgGo = new GameObject("Bar", typeof(RectTransform), typeof(Image));
             var bgRect = (RectTransform)bgGo.transform;
@@ -233,12 +235,12 @@ namespace MutantArmy.UI
             var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(Image));
             var fillRect = (RectTransform)fillGo.transform;
             fillRect.SetParent(bgRect, false);
-            fillRect.anchorMin = Vector2.zero; fillRect.anchorMax = Vector2.one;
+            fillRect.anchorMin = new Vector2(0f, 0f); fillRect.anchorMax = new Vector2(0f, 1f);
+            fillRect.pivot = new Vector2(0f, 0.5f);
             fillRect.offsetMin = Vector2.zero; fillRect.offsetMax = Vector2.zero;
             var fill = fillGo.GetComponent<Image>();
-            fill.color = Green; fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal; fill.fillAmount = 0f; fill.raycastTarget = false;
-            return fill;
+            fill.color = Green; fill.type = Image.Type.Simple; fill.raycastTarget = false;
+            return fillRect;
         }
 
         private Button Btn(Transform parent, string name, string label, float size, Vector2 anchor,
@@ -282,14 +284,20 @@ namespace MutantArmy.UI
         {
             public string missionId;
             public TMP_Text reward, claimLabel;
-            public Image progressFill, claimImage;
+            public RectTransform progressFill;   // largura = fração progresso/alvo (anchorMax.x)
+            public Image claimImage;
             public Button claim;
 
             public void Refresh(MetaBridge.MissionView m)
             {
                 if (reward != null) reward.text = "+" + m.rewardCoins + " moedas  +" + m.rewardGems + " gemas";
                 if (progressFill != null)
-                    progressFill.fillAmount = m.target > 0 ? Mathf.Clamp01((float)m.progress / m.target) : 0f;
+                {
+                    float frac = m.target > 0 ? Mathf.Clamp01((float)m.progress / m.target) : 0f;
+                    progressFill.anchorMax = new Vector2(frac, 1f);
+                    progressFill.offsetMin = Vector2.zero;
+                    progressFill.offsetMax = Vector2.zero;
+                }
 
                 if (claim == null) return;
                 bool canClaim = m.complete && !m.claimed;

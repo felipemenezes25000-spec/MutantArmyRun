@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.MutationConfigSO
   mutationId: mut_area_blast
   displayNameKey: mut_area_blast_name
+  displayName: Onda de Choque
   rarity: 2
   dpsMult: 1.4
   hpMult: 1

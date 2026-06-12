@@ -134,13 +134,33 @@ namespace MutantArmy.UI
             return s.Length > 0;
         }
 
-        /// <summary>Nome amigável de uma tropa (id humanizado — UnitConfigSO não tem displayName).</summary>
+        /// <summary>
+        /// Nome amigável de uma tropa. 1) displayName PT-BR gravado pelo MvpContentFactory
+        /// (caminho normal); 2) fallback humaniza a chave de loc/id em assets antigos —
+        /// NUNCA exibe a chave crua tipo "UNIT ARCHER".
+        /// </summary>
         public static string UnitName(UnitConfigSO unit)
         {
             if (unit == null) return "TROPA";
+            if (!string.IsNullOrEmpty(unit.displayName))
+                return unit.displayName.ToUpperInvariant();
             string raw = !string.IsNullOrEmpty(unit.displayNameKey) ? unit.displayNameKey : unit.unitId;
             string human = Humanize(raw);
             return string.IsNullOrEmpty(human) ? "TROPA" : human.ToUpperInvariant();
+        }
+
+        /// <summary>
+        /// Nome amigável de uma mutação. 1) displayName PT-BR gravado pelo MvpContentFactory;
+        /// 2) fallback humaniza a chave de loc/id — NUNCA exibe a chave crua tipo "MUT_ARMOR_NAME".
+        /// </summary>
+        public static string MutationName(MutationConfigSO mutation)
+        {
+            if (mutation == null) return "MUTAÇÃO";
+            if (!string.IsNullOrEmpty(mutation.displayName))
+                return mutation.displayName.ToUpperInvariant();
+            string raw = !string.IsNullOrEmpty(mutation.displayNameKey) ? mutation.displayNameKey : mutation.mutationId;
+            string human = Humanize(raw);
+            return string.IsNullOrEmpty(human) ? "MUTAÇÃO" : human.ToUpperInvariant();
         }
 
         /// <summary>Nome amigável de um mundo.</summary>

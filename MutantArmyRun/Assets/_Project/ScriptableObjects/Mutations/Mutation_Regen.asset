@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.MutationConfigSO
   mutationId: mut_regen
   displayNameKey: mut_regen_name
+  displayName: "Regenera\xE7\xE3o"
   rarity: 2
   dpsMult: 1
   hpMult: 1.6
