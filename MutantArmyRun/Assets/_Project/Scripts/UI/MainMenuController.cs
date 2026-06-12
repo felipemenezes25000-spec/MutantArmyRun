@@ -37,6 +37,15 @@ namespace MutantArmy.UI
         [SerializeField] private MapScreen _mapScreen;
         [SerializeField] private DailyScreen _dailyScreen;
 
+        [Header("Passe de Temporada (push a partir da Loja) — ligado pela RewardScreensFactory")]
+        [SerializeField] private SeasonPassScreen _seasonPassScreen;
+
+        [Header("Telas-sistema (push via UIManager) — ligadas pela SystemScreensFactory")]
+        [SerializeField] private Button _settingsButton;   // engrenagem no canto
+        [SerializeField] private Button _eventsButton;     // entrada para EVENTOS
+        [SerializeField] private SettingsScreen _settingsScreen;
+        [SerializeField] private EventsScreen _eventsScreen;
+
         private const string GameSceneName = "Game";   // const: sem string mágica espalhada (doc 12 §3.3)
 
         // Estático: sobrevive ao unload da cena Main enquanto a Game carrega.
@@ -60,16 +69,33 @@ namespace MutantArmy.UI
             BindNav(_shopButton, _shopScreen);
             BindNav(_mapButton, _mapScreen);
             BindNav(_dailyButton, _dailyScreen);
+            // Telas-sistema (SystemScreensFactory): engrenagem → Configurações, botão → Eventos.
+            BindNav(_settingsButton, _settingsScreen);
+            BindNav(_eventsButton, _eventsScreen);
 
             if (_troopsScreen != null) _troopsScreen.BackRequested += PopScreen;
             if (_upgradesScreen != null) _upgradesScreen.BackRequested += PopScreen;
             if (_shopScreen != null) _shopScreen.BackRequested += PopScreen;
             if (_dailyScreen != null) _dailyScreen.BackRequested += PopScreen;
+            if (_settingsScreen != null) _settingsScreen.BackRequested += PopScreen;
+            if (_eventsScreen != null) _eventsScreen.BackRequested += PopScreen;
             if (_mapScreen != null)
             {
                 _mapScreen.BackRequested += PopScreen;
                 _mapScreen.WorldSelected += OnWorldSelected;
             }
+
+            // Passe de Temporada: o botão PASSE da Loja dá Push na SeasonPassScreen; ela volta com Pop.
+            if (_seasonPassScreen != null) _seasonPassScreen.BackRequested += PopScreen;
+            if (_shopScreen != null && _seasonPassScreen != null)
+                _shopScreen.SeasonPassRequested += OnSeasonPassRequested;
+        }
+
+        private void OnSeasonPassRequested()
+        {
+            if (_seasonPassScreen == null) return;
+            if (UIManager.Instance != null) UIManager.Instance.Push(_seasonPassScreen);
+            else _seasonPassScreen.Show();
         }
 
         private void BindNav(Button button, UIScreen screen)

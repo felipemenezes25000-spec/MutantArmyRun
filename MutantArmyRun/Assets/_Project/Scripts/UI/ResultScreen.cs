@@ -20,6 +20,7 @@ namespace MutantArmy.UI
     {
         [SerializeField] private Image _headerBg;               // faixa do header: verde vitória / vermelho derrota
         [SerializeField] private TMP_Text _titleText;
+        [SerializeField] private TMP_Text _reasonText;          // motivo da derrota (doc 09 §4.5); vazio na vitória
         [SerializeField] private TMP_Text _coinsDeltaText;      // "+100" — DELTA, nunca o total
         [SerializeField] private TMP_Text _xpDeltaText;
         [SerializeField] private TMP_Text _survivorsText;
@@ -70,15 +71,33 @@ namespace MutantArmy.UI
         /// moedas da corrida); <paramref name="doubleBase"/> é SÓ a parcela dobrável pelo
         /// rewarded — as moedas coletadas na corrida (CANON §11). Sem passar, dobra o total.
         /// </summary>
-        public void Bind(bool won, long coinsDelta, int xpDelta, int survivors, long damageDealt, bool perfect, long doubleBase = -1L)
+        public void Bind(bool won, long coinsDelta, int xpDelta, int survivors, long damageDealt, bool perfect,
+                         long doubleBase = -1L, string defeatReason = null)
         {
             _coinsDelta = coinsDelta;
             _doubleBase = doubleBase >= 0L ? doubleBase : coinsDelta;
             _doubled = false;
             _doublePending = false;
 
-            if (_titleText != null) _titleText.text = won ? "VITÓRIA!" : "DERROTA...";
             if (_headerBg != null) _headerBg.color = won ? VictoryHeader : DefeatHeader;
+
+            // motivo só na derrota (doc 09 §4.5): "Exército eliminado" / "O boss venceu". Na
+            // vitória o campo some — o número grande é o ganho, não há motivo a explicar.
+            bool showReason = !won && !string.IsNullOrEmpty(defeatReason);
+            if (_reasonText != null)
+            {
+                _reasonText.gameObject.SetActive(showReason);
+                if (showReason) _reasonText.text = defeatReason;
+                if (_titleText != null) _titleText.text = won ? "VITÓRIA!" : "DERROTA...";
+            }
+            else if (_titleText != null)
+            {
+                // sem campo de motivo dedicado: dobra o motivo no título para nunca ficar mudo
+                // (a tela é só preenchida por fora — funciona com qualquer prefab de ResultScreen).
+                _titleText.text = won ? "VITÓRIA!"
+                    : (showReason ? "DERROTA — " + defeatReason : "DERROTA...");
+            }
+
             RenderCoinsDelta(coinsDelta);
 
             if (_xpDeltaText != null)

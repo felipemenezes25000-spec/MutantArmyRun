@@ -57,6 +57,11 @@ namespace MutantArmy.Services
         private const float BossHitSfxMinInterval = 0.2f;
         private float _lastBossHitSfxTime = -1f;
 
+        // Impacto de obstáculo da pista: obstáculos podem cair em sequência — rate-limit evita
+        // metralhadora de explosões (mesma filosofia do hit no boss).
+        private const float ObstacleSfxMinInterval = 0.12f;
+        private float _lastObstacleSfxTime = -1f;
+
         // Crescimento da multidão (OnCrowdChanged): cada salto positivo solta um pop, mas a
         // multidão muda em rajada (multiplicação 1→N) — rate-limit evita metralhadora.
         private const float CrowdPopMinInterval = 0.06f;
@@ -91,6 +96,7 @@ namespace MutantArmy.Services
             GameEvents.OnLevelFinished += HandleLevelFinished;
             GameEvents.OnCurrencyChanged += HandleCurrencyChanged;
             JuiceEvents.OnBossHitPulse += HandleBossHitPulse;
+            JuiceEvents.OnObstacleHit += HandleObstacleHit;
 
             // Música por mundo (Services enxerga Core §2.3, igual ao AnalyticsManager): assina
             // a entrada em Running para resolver a faixa do mundo da fase atual.
@@ -116,6 +122,7 @@ namespace MutantArmy.Services
             GameEvents.OnLevelFinished -= HandleLevelFinished;
             GameEvents.OnCurrencyChanged -= HandleCurrencyChanged;
             JuiceEvents.OnBossHitPulse -= HandleBossHitPulse;
+            JuiceEvents.OnObstacleHit -= HandleObstacleHit;
             if (GameManager.Instance != null)
                 GameManager.Instance.StateEntered -= HandleStateEntered;
         }
@@ -344,6 +351,15 @@ namespace MutantArmy.Services
             if (Time.unscaledTime - _lastBossHitSfxTime < BossHitSfxMinInterval) return;
             _lastBossHitSfxTime = Time.unscaledTime;
             PlaySfxPitched(_catalog.bossHit);
+        }
+
+        // Impacto de obstáculo da pista (doc 12 §4.11): camada de peso (explosão), pitch random,
+        // rate-limited. PlayExplosion é no-op silencioso se o catálogo não tem o clip.
+        private void HandleObstacleHit(Vector3 worldPosition)
+        {
+            if (Time.unscaledTime - _lastObstacleSfxTime < ObstacleSfxMinInterval) return;
+            _lastObstacleSfxTime = Time.unscaledTime;
+            PlayExplosion();
         }
     }
 }

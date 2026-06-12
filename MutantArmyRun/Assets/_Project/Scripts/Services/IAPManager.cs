@@ -43,7 +43,15 @@ namespace MutantArmy.Services
             // Entitlements e Oferta Inicial leem o save vivo do blackboard (Save roda
             // antes na ordem §3.3); sem bootstrap (teste), o bind fica a cargo do teste.
             if (GameBootstrap.Current != null)
+            {
                 BindSaveState(GameBootstrap.Current.Save, GameBootstrap.Current.MarkSaveDirty);
+
+                // Publica os hooks de IAP no blackboard: a UI (Loja/Passe) lê ownership e dispara a
+                // compra por aqui — UI não referencia Services (doc 12 §2.3). Com provider Null o
+                // Purchase responde false e a tela mantém o selo "EM BREVE" (doc 12 §7.4).
+                GameBootstrap.Current.SeasonPassOwned = () => HasSeasonPass;
+                GameBootstrap.Current.PurchaseProduct = Purchase;
+            }
         }
 
         /// <summary>Liga o manager ao estado persistente (mesma instância viva do SaveSystem).</summary>

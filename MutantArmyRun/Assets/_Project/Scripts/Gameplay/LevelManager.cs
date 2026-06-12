@@ -21,6 +21,8 @@ namespace MutantArmy.Gameplay
         [SerializeField] private float _recycleBehindMeters = 25f;
         [SerializeField] private float _gateSafetyMeters = 6f;   // zona de segurança pós-portal (doc 12 §4.11)
         [SerializeField] private float _laneHalfWidth = 2.2f;
+        [SerializeField] private float _obstacleImpactHalfWidth = 1.1f;   // faixa de impacto do obstáculo em X
+        [SerializeField] private float _obstacleShakeDegrees = 0.6f;      // shake LEVE ao bater (cosmético)
 
         private LevelConfigSO _level;
         private System.Random _rng;     // seed do LevelConfigSO — NUNCA UnityEngine.Random aqui
@@ -34,7 +36,18 @@ namespace MutantArmy.Gameplay
         private const float ProgressEventStep = 0.005f;
 
         private readonly Queue<TrackSegment> _liveSegments = new Queue<TrackSegment>();
-        private readonly List<GameObject> _liveObstacles = new List<GameObject>();
+        private readonly List<LiveObstacle> _liveObstacles = new List<LiveObstacle>();
+
+        // obstáculo vivo na pista + estado de impacto. O impacto é POR DISTÂNCIA (o líder cruza
+        // o Z do obstáculo dentro da faixa lateral), determinístico e sem collider de gameplay —
+        // mesma filosofia do spawn por distância. O collider do prefab é só presença visual/física.
+        private struct LiveObstacle
+        {
+            public GameObject go;
+            public float z;
+            public float x;
+            public bool hit;
+        }
 
         // pooling POR TIPO (doc 12 §6.4): 1 ObjectPool por prefab de segmento/obstáculo
         private readonly Dictionary<GameObject, ObjectPool<TrackSegment>> _segmentPools =
@@ -126,9 +139,11 @@ namespace MutantArmy.Gameplay
                 // stats por tropa (UnitManager), aplicadas no spawn pelo CrowdManager.
                 int startUnits = Mathf.Max(1, level.startingUnits) + Mathf.Max(0, bonuses.extraStartUnits);
                 CrowdManager.Instance.ReconcileTo(startUnits, null);
+                // ObstacleResist (trilha de meta): obstáculos da pista perdem MENOS unidades.
+                CrowdManager.Instance.SetObstacleLossFactor(bonuses.obstacleLossFactor);
             }
-            // ObstacleResist (bonuses.obstacleLossFactor) e StartDamage/StartHealth dependem do
-            // CrowdManager ler stats efetivos da Meta — ver avisos de integração.
+            // StartDamage/StartHealth dependem do CrowdManager ler stats efetivos da Meta no
+            // spawn por tropa — ver avisos de integração.
 
             // ordem fixa de consumo do RNG (gates → obstáculos → segmentos) preserva o determinismo
             if (GateManager.Instance != null) GateManager.Instance.SpawnGates(level, _rng);
@@ -150,6 +165,7 @@ namespace MutantArmy.Gameplay
             while (_furthestZ < leaderZ + _spawnAheadMeters) SpawnNextSegment();
             while (_liveSegments.Count > 0 && _liveSegments.Peek().EndZ < leaderZ - _recycleBehindMeters)
                 ReleaseSegment(_liveSegments.Dequeue());
+            CheckObstacleImpacts(leaderZ);   // impacto por distância ANTES de reciclar (não some sem morder)
             RecycleObstaclesBehind(leaderZ);
             RaiseProgressIfChanged();
 
@@ -287,9 +303,39 @@ namespace MutantArmy.Gameplay
                 GameObject go = GetObstaclePool(slot.prefab).Get();
                 float laneX = (float)(_rng.NextDouble() * 2.0 - 1.0) * _laneHalfWidth;
                 go.transform.position = new Vector3(laneX, 0f, slot.trackPosition);
-                _liveObstacles.Add(go);
+                _liveObstacles.Add(new LiveObstacle { go = go, z = slot.trackPosition, x = laneX, hit = false });
             }
         }
+
+        // Impacto por DISTÂNCIA (doc 12 §4.11): quando o líder cruza o Z do obstáculo e a massa
+        // do exército está na faixa lateral dele, REMOVE uma fração das unidades atingidas (via
+        // CrowdManager, que aplica esquiva + ObstacleResist) com feedback cosmético null-safe.
+        private void CheckObstacleImpacts(float leaderZ)
+        {
+            CrowdManager crowd = CrowdManager.Instance;
+            if (crowd == null) return;
+            for (int i = 0; i < _liveObstacles.Count; i++)
+            {
+                LiveObstacle o = _liveObstacles[i];
+                if (o.hit || o.go == null) continue;
+                if (leaderZ < o.z) continue;   // ainda não alcançou o obstáculo
+
+                o.hit = true;
+                _liveObstacles[i] = o;
+                int removed = crowd.ApplyObstacleHit(o.x, _obstacleImpactHalfWidth);
+                if (removed <= 0) continue;   // exército esquivou/voou/passou de lado: sem feedback de dano
+
+                Vector3 fxPos = new Vector3(o.x, 0.5f, o.z);
+                if (VFXManager.Instance != null) VFXManager.Instance.PlayGateBurst(fxPos, ObstacleHitColor);
+                // som da explosão via bus de juice: Gameplay não enxerga Services (doc 12 §2.3);
+                // o AudioManager assina e chama PlayExplosion (mesmo padrão do OnBossHitPulse).
+                JuiceEvents.RaiseObstacleHit(fxPos);
+                Tween.ShakeCamera(_obstacleShakeDegrees, 0.12f);   // shake LEVE (Tween é null-safe sem câmera)
+            }
+        }
+
+        // laranja-empoeirado: leitura clara de "perda/impacto" distinta do azul/dourado dos portais
+        private static readonly Color ObstacleHitColor = new Color(0.85f, 0.45f, 0.20f);
 
         private bool InGateSafetyZone(LevelConfigSO level, float z)
         {
@@ -325,7 +371,7 @@ namespace MutantArmy.Gameplay
         {
             for (int i = _liveObstacles.Count - 1; i >= 0; i--)
             {
-                GameObject go = _liveObstacles[i];
+                GameObject go = _liveObstacles[i].go;
                 if (go == null)
                 {
                     _liveObstacles.RemoveAt(i);
@@ -349,7 +395,7 @@ namespace MutantArmy.Gameplay
         {
             while (_liveSegments.Count > 0) ReleaseSegment(_liveSegments.Dequeue());
             for (int i = _liveObstacles.Count - 1; i >= 0; i--)
-                if (_liveObstacles[i] != null) ReleaseObstacle(_liveObstacles[i]);
+                if (_liveObstacles[i].go != null) ReleaseObstacle(_liveObstacles[i].go);
             _liveObstacles.Clear();
             if (GateManager.Instance != null) GateManager.Instance.ReleaseAll();
         }

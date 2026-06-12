@@ -32,6 +32,13 @@ namespace MutantArmy.Meta
         public int RunCoins => _runWallet.Coins;
         public int RunXp => _runWallet.Xp;
 
+        /// <summary>
+        /// Disparado quando a XP faz o jogador SUBIR de nível (CANON §8) — uma vez por nível ganho.
+        /// Carrega o novo nível. A UI (CelebrationOverlay) assina para celebrar "NÍVEL N!" sem
+        /// acoplamento; Meta não enxerga UI (doc 12 §2.3), então é a UI que se inscreve no evento.
+        /// </summary>
+        public event System.Action<int> OnPlayerLevelUp;
+
         /// <summary>Chamado pelo GameBootstrap (doc 12 §3.3) via IInitializable, após Save e RemoteConfig.</summary>
         public void Init()
         {
@@ -208,6 +215,9 @@ namespace MutantArmy.Meta
             {
                 d.playerXp -= required;
                 d.playerLevel++;
+                // Notifica a UI a CADA nível ganho (um Earn de XP grande pode subir vários de uma vez):
+                // a celebração mostra o nível novo. Invocado após o ++ para carregar o nível final do passo.
+                OnPlayerLevelUp?.Invoke(d.playerLevel);
                 required = EconomyMath.PlayerLevelXpToNext(d.playerLevel);
             }
         }

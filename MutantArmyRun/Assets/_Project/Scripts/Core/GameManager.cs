@@ -23,6 +23,17 @@ namespace MutantArmy.Core
         public GameState State => _states.Current;
         public LevelConfigSO CurrentLevel { get; private set; }
 
+        /// <summary>
+        /// Motivo da última derrota (doc 09 §4.5) — a ResultScreen exibe o texto. Definido por
+        /// quem causa a derrota (CrowdManager no wipe do exército; BossFight no wipe da arena).
+        /// Resetado no início de cada fase. ArmyWiped = "Exército eliminado" durante a corrida;
+        /// BossWon = "O boss venceu" (wipe na arena). None = vitória/sem derrota.
+        /// </summary>
+        public DefeatReason LastDefeatReason { get; private set; } = DefeatReason.None;
+
+        /// <summary>Registrado pela camada que detecta a derrota (Gameplay), lido pela UI.</summary>
+        public void SetDefeatReason(DefeatReason reason) => LastDefeatReason = reason;
+
         private GameStateStack _states;
         private bool _endSelectionDone;            // guard anti duplo-clique/duplo-evento no fim de fase
 
@@ -60,6 +71,7 @@ namespace MutantArmy.Core
         {
             CurrentLevel = level;
             _endSelectionDone = false;
+            LastDefeatReason = DefeatReason.None;   // nova fase: motivo de derrota zerado
             LevelStarted?.Invoke(level.levelIndex);
             ChangeState(GameState.BossScout);      // cartão de ~2 s ANTES da corrida (CANON §3.1)
         }
@@ -80,6 +92,20 @@ namespace MutantArmy.Core
             _states = new GameStateStack();        // volta à base (Boot) — espelha uma cena nova
             ChangeState(GameState.MainMenu);       // Boot→MainMenu (legal)
             StartLevel(level);                     // MainMenu→BossScout→… (legal)
+        }
+
+        /// <summary>
+        /// Vai para o MainMenu a partir de QUALQUER estado (abandono pela PAUSA — botão MENU do
+        /// PauseOverlay). Running/BossFight→MainMenu NÃO está na tabela do GameStateStack (só
+        /// Victory/Defeat→MainMenu é legal — "voltar ao menu" pós-fase), então um ChangeState
+        /// cru mid-run logaria transição ilegal e o estado ficaria preso. Aqui a pilha é zerada
+        /// para a base (espelha uma cena nova) e segue Boot→MainMenu por transição LEGAL — mesmo
+        /// padrão do RestartLevelFromAnyState. Não dispara ResolveEnd/recompensa: é abandono.
+        /// </summary>
+        public void GoToMainMenuFromAnyState()
+        {
+            _states = new GameStateStack();        // volta à base (Boot)
+            ChangeState(GameState.MainMenu);       // Boot→MainMenu (legal)
         }
 
         /// <summary>Troca o TOPO da pilha (transição lateral). Ilegal loga erro e é ignorada.</summary>
@@ -188,5 +214,13 @@ namespace MutantArmy.Core
             if (LevelEndRecorder != null) LevelEndRecorder(result);            // save imediato pós-fase
             GameEvents.RaiseLevelFinished(result);                             // UI/Ads/Analytics reagem
         }
+    }
+
+    /// <summary>Motivo da derrota exibido na ResultScreen (doc 09 §4.5).</summary>
+    public enum DefeatReason
+    {
+        None = 0,       // vitória / sem derrota
+        ArmyWiped = 1,  // exército zerou durante a corrida ("Exército eliminado")
+        BossWon = 2     // exército zerou na arena do boss ("O boss venceu")
     }
 }

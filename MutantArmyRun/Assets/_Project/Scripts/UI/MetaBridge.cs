@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MutantArmy.Core;
 using MutantArmy.Domain;
@@ -183,6 +184,210 @@ namespace MutantArmy.UI
                    RewardSystem.Instance.TryClaimDailyChest(ChestType.Common, out result);
         }
 
+        // ---------------------------------------------------------------- Passe de Temporada (contrato SeasonPass)
+
+        /// <summary>Recompensa de UM nó do passe moldada para a UI — kind/amount do Domain + rótulo PT-BR pronto.</summary>
+        public struct SeasonRewardView
+        {
+            public SeasonRewardKind kind;
+            public int amount;
+            public string label;        // "+250", "+10 gemas", "+5 frag", "SKIN" — pronto para o chip
+            public bool hasReward;
+        }
+
+        /// <summary>Um nível (tier) do passe: trilha grátis + premium, e se já foi atingido pela XP.</summary>
+        public struct SeasonTierView
+        {
+            public int tier;            // 1..TierCount
+            public bool reached;        // XP de passe já alcançou este nível
+            public SeasonRewardView free;
+            public SeasonRewardView premium;
+        }
+
+        /// <summary>Estado geral do passe para o cabeçalho da tela (XP/nível/posse).</summary>
+        public struct SeasonPassView
+        {
+            public int currentTier;     // 1..TierCount
+            public int tierCount;
+            public long totalXp;
+            public int xpIntoTier;      // 0..XpPerTier
+            public int xpPerTier;
+            public float tierProgress01;
+            public bool owned;          // passe premium comprado
+            public float priceUsd;
+        }
+
+        // Cursor de RESGATE da sessão: o maior nível já coletado. Sem campo de save dedicado (dono:
+        // SISTEMAS), o resgate não persiste entre sessões — ver avisos de integração. -1 = nada coletado
+        // ainda nesta sessão; ao coletar, sobe para o nível resgatado e impede duplo-crédito.
+        private static int s_seasonClaimedTier = -1;
+
+        // Id de produto do passe (espelha IAPManager.ProductSeasonPass; UI não referencia Services).
+        private const string SeasonPassProductId = "season_pass_699";
+
+        /// <summary>
+        /// XP de passe DERIVADA de forma determinística do que o save já tem (brief: "XP = baseado em
+        /// fases vencidas/missões"). Não adiciona campo ao SaveData: soma fases vencidas (peso maior),
+        /// missões reivindicadas e o nível do jogador. Pura sobre o save, então tela e resgate veem o
+        /// MESMO progresso.
+        /// </summary>
+        public static long SeasonPassXp()
+        {
+            SaveData d = Save;
+            if (d == null) return 0L;
+
+            long xp = (long)Mathf.Max(0, d.highestLevelCleared) * 60L;   // ≈ 1 nível a cada ~1,7 fases
+            xp += (long)Mathf.Max(0, d.playerLevel - 1) * 40L;
+            int claimedMissions = 0;
+            if (d.dailyMissions != null)
+                for (int i = 0; i < d.dailyMissions.Count; i++)
+                    if (d.dailyMissions[i] != null && d.dailyMissions[i].claimed) claimedMissions++;
+            xp += claimedMissions * 50L;
+            return xp;
+        }
+
+        public static bool SeasonPassOwned()
+        {
+            // Fonte viva: hook do IAPManager publicado no blackboard (UI não vê Services). Fallback
+            // ao SaveData (Domain, visível) quando o IAP ainda não montou — concessão local de teste.
+            if (GameBootstrap.Current != null && GameBootstrap.Current.SeasonPassOwned != null)
+                return GameBootstrap.Current.SeasonPassOwned();
+            return Save != null && Save.seasonPassActive;
+        }
+
+        public static SeasonPassView GetSeasonPass()
+        {
+            long xp = SeasonPassXp();
+            return new SeasonPassView
+            {
+                currentTier = SeasonPassMath.TierForXp(xp),
+                tierCount = SeasonPassMath.TierCount,
+                totalXp = xp,
+                xpIntoTier = SeasonPassMath.XpIntoTier(xp),
+                xpPerTier = SeasonPassMath.XpPerTier,
+                tierProgress01 = SeasonPassMath.TierProgress01(xp),
+                owned = SeasonPassOwned(),
+                priceUsd = SeasonPassMath.PriceUsd
+            };
+        }
+
+        /// <summary>Todos os níveis do passe com as duas trilhas e o estado de atingido (pinta a lista).</summary>
+        public static IReadOnlyList<SeasonTierView> SeasonTiers()
+        {
+            long xp = SeasonPassXp();
+            var list = new List<SeasonTierView>(SeasonPassMath.TierCount);
+            for (int t = 1; t <= SeasonPassMath.TierCount; t++)
+            {
+                list.Add(new SeasonTierView
+                {
+                    tier = t,
+                    reached = SeasonPassMath.IsTierReached(t, xp),
+                    free = ToRewardView(SeasonPassMath.FreeReward(t)),
+                    premium = ToRewardView(SeasonPassMath.PremiumReward(t))
+                });
+            }
+            return list;
+        }
+
+        private static SeasonRewardView ToRewardView(SeasonReward r)
+        {
+            return new SeasonRewardView
+            {
+                kind = r.kind,
+                amount = r.amount,
+                label = SeasonRewardLabel(r),
+                hasReward = r.HasReward
+            };
+        }
+
+        /// <summary>Rótulo curto PT-BR de um nó do passe (chip da trilha).</summary>
+        public static string SeasonRewardLabel(SeasonReward r)
+        {
+            switch (r.kind)
+            {
+                case SeasonRewardKind.Coins: return "+" + r.amount;
+                case SeasonRewardKind.Gems: return "+" + r.amount + " gemas";
+                case SeasonRewardKind.Shards: return "+" + r.amount + " frag";
+                case SeasonRewardKind.Skin: return "SKIN";
+                default: return "—";
+            }
+        }
+
+        /// <summary>Há recompensa de passe pronta para resgatar (níveis atingidos não coletados nesta sessão)?</summary>
+        public static bool CanClaimSeasonRewards()
+        {
+            int current = SeasonPassMath.TierForXp(SeasonPassXp());
+            return current > s_seasonClaimedTier && current >= 1;
+        }
+
+        /// <summary>
+        /// Resgata TODAS as recompensas atingidas e não coletadas nesta sessão (grátis sempre; premium
+        /// só com o passe comprado). Credita pelo funil REAL da Meta (EconomySystem.Earn /
+        /// UnitManager.GrantShards) — nada escrito no save direto. Devolve o agregado para a tela
+        /// celebrar. Idempotente por sessão via o cursor s_seasonClaimedTier.
+        /// </summary>
+        public static bool TryClaimSeasonRewards(out long coins, out int gems, out int shards, out int skins)
+        {
+            coins = 0; gems = 0; shards = 0; skins = 0;
+            int current = SeasonPassMath.TierForXp(SeasonPassXp());
+            if (current <= s_seasonClaimedTier) return false;
+
+            bool owned = SeasonPassOwned();
+            int start = s_seasonClaimedTier < 0 ? 1 : s_seasonClaimedTier + 1;
+            for (int t = start; t <= current; t++)
+            {
+                AccumulateReward(SeasonPassMath.FreeReward(t), ref coins, ref gems, ref shards, ref skins);
+                if (owned) AccumulateReward(SeasonPassMath.PremiumReward(t), ref coins, ref gems, ref shards, ref skins);
+            }
+
+            if (EconomySystem.Instance != null)
+            {
+                if (coins > 0) EconomySystem.Instance.Earn(CurrencyType.Coin, coins, "season_pass_claim");
+                if (gems > 0) EconomySystem.Instance.Earn(CurrencyType.Gem, gems, "season_pass_claim");
+            }
+            if (shards > 0) GrantSeasonShards(shards);
+
+            s_seasonClaimedTier = current;
+            return coins > 0 || gems > 0 || shards > 0 || skins > 0;
+        }
+
+        private static void AccumulateReward(SeasonReward r, ref long coins, ref int gems, ref int shards, ref int skins)
+        {
+            switch (r.kind)
+            {
+                case SeasonRewardKind.Coins: coins += r.amount; break;
+                case SeasonRewardKind.Gems: gems += r.amount; break;
+                case SeasonRewardKind.Shards: shards += r.amount; break;
+                case SeasonRewardKind.Skin: skins += 1; break;
+            }
+        }
+
+        /// <summary>Espalha fragmentos do passe pela 1ª tropa do catálogo (genérico, sem pool de evento dedicado).</summary>
+        private static void GrantSeasonShards(int shards)
+        {
+            UnitManager um = UnitManager.Instance;
+            if (um == null || shards <= 0) return;
+            UnitConfigSO target = um.GetConfig(0);
+            if (target != null) um.GrantShards(target.unitId, shards);
+        }
+
+        /// <summary>
+        /// Dispara a compra do passe pelo blackboard de IAP (UI não vê Services). Com provider Null o
+        /// callback responde false e a tela mantém "EM BREVE"/preço (doc 12 §7.4). Concedido → callback
+        /// true e a tela re-renderiza a trilha premium liberada.
+        /// </summary>
+        public static void TryBuySeasonPass(Action<bool> onResult)
+        {
+            GameBootstrap root = GameBootstrap.Current;
+            if (root == null || root.PurchaseProduct == null)
+            {
+                if (onResult != null) onResult(false);
+                return;
+            }
+            root.PurchaseProduct(SeasonPassProductId, SeasonPassMath.PriceUsd, "season_pass_screen",
+                                 onResult ?? (_ => { }));
+        }
+
         // ---------------------------------------------------------------- Diário: login + missões (MissionSystem)
 
         /// <summary>
@@ -331,6 +536,167 @@ namespace MutantArmy.UI
             if (next < first) return first;     // mundo ainda intocado: começa na 1ª
             if (next > last) return last;       // mundo já zerado: rejoga a última (farm)
             return next;
+        }
+
+        // ---------------------------------------------------------------- Eventos (contrato EventsScreen)
+        //
+        // INTEGRAÇÃO (aviso ao orquestrador / dono do Meta): ainda NÃO há EventSystem dedicado.
+        // Tudo aqui é DETERMINÍSTICO e LOCAL — derivado do que o SaveData JÁ tem (progresso de
+        // missões para o evento diário, highestLevelCleared para o semanal) e do relógio do
+        // sistema (tempo restante até a virada do dia/semana UTC). Quando o Meta publicar um
+        // EventSystem real, este bloco passa a delegar a ele, sem tocar na EventsScreen (mesma
+        // estratégia de degradação graciosa do bloco de login/missões acima). O ranking é
+        // explicitamente LOCAL/placeholder — a tela rotula "em breve online".
+
+        /// <summary>Card de um evento (diário ou semanal) — moldado para a EventsScreen.</summary>
+        public struct EventView
+        {
+            public string title;
+            public string desc;
+            public int progress;
+            public int target;
+            public long rewardCoins;
+            public int rewardGems;
+            public long secondsRemaining;    // até a virada (dia/semana UTC)
+            public bool complete;
+        }
+
+        /// <summary>
+        /// Evento DIÁRIO: "vença fases hoje". Progresso reaproveita a missão diária de vencer
+        /// fases quando o MissionSystem existe (já é determinístico/local); senão, alvo fixo com
+        /// progresso 0. Tempo restante = até a próxima meia-noite UTC.
+        /// </summary>
+        public static EventView DailyEvent()
+        {
+            var v = new EventView
+            {
+                title = "DESAFIO DIÁRIO",
+                desc = "Vença 5 fases hoje",
+                target = 5,
+                rewardCoins = 500,
+                rewardGems = 5,
+                secondsRemaining = SecondsUntilNextUtcMidnight()
+            };
+
+            IReadOnlyList<MissionView> missions = DailyMissions();
+            for (int i = 0; i < missions.Count; i++)
+            {
+                if (missions[i].id == MissionSystem.MissionWinLevels)
+                {
+                    v.progress = missions[i].progress;
+                    v.target = Mathf.Max(v.target, missions[i].target);
+                    break;
+                }
+            }
+            v.complete = v.progress >= v.target;
+            return v;
+        }
+
+        /// <summary>
+        /// Evento SEMANAL: "alcance fases novas esta semana". Progresso = highestLevelCleared
+        /// (proxy honesto e determinístico do avanço). Tempo restante = até a virada de semana
+        /// (segunda-feira 00:00 UTC).
+        /// </summary>
+        public static EventView WeeklyEvent()
+        {
+            int highest = HighestLevelCleared;
+            return new EventView
+            {
+                title = "MARATONA SEMANAL",
+                desc = "Avance pelo mapa esta semana",
+                progress = highest,
+                target = Mathf.Max(10, ((highest / 10) + 1) * 10),   // próxima dezena de fases
+                rewardCoins = 2000,
+                rewardGems = 20,
+                secondsRemaining = SecondsUntilNextUtcWeek(),
+                complete = false
+            };
+        }
+
+        /// <summary>Uma linha do ranking local (placeholder honesto — top 10 + jogador destacado).</summary>
+        public struct LeaderboardRow
+        {
+            public int rank;          // 1–10
+            public string name;
+            public long score;        // pontuação (proxy: fases vencidas × 100 + moedas/10)
+            public bool isPlayer;
+        }
+
+        /// <summary>
+        /// Ranking LOCAL determinístico (placeholder): 9 nomes-bot com pontuações fixas + o
+        /// jogador inserido pela sua pontuação real (highestLevelCleared/coins), ordenado e
+        /// recortado no top 10 com o jogador SEMPRE presente. Honesto: a tela rotula que é
+        /// local e que o online "chega em breve". Nada disto escreve no save.
+        /// </summary>
+        public static IReadOnlyList<LeaderboardRow> LocalLeaderboard()
+        {
+            long playerScore = PlayerScore();
+            var rows = new List<LeaderboardRow>(11)
+            {
+                new LeaderboardRow { name = "Comandante Áurea", score = 9800 },
+                new LeaderboardRow { name = "General Vex",      score = 8600 },
+                new LeaderboardRow { name = "Capitã Nyx",       score = 7400 },
+                new LeaderboardRow { name = "Sargento Rook",    score = 6100 },
+                new LeaderboardRow { name = "Tática Lumen",     score = 5200 },
+                new LeaderboardRow { name = "Bruto Kael",       score = 4300 },
+                new LeaderboardRow { name = "Veloz Pip",        score = 3500 },
+                new LeaderboardRow { name = "Recruta Mox",      score = 2400 },
+                new LeaderboardRow { name = "Aprendiz Tib",     score = 1500 },
+                new LeaderboardRow { name = "VOCÊ",             score = playerScore, isPlayer = true }
+            };
+
+            rows.Sort((a, b) => b.score.CompareTo(a.score));
+
+            // recorta no top 10 garantindo o jogador presente: se ele caiu fora do corte,
+            // substitui o 10º colocado por ele (a lista de bots tem 9, então com o jogador são
+            // 10 — mas mantemos a salvaguarda caso a lista de bots cresça no futuro).
+            if (rows.Count > 10)
+            {
+                int playerIdx = rows.FindIndex(r => r.isPlayer);
+                LeaderboardRow player = playerIdx >= 0 ? rows[playerIdx] : new LeaderboardRow { name = "VOCÊ", isPlayer = true };
+                rows = rows.GetRange(0, 10);
+                if (playerIdx < 0 || playerIdx >= 10) rows[9] = player;
+            }
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                LeaderboardRow r = rows[i];
+                r.rank = i + 1;
+                rows[i] = r;
+            }
+            return rows;
+        }
+
+        /// <summary>Pontuação do jogador (proxy determinístico p/ o ranking local).</summary>
+        public static long PlayerScore() => (long)HighestLevelCleared * 100L + Coins / 10L;
+
+        private static long SecondsUntilNextUtcMidnight()
+        {
+            System.DateTime now = System.DateTime.UtcNow;
+            System.DateTime nextMidnight = now.Date.AddDays(1);
+            return (long)(nextMidnight - now).TotalSeconds;
+        }
+
+        private static long SecondsUntilNextUtcWeek()
+        {
+            System.DateTime now = System.DateTime.UtcNow;
+            // virada na próxima segunda-feira 00:00 UTC
+            int daysUntilMonday = ((int)System.DayOfWeek.Monday - (int)now.DayOfWeek + 7) % 7;
+            if (daysUntilMonday == 0) daysUntilMonday = 7;
+            System.DateTime nextMonday = now.Date.AddDays(daysUntilMonday);
+            return (long)(nextMonday - now).TotalSeconds;
+        }
+
+        /// <summary>Formata um tempo restante como "2d 5h", "5h 12m" ou "12m" (para os cards de evento).</summary>
+        public static string FormatRemaining(long seconds)
+        {
+            if (seconds < 0) seconds = 0;
+            long days = seconds / 86400L;
+            long hours = (seconds % 86400L) / 3600L;
+            long minutes = (seconds % 3600L) / 60L;
+            if (days > 0) return days + "d " + hours + "h";
+            if (hours > 0) return hours + "h " + minutes + "m";
+            return minutes + "m";
         }
     }
 }

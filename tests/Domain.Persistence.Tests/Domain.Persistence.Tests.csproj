@@ -13,6 +13,7 @@
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\EconomyMath.cs" Link="Domain\EconomyMath.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\ChestMath.cs" Link="Domain\ChestMath.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\MissionMath.cs" Link="Domain\MissionMath.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\SeasonPassMath.cs" Link="Domain\SeasonPassMath.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />

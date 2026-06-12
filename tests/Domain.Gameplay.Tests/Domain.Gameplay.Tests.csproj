@@ -11,6 +11,7 @@
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\SupplyLedger.cs" Link="Domain\SupplyLedger.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\ElementChart.cs" Link="Domain\ElementChart.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\CombatMath.cs" Link="Domain\CombatMath.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\CombatAbilities.cs" Link="Domain\CombatAbilities.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\FormationMath.cs" Link="Domain\FormationMath.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\RiskGate.cs" Link="Domain\RiskGate.cs" />
   </ItemGroup>

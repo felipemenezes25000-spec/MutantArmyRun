@@ -472,6 +472,7 @@ namespace MutantArmy.Editor
             Mesh capsule = GetPrimitiveMesh(PrimitiveType.Capsule);
             var segmentPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SegmentPrefabPath);
             var bossPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);
+            var obstaclePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ObstaclePrefabPath);
 
             // À prova de ORDEM (greybox vs UnitVisual/WorldVisual): só preenche o que ainda
             // estiver vazio. mesh/material da tropa são o fallback INSTANCED — o UnitVisualFactory
@@ -501,6 +502,26 @@ namespace MutantArmy.Editor
                 {
                     world.trackSegmentPrefabs = new[] { segmentPrefab };
                     EditorUtility.SetDirty(world);
+                }
+            }
+
+            // Obstáculos/armadilhas (doc 12 §4.11): o MvpContentFactory popula as POSIÇÕES
+            // (ObstacleSlot.trackPosition) e deixa o prefab null; aqui ligamos o Obstacle_Greybox
+            // em cada slot ainda vazio. À prova de ORDEM como o trackSegmentPrefabs: se uma Visual
+            // factory já tiver atribuído um prefab temático ao slot, o greybox NÃO sobrescreve.
+            if (obstaclePrefab != null)
+            {
+                foreach (LevelConfigSO level in LoadAllAssets<LevelConfigSO>(SoRoot + "/Levels"))
+                {
+                    if (level.obstacles == null || level.obstacles.Length == 0) continue;
+                    bool dirty = false;
+                    foreach (ObstacleSlot slot in level.obstacles)
+                    {
+                        if (slot == null || slot.prefab != null) continue;
+                        slot.prefab = obstaclePrefab;
+                        dirty = true;
+                    }
+                    if (dirty) EditorUtility.SetDirty(level);
                 }
             }
         }

@@ -45,6 +45,7 @@ namespace MutantArmy.Gameplay
         private SpatialGridXZ _grid;
         private SupplyLedger _supply;   // Domain: contabilidade pura de Supply
         private ElementType _armyElement = ElementType.None;
+        private float _obstacleLossFactor = 1f;   // trilha de meta ObstacleResist (RunStartBonuses.obstacleLossFactor)
         private bool _arenaFormation;
         private int _arenaEntryCount;
         private int _fallenThisFight;   // cadáveres acumulados na arena → alvos do Necromante (Levantar)
@@ -217,6 +218,68 @@ namespace MutantArmy.Gameplay
         public void SetElement(ElementType e)   // portal de elemento: aplica ao exército inteiro
         {
             _armyElement = e;
+        }
+
+        /// <summary>
+        /// Fator de perda por obstáculo da trilha de meta ObstacleResist (RunStartBonuses.
+        /// obstacleLossFactor; 1 = sem bônus, &lt;1 reduz). Lido 1× no início da corrida pelo
+        /// LevelManager.BeginRun — Gameplay não enxerga a Meta (doc 12 §2.3).
+        /// </summary>
+        public void SetObstacleLossFactor(float factor)
+        {
+            _obstacleLossFactor = factor < 0f ? 0f : factor;
+        }
+
+        /// <summary>
+        /// Armadilha/obstáculo da pista (doc 12 §4.11): elimina uma FRAÇÃO das unidades na faixa
+        /// de impacto [<paramref name="laneX"/> ± <paramref name="halfWidth"/>]. Esquiva
+        /// (Corredor/Ninja com DodgeTraps) e a trilha de meta ObstacleResist reduzem a perda —
+        /// a matemática canônica vive no Domain (CombatAbilities.ObstacleLossFraction).
+        /// DETERMINÍSTICO: sem RNG — remove de trás pra frente as unidades dentro da faixa.
+        /// Unidades VOADORAS (mutação de Asas) ignoram obstáculos de chão (CANON §3.3/§5).
+        /// Retorna quantas unidades foram eliminadas (0 se nenhuma na faixa / exército imune).
+        /// </summary>
+        public int ApplyObstacleHit(float laneX, float halfWidth)
+        {
+            if (_count == 0 || _mutationGrantsFlight) return 0;   // asas: sobrevoam os obstáculos de chão
+
+            // unidades vivas dentro da faixa de impacto + parcela esquiva (DodgeTraps) entre elas
+            int inLane = 0;
+            int dodgers = 0;
+            for (int i = 0; i < _count; i++)
+            {
+                if ((_flags[i] & FlagDying) != 0) continue;
+                if (Mathf.Abs(_positions[i].x - laneX) > halfWidth) continue;
+                inLane++;
+                UnitConfigSO cfg = _types[_typeIds[i]];
+                if (cfg != null && cfg.specialAbilityId == CombatAbilities.DodgeTraps) dodgers++;
+            }
+            if (inLane == 0) return 0;
+
+            float dodgeRatio = (float)dodgers / inLane;
+            float fraction = CombatAbilities.ObstacleLossFraction(
+                CombatAbilities.ObstacleBaseLossFraction, dodgeRatio, _obstacleLossFactor);
+            int toRemove = Mathf.Clamp(Mathf.RoundToInt(inLane * fraction), 0, inLane);
+            // piso de 1 quando a perda-base não é zero e há alvo: o obstáculo tem que "morder"
+            if (toRemove == 0 && fraction > 0f) toRemove = 1;
+            // nunca zera o exército inteiro num obstáculo: deixa ≥1 viva fora/dentro da faixa
+            toRemove = Mathf.Min(toRemove, Mathf.Max(0, Count - 1));
+            if (toRemove <= 0) return 0;
+
+            Vector3 vfxPos = Vector3.zero;
+            int removed = 0;
+            for (int i = _count - 1; i >= 0 && removed < toRemove; i--)
+            {
+                if ((_flags[i] & FlagDying) != 0) continue;
+                if (Mathf.Abs(_positions[i].x - laneX) > halfWidth) continue;
+                vfxPos = _positions[i];
+                _hp[i] = 0f;
+                KillUnit(i);   // estado "dying" + Supply liberado + OnUnitDied (VFX/analytics)
+                removed++;
+            }
+            if (removed > 0 && VFXManager.Instance != null)
+                VFXManager.Instance.PlayCrowdDespawnBurst(vfxPos);
+            return removed;
         }
 
         /// <summary>Soma de DPS × chart elemental × mutações × habilidades — consumida pelo CombatSystem (doc 12 §4.4).</summary>
@@ -760,8 +823,17 @@ namespace MutantArmy.Gameplay
         {
             GameManager gm = GameManager.Instance;
             if (gm == null) return;
-            if (gm.State == GameState.BossFight) gm.OfferRevive();              // revive 1×/fase (doc 12 §4.1)
-            else if (gm.State == GameState.Running) gm.ChangeState(GameState.Defeat);
+            if (gm.State == GameState.BossFight)
+            {
+                gm.SetDefeatReason(DefeatReason.BossWon);   // "O boss venceu" (motivo exibido na ResultScreen)
+                gm.OfferRevive();                           // revive 1×/fase (doc 12 §4.1)
+            }
+            else if (gm.State == GameState.Running)
+            {
+                // exército zerou ANTES do boss: derrota imediata na corrida (doc 12 §4.1)
+                gm.SetDefeatReason(DefeatReason.ArmyWiped);  // "Exército eliminado"
+                gm.ChangeState(GameState.Defeat);
+            }
         }
     }
 

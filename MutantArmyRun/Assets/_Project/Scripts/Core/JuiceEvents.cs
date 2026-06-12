@@ -16,5 +16,13 @@ namespace MutantArmy.Core
         public static event Action<Vector3> OnBossHitPulse;
 
         public static void RaiseBossHitPulse(Vector3 worldPosition) => OnBossHitPulse?.Invoke(worldPosition);
+
+        /// <summary>
+        /// Exército atingido por um obstáculo/armadilha da pista (doc 12 §4.11): posição de mundo.
+        /// O AudioManager (Services) assina e toca a explosão — Gameplay não enxerga Services (§2.3).
+        /// </summary>
+        public static event Action<Vector3> OnObstacleHit;
+
+        public static void RaiseObstacleHit(Vector3 worldPosition) => OnObstacleHit?.Invoke(worldPosition);
     }
 }

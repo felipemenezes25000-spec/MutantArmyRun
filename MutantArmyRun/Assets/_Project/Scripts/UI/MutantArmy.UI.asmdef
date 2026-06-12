@@ -5,6 +5,7 @@
         "MutantArmy.Domain",
         "MutantArmy.Core",
         "MutantArmy.Meta",
+        "MutantArmy.Services",
         "Unity.TextMeshPro",
         "UnityEngine.UI"
     ],

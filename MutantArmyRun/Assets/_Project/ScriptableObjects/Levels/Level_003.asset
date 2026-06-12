@@ -32,7 +32,11 @@ MonoBehaviour:
     autoBalance: 0
     leftGate: {fileID: 11400000, guid: aa2727e84acd0a2468ff34b5f5ea0a9b, type: 2}
     rightGate: {fileID: 11400000, guid: e811d4939ac4d6d478c734c21efb73c7, type: 2}
-  obstacles: []
+  obstacles:
+  - trackPosition: 25
+    prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
+  - trackPosition: 165
+    prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
   boss: {fileID: 11400000, guid: f014fe0b697b9644b9b67dde425ba453, type: 2}
   bossHpMultiplier: 0.47000003
   winReward: {fileID: 0}

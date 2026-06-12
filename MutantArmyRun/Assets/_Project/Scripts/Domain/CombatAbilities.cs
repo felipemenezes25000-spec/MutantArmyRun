@@ -14,6 +14,33 @@ namespace MutantArmy.Domain
         public const string HealAllies = "heal_allies";     // Médico / Anjo de Guerra (Triagem / Aura Solar)
         public const string ReviveDead = "revive_dead";     // Necromante (Levantar)
         public const string BuildTurret = "build_turret";   // Engenheiro (Torreta Mk-1)
+        public const string DodgeTraps = "dodge_traps";     // Corredor / Ninja (esquiva de armadilhas da pista)
+
+        // ---- Armadilhas/obstáculos da pista (doc 12 §4.11) ----
+        // Quando o exército passa por um obstáculo, uma FRAÇÃO das unidades na faixa de impacto
+        // é eliminada. Tropas com DodgeTraps (Corredor/Ninja) reduzem a perda (esquiva) e a
+        // trilha de meta ObstacleResist (RunStartBonuses.obstacleLossFactor) também reduz —
+        // os dois multiplicam sobre a perda-base. Números canônicos como dado puro (testável).
+        public const float ObstacleBaseLossFraction = 0.25f;   // 25% das unidades da faixa por obstáculo (greybox)
+        public const float DodgeTrapsMaxReduction = 0.6f;      // exército 100% esquivo perde até 60% menos
+
+        /// <summary>
+        /// Fração das unidades da faixa de impacto eliminada por UM obstáculo (doc 12 §4.11),
+        /// já combinada com a esquiva (DodgeTraps) e o fator de meta ObstacleResist.
+        /// <paramref name="dodgeRatio"/> = unidades esquivas / total vivo (0..1); reduz a perda
+        /// linearmente até <see cref="DodgeTrapsMaxReduction"/>. <paramref name="lossFactor"/> é o
+        /// RunStartBonuses.obstacleLossFactor (1 = sem bônus; &lt;1 reduz; clamp ≥0). Resultado em [0,1].
+        /// </summary>
+        public static float ObstacleLossFraction(float baseFraction, float dodgeRatio, float lossFactor)
+        {
+            if (baseFraction <= 0f) return 0f;
+            float dodge = 1f - DodgeTrapsMaxReduction * Clamp01(dodgeRatio);
+            float factor = lossFactor < 0f ? 0f : lossFactor;   // meta nunca aumenta a perda além do dado
+            float result = baseFraction * dodge * factor;
+            return Clamp01(result);
+        }
+
+        private static float Clamp01(float v) => v < 0f ? 0f : (v > 1f ? 1f : v);
 
         // Habilidades de DANO em área/contínuo: somam um uplift de DPS no agregado (OffenseBonusDps).
         public const string AreaDamage = "area_damage";     // Mecha (Arsenal Total)

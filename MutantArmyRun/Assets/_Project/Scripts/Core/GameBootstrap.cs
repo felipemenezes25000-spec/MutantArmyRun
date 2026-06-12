@@ -68,6 +68,18 @@ namespace MutantArmy.Core
         /// SEMPRE responde: true = recompensa concedida) — publicado pelo AdsManager.</summary>
         public Action<string, Action<bool>> ShowRewardedAd { get; set; }
 
+        /// <summary>Entitlement do Passe de Temporada — publicado pelo IAPManager (Services) no Init dele.
+        /// UI consome via blackboard porque UI não referencia Services (doc 12 §2.3); null = sem passe.
+        /// O estado também vive no SaveData (seasonPassActive) — este hook é a fonte de verdade viva
+        /// quando o IAP está montado.</summary>
+        public Func<bool> SeasonPassOwned { get; set; }
+
+        /// <summary>Compra de produto IAP por id (doc 11 §4.6: remove_ads_499 / season_pass_699). O
+        /// callback SEMPRE responde: true = compra confirmada (entitlement concedido). Publicado pelo
+        /// IAPManager; com provider Null responde false e a tela mostra "EM BREVE" (doc 12 §7.4).
+        /// Assinatura: (productId, priceUsd, sourceScreen, onResult).</summary>
+        public Action<string, float, string, Action<bool>> PurchaseProduct { get; set; }
+
         private void Awake()
         {
             Current = this;

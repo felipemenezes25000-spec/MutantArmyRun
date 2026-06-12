@@ -867,7 +867,6 @@ namespace MutantArmy.Editor
                     // as demais pagam moedas via EconomySystem.GrantLevelReward (curva §8).
                     level.winReward = fase == LevelsPerWorld ? rewards.Level10 : null;
                     level.startingUnits = 1;        // fase sempre começa com 1 + bônus de meta
-                    level.obstacles = new ObstacleSlot[0];
 
                     // Fase global 1 = onboarding impossível de perder (CANON §16). As demais
                     // fases-chave de cada mundo recebem pares MANUAIS curados (elemento vs
@@ -876,6 +875,14 @@ namespace MutantArmy.Editor
                         ? BuildOnboardingSlots(level.trackLength, gates)
                         : BuildManualSlotsForLevel(def, fase, level.trackLength, gates);
                     level.gateSlots = manual ?? BuildAutoSlots(SlotCount(level.trackLength), level.trackLength);
+
+                    // Obstáculos/armadilhas da pista (doc 12 §4.11): densidade CRESCENTE por mundo
+                    // e por fase, posições determinísticas pela seed, longe dos portais e da zona
+                    // de segurança. Fase global 1 = ZERO obstáculos (onboarding fácil — CANON §16;
+                    // mantém o PlayMode GameScene_Fase1_VitoriaCompleta vencível). O prefab fica
+                    // null aqui e é wired pelo GreyboxFactory (que cria o Obstacle_Greybox).
+                    level.obstacles = BuildObstacleSlots(globalIndex, def.Index, fase,
+                                                         level.trackLength, level.gateSlots);
 
                     EditorUtility.SetDirty(level);
                     worldLevels.Add(level);
@@ -1141,6 +1148,84 @@ namespace MutantArmy.Editor
                 };
             }
             return slots;
+        }
+
+        // ------------------------------------------------------------------ Obstáculos (doc 12 §4.11)
+
+        // Espaço mínimo entre um obstáculo e qualquer portal (não pune logo a escolha do portal).
+        private const float ObstacleGateClearance = 9f;
+
+        /// <summary>
+        /// Quantidade de obstáculos da fase: ZERO na fase global 1 (onboarding) e nas 2 primeiras
+        /// fases do mundo 1 (FTUE). Cresce com a fase dentro do mundo e com o índice do mundo
+        /// (conteúdo acompanha a curva de dificuldade, CANON §12). Capada para não saturar a pista.
+        /// </summary>
+        private static int ObstacleCountForLevel(int globalIndex, int worldIndex, int fase)
+        {
+            if (globalIndex == 1) return 0;            // onboarding absoluto: pista limpa (CANON §16)
+            if (worldIndex == 1 && fase <= 2) return 0; // FTUE do mundo 1: ainda sem armadilhas
+
+            // base por fase: 1ª–2ª do mundo ~1, miolo ~2–3, fim do mundo ~4
+            int byFase = 1 + Mathf.Clamp((fase - 1) / 2, 0, 3);   // 1,1,2,2,3,3,4,4,4,4
+            int byWorld = (worldIndex - 1) / 3;                   // +0 (W1-3), +1 (W4-6), +2 (W7-9), +3 (W10)
+            return Mathf.Clamp(byFase + byWorld, 1, 6);
+        }
+
+        /// <summary>
+        /// Slots de obstáculo distribuídos pela pista jogável, ALTERNANDO o lado lateral (X) de
+        /// forma determinística pela seed, evitando a vizinhança dos portais e a zona de segurança
+        /// final antes da arena. O prefab fica null (wired pelo GreyboxFactory). Densidade vinda
+        /// de <see cref="ObstacleCountForLevel"/>.
+        /// </summary>
+        private static ObstacleSlot[] BuildObstacleSlots(int globalIndex, int worldIndex, int fase,
+                                                         float trackLength, GateSlot[] gateSlots)
+        {
+            int count = ObstacleCountForLevel(globalIndex, worldIndex, fase);
+            if (count <= 0) return new ObstacleSlot[0];
+
+            // janela útil: depois do primeiro trecho e antes da arena (mesma margem dos portais)
+            float first = 25f;
+            float last = trackLength - 45f;
+            if (last <= first) return new ObstacleSlot[0];
+
+            // ObstacleSlot carrega só trackPosition + prefab — o X lateral é derivado pela seed da
+            // fase em runtime (LevelManager.SpawnObstacles), mantendo esse contrato. Aqui ficam as
+            // posições Z determinísticas e a curadoria anti-portal.
+            var result = new System.Collections.Generic.List<ObstacleSlot>(count);
+            for (int i = 0; i < count; i++)
+            {
+                float t = count > 1 ? i / (float)(count - 1) : 0.5f;
+                float z = Mathf.Lerp(first, last, t);
+                if (TooCloseToGate(z, gateSlots)) z = NudgeAwayFromGates(z, first, last, gateSlots);
+                if (TooCloseToGate(z, gateSlots)) continue;   // ainda colado num portal: pula este slot
+                result.Add(new ObstacleSlot { trackPosition = z, prefab = null });
+            }
+            return result.ToArray();
+        }
+
+        private static bool TooCloseToGate(float z, GateSlot[] gates)
+        {
+            if (gates == null) return false;
+            for (int i = 0; i < gates.Length; i++)
+            {
+                if (gates[i] == null) continue;
+                if (Mathf.Abs(z - gates[i].trackPosition) < ObstacleGateClearance) return true;
+            }
+            return false;
+        }
+
+        // empurra o Z em passos pequenos (para frente, depois para trás) até sair da vizinhança
+        // de todo portal, sem ultrapassar a janela útil — determinístico (sem RNG).
+        private static float NudgeAwayFromGates(float z, float first, float last, GateSlot[] gates)
+        {
+            for (float step = 2f; step <= ObstacleGateClearance * 2f; step += 2f)
+            {
+                float fwd = z + step;
+                if (fwd <= last && !TooCloseToGate(fwd, gates)) return fwd;
+                float back = z - step;
+                if (back >= first && !TooCloseToGate(back, gates)) return back;
+            }
+            return z;
         }
 
         // ------------------------------------------------------------------ infra

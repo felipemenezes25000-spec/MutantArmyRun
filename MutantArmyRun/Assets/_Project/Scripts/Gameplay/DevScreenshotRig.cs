@@ -373,9 +373,15 @@ namespace MutantArmy.Gameplay
                 FindFirstObjectByType<UpgradesScreen>(FindObjectsInactive.Include),
                 FindFirstObjectByType<ShopScreen>(FindObjectsInactive.Include),
                 FindFirstObjectByType<MapScreen>(FindObjectsInactive.Include),
-                FindFirstObjectByType<DailyScreen>(FindObjectsInactive.Include)
+                FindFirstObjectByType<DailyScreen>(FindObjectsInactive.Include),
+                // Telas-sistema (SystemScreensFactory): Configurações e Eventos.
+                FindFirstObjectByType<SettingsScreen>(FindObjectsInactive.Include),
+                FindFirstObjectByType<EventsScreen>(FindObjectsInactive.Include),
+                // SeasonPassScreen é de OUTRO agente: referenciada por NOME do tipo (sem
+                // dependência de compile) para o showcase não quebrar se ela ainda não existir.
+                FindScreenByTypeName("SeasonPassScreen")
             };
-            string[] tags = { "troops", "upgrades", "shop", "map", "daily" };
+            string[] tags = { "troops", "upgrades", "shop", "map", "daily", "settings", "events", "seasonpass" };
 
             float watchdogStart = Time.realtimeSinceStartup;
             for (int i = 0; i < screens.Length; i++)
@@ -406,6 +412,19 @@ namespace MutantArmy.Gameplay
                 else screen.Hide();
                 yield return new WaitForSecondsRealtime(0.4f);
             }
+        }
+
+        /// <summary>
+        /// Acha uma UIScreen pelo NOME do tipo (sem referência de compile) — usada para a
+        /// SeasonPassScreen de outro agente: se a classe ainda não existe no projeto, retorna
+        /// null e o showcase apenas pula a tela (warning), sem quebrar a build do rig.
+        /// </summary>
+        private static UIScreen FindScreenByTypeName(string typeName)
+        {
+            UIScreen[] all = FindObjectsByType<UIScreen>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < all.Length; i++)
+                if (all[i] != null && all[i].GetType().Name == typeName) return all[i];
+            return null;
         }
 
         /// <summary>Carrega a cena Game e inicia o nível dado (mesmo mecanismo do StartLevelOneRoutine).</summary>

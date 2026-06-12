@@ -39,7 +39,13 @@ namespace MutantArmy.UI
         [SerializeField] private TMP_Text _removeAdsLabel;
         [SerializeField] private TMP_Text _seasonPassLabel;
 
+        [Header("Passe de Temporada (abre SeasonPassScreen)")]
+        [SerializeField] private Button _seasonPassButton;
+
         public event System.Action BackRequested;
+
+        /// <summary>Disparado pelo botão PASSE — o MainMenuController dá Push na SeasonPassScreen.</summary>
+        public event System.Action SeasonPassRequested;
 
         private readonly StringBuilder _sb = new StringBuilder(96);
 
@@ -53,6 +59,7 @@ namespace MutantArmy.UI
             if (_backButton != null) _backButton.onClick.AddListener(() => { if (BackRequested != null) BackRequested(); });
             if (_freeChestButton != null) _freeChestButton.onClick.AddListener(OnFreeChest);
             if (_gemChestButton != null) _gemChestButton.onClick.AddListener(OnGemChest);
+            if (_seasonPassButton != null) _seasonPassButton.onClick.AddListener(() => { if (SeasonPassRequested != null) SeasonPassRequested(); });
         }
 
         private void OnEnable() { GameEvents.OnCurrencyChanged += HandleCurrencyChanged; }
