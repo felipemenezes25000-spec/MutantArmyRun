@@ -93,7 +93,12 @@ namespace MutantArmy.Gameplay
 
             for (int t = 0; t < _batches.Count; t++) _batches[t].Count = 0;
 
-            float sizeMult = CrowdManager.Instance != null ? CrowdManager.Instance.MutationSizeMult : 1f;
+            CrowdManager crowd = CrowdManager.Instance;
+            float sizeMult = crowd != null ? crowd.MutationSizeMult : 1f;
+            // tint da mutação de maior prioridade (laser/armadura/asas…): lido 1×/frame e
+            // empurrado por MPB no caminho pooled; quando inativo o view restaura o material
+            bool tintActive = crowd != null && crowd.HasMutationTint;
+            Color tint = tintActive ? crowd.MutationTint : Color.white;
             int animState = ResolveAnimState();
             Vector3 min = Vector3.zero;
             Vector3 max = Vector3.zero;
@@ -110,7 +115,7 @@ namespace MutantArmy.Gameplay
                 if (b.HasView && _viewPool.HasView(typeId))
                 {
                     PlaceView(typeId, i, positions, velocities, flags, dyingTimers, dyingSeconds,
-                              sizeMult, animState);
+                              sizeMult, animState, tintActive, tint);
                     continue;
                 }
 
@@ -172,7 +177,8 @@ namespace MutantArmy.Gameplay
         }
 
         private void PlaceView(int typeId, int i, Vector3[] positions, Vector3[] velocities, byte[] flags,
-                               float[] dyingTimers, float dyingSeconds, float sizeMult, int animState)
+                               float[] dyingTimers, float dyingSeconds, float sizeMult, int animState,
+                               bool tintActive, Color tint)
         {
             Vector3 pos = positions[i];
 
@@ -197,7 +203,7 @@ namespace MutantArmy.Gameplay
                 pos.y -= (1f - p) * 0.5f;
             }
 
-            _viewPool.Place(typeId, pos, rot, scale, animState);
+            _viewPool.Place(typeId, pos, rot, scale, animState, tintActive, tint);
         }
 
         // Estado do Animator segue o estado do JOGO (contrato da fase): Running → Run,

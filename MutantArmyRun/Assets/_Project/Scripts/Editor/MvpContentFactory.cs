@@ -379,12 +379,15 @@ namespace MutantArmy.Editor
             set.RiskTen.riskSuccessChance = 0.7f;
             set.RiskTen.riskRewardMult = 10f;
             set.RiskTen.riskFailPenalty = 0.5f;
-            // "x10 SE SOBREVIVER" agressivo: odds baixas, prêmio enorme.
+            // "x10 SE SOBREVIVER" agressivo: odds baixas, prêmio enorme. unitToAdd = Titã (lendário,
+            // Supply 25 ≥ 18) ATIVA o Sacrifício do Titã no RiskResolver (doc 04 §3.5): no sucesso,
+            // 50% das tropas → 1 Titã — sacrifício determinístico, mais interessante que o x10 simples.
             set.RiskTitan = ConfigureGate("Gate_RiskTitan", "gate_risk_titan", GateType.Risk, 0f,
-                "50% x10 / 50% −½", GateColor.Risk);
+                "50%: SACRIFÍCIO → TITÃ / 50% −½", GateColor.Risk);
             set.RiskTitan.riskSuccessChance = 0.5f;
             set.RiskTitan.riskRewardMult = 10f;
             set.RiskTitan.riskFailPenalty = 0.5f;
+            set.RiskTitan.unitToAdd = units.Titan;
             // "sacrificar metade por um prêmio" — sucesso quase garantido, penalidade pesada.
             set.RiskSacrifice = ConfigureGate("Gate_RiskSacrifice", "gate_risk_sacrifice", GateType.Risk, 0f,
                 "90% x3 / 10% −½", GateColor.Risk);

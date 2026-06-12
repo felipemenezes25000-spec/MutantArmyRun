@@ -56,7 +56,11 @@ namespace MutantArmy.Gameplay
             Vector3 p = transform.position;
             if (running)
             {
-                p.z += _forwardSpeed * _speedMultiplier * Time.deltaTime;
+                // velocidade efetiva = base × trilha de meta × mutação. O canal de meta
+                // (_speedMultiplier, setter único) fica intocado; a mutação entra só aqui,
+                // multiplicativa — exército com mutação de Velocidade corre mais rápido (CANON §3.3).
+                float effectiveSpeed = _forwardSpeed * _speedMultiplier * MutationSpeedMultiplier();
+                p.z += effectiveSpeed * Time.deltaTime;
                 p.x = Mathf.Clamp(p.x + ReadDragDeltaMeters(), -_laneHalfWidth, _laneHalfWidth);
             }
             else
@@ -67,6 +71,14 @@ namespace MutantArmy.Gameplay
             transform.position = p;
             Position = p;
             UpdateProxyBounds();
+        }
+
+        // Multiplicador de velocidade da mutação ativa (CrowdManager é a fonte; 1 se ausente).
+        // Lido por frame, sem cache — RecomputeMutationMultipliers já o mantém barato.
+        private static float MutationSpeedMultiplier()
+        {
+            CrowdManager crowd = CrowdManager.Instance;
+            return crowd != null ? Mathf.Max(0.1f, crowd.MutationSpeedMult) : 1f;
         }
 
         // Input clássico de propósito: é o caminho mais simples estável enquanto o projeto

@@ -66,6 +66,8 @@ namespace MutantArmy.Gameplay
         private float _mutationSpeedMult = 1f;
         private bool _mutationGrantsFlight;
         private ElementType _mutationElement = ElementType.None;   // ex.: laser adiciona Raio (MutationConfigSO.addsElement)
+        private bool _hasMutationTint;
+        private Color _mutationTint = Color.white;
 
         // conversão de excedente de Supply com metering (CANON §3.2: fanfarra, nunca punição)
         private int _pendingConversions;
@@ -80,6 +82,10 @@ namespace MutantArmy.Gameplay
         public float MutationSizeMult { get; private set; } = 1f;
         public float MutationSpeedMult => _mutationSpeedMult;   // CrowdAnchor multiplica a velocidade de corrida
         public bool HasFlight => _mutationGrantsFlight;        // asas: ignora obstáculos de chão (CANON §3.3/§5)
+        /// <summary>Há tint visual ativo da mutação de maior prioridade? (laser/armadura/asas… — CANON §3.3).</summary>
+        public bool HasMutationTint => _hasMutationTint;
+        /// <summary>Cor/emissão da mutação de maior prioridade ativa — o CrowdRenderer empurra via MPB.</summary>
+        public Color MutationTint => _mutationTint;
         public ElementType ArmyElement => _armyElement;
         /// <summary>Elemento EFETIVO do dano agregado: portal de elemento tem prioridade; senão a mutação de elemento.</summary>
         public ElementType EffectiveElement => _armyElement != ElementType.None ? _armyElement : _mutationElement;
@@ -721,6 +727,9 @@ namespace MutantArmy.Gameplay
             MutationSizeMult = 1f;
             _mutationGrantsFlight = false;
             _mutationElement = ElementType.None;
+            _hasMutationTint = false;
+            _mutationTint = Color.white;
+            int bestTintPriority = int.MinValue;
             for (int s = 0; s < _mutationSlots.Length; s++)
             {
                 MutationConfigSO m = _mutationSlots[s];
@@ -731,6 +740,16 @@ namespace MutantArmy.Gameplay
                 MutationSizeMult *= m.sizeMult;
                 if (m.grantsFlight) _mutationGrantsFlight = true;
                 if (m.addsElement != ElementType.None) _mutationElement = m.addsElement;   // última mutação de elemento vence
+
+                // Tint visual: a mutação de MAIOR prioridade entre os slots ativos pinta o exército
+                // (laser ciano-elétrico > armadura cinza-metal > asas céu…); empate vence o slot mais novo.
+                if (MutationTints.TryResolve(m.shaderVariantFlag, out Color tint, out int priority)
+                    && priority >= bestTintPriority)
+                {
+                    bestTintPriority = priority;
+                    _mutationTint = tint;
+                    _hasMutationTint = true;
+                }
             }
             // _mutationSpeedMult é EXPOSTO via MutationSpeedMult; o CrowdAnchor (dono do speed) o
             // combina com a trilha de meta "Velocidade" — não setamos aqui para não sobrescrever
@@ -743,6 +762,57 @@ namespace MutantArmy.Gameplay
             if (gm == null) return;
             if (gm.State == GameState.BossFight) gm.OfferRevive();              // revive 1×/fase (doc 12 §4.1)
             else if (gm.State == GameState.Running) gm.ChangeState(GameState.Defeat);
+        }
+    }
+
+    /// <summary>
+    /// Cor/emissão por BIT de mutação (MutationConfigSO.shaderVariantFlag = 1&lt;&lt;bit; ver
+    /// MvpContentFactory). Mapeia o visual do exército inteiro ao caráter da mutação — laser
+    /// ciano-elétrico, armadura cinza-metal, asas céu… (CANON §3.3). A prioridade decide qual
+    /// tint vence quando há várias mutações ativas (a mais "marcante" pinta a multidão).
+    /// </summary>
+    internal static class MutationTints
+    {
+        private readonly struct Entry
+        {
+            public readonly Color Color;
+            public readonly int Priority;
+            public Entry(Color color, int priority) { Color = color; Priority = priority; }
+        }
+
+        // bit → (cor, prioridade). Os bits seguem MvpContentFactory (fonte do shaderVariantFlag);
+        // as cores de wings/armor/laser batem com os materiais M_Mutation_* do UnitVisualFactory.
+        // 'size'/'speed' não tintam (size já é escala; speed é o canal de meta de velocidade).
+        private static readonly Entry[] ByBit =
+        {
+            new Entry(new Color(0.85f, 0.92f, 1.00f), 10),   // 0 wings  — céu-claro (= M_Mutation wings)
+            new Entry(new Color(0.72f, 0.78f, 0.85f), 30),   // 1 armor  — cinza-metal (= M_Mutation armor)
+            new Entry(new Color(0.30f, 0.95f, 1.00f), 50),   // 2 laser  — ciano-elétrico (= M_Mutation laser; mais marcante)
+            default,                                          // 3 size   — sem tint (é escala)
+            default,                                          // 4 speed  — sem tint (canal de meta)
+            new Entry(new Color(1.00f, 0.92f, 0.55f), 40),   // 5 clone  — dourado-pálido (lendária)
+            new Entry(new Color(0.55f, 1.00f, 0.65f), 20),   // 6 regen  — verde-vida
+            new Entry(new Color(0.45f, 0.70f, 1.00f), 25),   // 7 shield — azul-escudo
+            new Entry(new Color(1.00f, 0.55f, 0.25f), 45),   // 8 area   — laranja-explosão
+        };
+
+        /// <summary>Resolve o tint do flag (só o bit MENOS significativo importa — 1 bit por mutação).</summary>
+        public static bool TryResolve(int shaderVariantFlag, out Color color, out int priority)
+        {
+            color = Color.white;
+            priority = int.MinValue;
+            if (shaderVariantFlag == 0) return false;
+
+            for (int bit = 0; bit < ByBit.Length; bit++)
+            {
+                if ((shaderVariantFlag & (1 << bit)) == 0) continue;
+                Entry e = ByBit[bit];
+                if (e.Priority == 0) return false;   // bit sem tint (size/speed/default)
+                color = e.Color;
+                priority = e.Priority;
+                return true;
+            }
+            return false;
         }
     }
 }

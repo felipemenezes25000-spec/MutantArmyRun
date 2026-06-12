@@ -23,9 +23,9 @@ namespace MutantArmy.Gameplay
 
         private ObjectPool<GatePairView> _pairPool;                 // UnityEngine.Pool (doc 12 §6.4)
         private readonly List<GatePairView> _livePairs = new List<GatePairView>();
-        private readonly List<GateConfigSO> _optimalBuffer = new List<GateConfigSO>();
-        private readonly List<GateConfigSO> _trapBuffer = new List<GateConfigSO>();
-        private readonly List<GateConfigSO> _neutralBuffer = new List<GateConfigSO>();
+        private readonly List<GateConfigSO> _strongBuffer = new List<GateConfigSO>();   // rota ótima (FORTE)
+        private readonly List<GateConfigSO> _trapBuffer = new List<GateConfigSO>();     // armadilha plausível
+        private readonly List<GateConfigSO> _neutralBuffer = new List<GateConfigSO>();  // honesto sem brilho
 
         public void Init()   // chamado pelo bootstrap da cena Game (doc 12 §3.3)
         {
@@ -60,19 +60,36 @@ namespace MutantArmy.Gameplay
             }
         }
 
-        // Rota ótima: portal cujo elemento explora boss.weaknesses.
-        // Armadilha: número maior bruto, mas elemento resistido/imune (CANON §3.1).
+        // Par autoBalance SEMPRE honesto-mas-justo (CANON §3.1/§3.4): a rota ótima é genuinamente
+        // BOA (FORTE — número alto, elemento/classe vantajoso vs boss ou mutação boa) e a alternativa
+        // é NEUTRA ou ARMADILHA (a graça do "número maior que engana"). NUNCA FRACO vs FRACO: nenhum
+        // par oferece os DOIS lados ruins. Determinístico pela seed da fase.
         private (GateConfigSO, GateConfigSO) PickPairForBoss(BossConfigSO boss, float depth01, System.Random rng)
         {
             CategorizeForBoss(boss);
 
-            GateConfigSO optimal = PickWeighted(
-                _optimalBuffer.Count > 0 ? _optimalBuffer : _neutralBuffer, depth01, rng);
-            GateConfigSO trap = _trapBuffer.Count > 0
-                ? PickWeighted(_trapBuffer, depth01, rng)
-                : PickBiggestNumber(_neutralBuffer, optimal);
+            // Lado ótimo: SEMPRE um FORTE. Sem FORTE no pool, o melhor NEUTRO assume o papel
+            // (maior número; senão um neutro qualquer) — a armadilha é escolhida por exclusão abaixo.
+            GateConfigSO optimal;
+            if (_strongBuffer.Count > 0)
+                optimal = PickWeighted(_strongBuffer, depth01, rng);
+            else
+            {
+                optimal = PickBiggestNumber(_neutralBuffer, null);
+                if (optimal == null) optimal = PickWeighted(_neutralBuffer, depth01, rng);
+            }
 
-            if (optimal == null) optimal = trap;
+            // Alternativa: a ARMADILHA é preferida (decisão tem peso real); sem armadilha,
+            // um NEUTRO diferente do ótimo. Nunca outro FORTE (não seria escolha), nunca o ótimo.
+            GateConfigSO trap = null;
+            if (_trapBuffer.Count > 0)
+                trap = PickWeighted(_trapBuffer, depth01, rng);
+            if (trap == null)
+                trap = PickBiggestNumber(_neutralBuffer, optimal);
+            if (trap == null || trap == optimal)
+                trap = PickWeighted(_neutralBuffer, depth01, rng, optimal);
+
+            if (optimal == null) optimal = trap;     // pool degenerado: par espelhado em vez de slot vazio
             if (trap == null) trap = optimal;
             if (optimal == null) return (null, null);   // pool vazio: o chamador pula o slot
 
@@ -80,9 +97,14 @@ namespace MutantArmy.Gameplay
             return rng.Next(2) == 0 ? (optimal, trap) : (trap, optimal);
         }
 
+        // Classifica cada gate em 3 cestas vs o boss (CANON §3.1):
+        //   FORTE     = ganho genuíno: x2/x3/x5, +25/+50, elemento que explora fraqueza,
+        //               classe com elemento vantajoso, mutação boa (DPS/HP/voo).
+        //   ARMADILHA = parece bom mas é ruim: −10, ÷2, elemento resistido/imune, risco de EV baixo.
+        //   NEUTRO    = honesto sem brilho: +10, x2 pequeno, mutação sem ganho claro, classe neutra.
         private void CategorizeForBoss(BossConfigSO boss)
         {
-            _optimalBuffer.Clear();
+            _strongBuffer.Clear();
             _trapBuffer.Clear();
             _neutralBuffer.Clear();
             if (_autoBalancePool == null) return;
@@ -90,18 +112,76 @@ namespace MutantArmy.Gameplay
             foreach (GateConfigSO g in _autoBalancePool)
             {
                 if (g == null) continue;
-                // o elemento ESTRATÉGICO do portal: elemento direto (Element gate) OU o elemento
-                // nativo da tropa-alvo de um portal de classe (Virar Lança-Chamas vs boss de Gelo).
-                ElementType strategic = StrategicElementOf(g);
-
-                bool exploitsWeakness = boss != null && strategic != ElementType.None
-                                        && ContainsElement(boss.weaknesses, strategic);
-                bool resisted = boss != null && strategic != ElementType.None
-                                && (ContainsElement(boss.immunities, strategic) || strategic == boss.element);
-                if (exploitsWeakness) _optimalBuffer.Add(g);
-                else if (resisted) _trapBuffer.Add(g);
-                else _neutralBuffer.Add(g);
+                switch (Classify(g, boss))
+                {
+                    case GateClass.Strong: _strongBuffer.Add(g); break;
+                    case GateClass.Trap: _trapBuffer.Add(g); break;
+                    default: _neutralBuffer.Add(g); break;
+                }
             }
+        }
+
+        private enum GateClass { Neutral, Strong, Trap }
+
+        private static GateClass Classify(GateConfigSO g, BossConfigSO boss)
+        {
+            // Elemento estratégico (direto p/ Element; herdado da tropa-alvo p/ ClassConvert)
+            // tem prioridade na leitura vs boss — uma fraqueza explorada é sempre FORTE,
+            // um elemento resistido/imune é sempre ARMADILHA (a promessa do cartão é mecânica).
+            ElementType strategic = StrategicElementOf(g);
+            if (strategic != ElementType.None && boss != null)
+            {
+                if (ContainsElement(boss.weaknesses, strategic)) return GateClass.Strong;
+                if (ContainsElement(boss.immunities, strategic) || strategic == boss.element)
+                    return GateClass.Trap;
+            }
+
+            switch (g.gateType)
+            {
+                case GateType.Multiply:
+                    if (g.value < 1f) return GateClass.Trap;          // ÷2 e afins: corta o exército
+                    if (g.value >= 2f) return GateClass.Strong;       // x2/x3/x5: ganho real
+                    return GateClass.Neutral;                          // x1.x: ganho marginal
+
+                case GateType.AddFlat:
+                    if (g.value < 0f) return GateClass.Trap;          // −10: punição disfarçada
+                    if (g.value >= 25f) return GateClass.Strong;      // +25/+50: ganho real
+                    return GateClass.Neutral;                          // +10: honesto, modesto
+
+                case GateType.ClassConvert:
+                    // sem vantagem elemental, classe é só tradeoff de stats → NEUTRO honesto
+                    return GateClass.Neutral;
+
+                case GateType.Element:
+                    // elemento que não explora fraqueza nem é resistido: lateral → NEUTRO
+                    return GateClass.Neutral;
+
+                case GateType.Mutation:
+                    return IsStrongMutation(g.mutation) ? GateClass.Strong : GateClass.Neutral;
+
+                case GateType.Risk:
+                    // EV = chance×prêmio + (1−chance)×penalidade. EV alto e prêmio gordo → FORTE;
+                    // EV baixo (aposta ruim disfarçada de dourado) → ARMADILHA; meio-termo NEUTRO.
+                    float ev = g.riskSuccessChance * g.riskRewardMult
+                               + (1f - g.riskSuccessChance) * g.riskFailPenalty;
+                    if (ev >= 3f) return GateClass.Strong;
+                    if (ev < 1.5f) return GateClass.Trap;
+                    return GateClass.Neutral;
+
+                default:
+                    return GateClass.Neutral;
+            }
+        }
+
+        // Mutação "boa" = ganho claro de poder (DPS/HP) OU voo/elemento — vira rota ótima.
+        // Mutações só cosméticas/laterais (sem ganho líquido) ficam NEUTRAS.
+        private static bool IsStrongMutation(MutationConfigSO m)
+        {
+            if (m == null) return false;
+            return m.grantsFlight
+                   || m.addsElement != ElementType.None
+                   || m.dpsMult >= 1.25f
+                   || m.hpMult >= 1.4f;
         }
 
         // Elemento que o portal injeta no plano contra o boss (CANON §3.1): direto para Element,
@@ -123,17 +203,30 @@ namespace MutantArmy.Gameplay
 
         private static GateConfigSO PickWeighted(List<GateConfigSO> pool, float depth01, System.Random rng)
         {
+            return PickWeighted(pool, depth01, rng, null);
+        }
+
+        // exclude: nunca sorteia o gate já escolhido para o outro lado (evita par espelhado).
+        private static GateConfigSO PickWeighted(List<GateConfigSO> pool, float depth01,
+                                                 System.Random rng, GateConfigSO exclude)
+        {
             if (pool == null || pool.Count == 0) return null;
             double total = 0;
-            for (int i = 0; i < pool.Count; i++) total += WeightOf(pool[i], depth01);
+            for (int i = 0; i < pool.Count; i++)
+                if (pool[i] != exclude) total += WeightOf(pool[i], depth01);
+            if (total <= 0) return null;   // só o excluído sobrou
 
             double roll = rng.NextDouble() * total;
             for (int i = 0; i < pool.Count; i++)
             {
+                if (pool[i] == exclude) continue;
                 roll -= WeightOf(pool[i], depth01);
                 if (roll <= 0) return pool[i];
             }
-            return pool[pool.Count - 1];
+            // fallback determinístico: último != exclude
+            for (int i = pool.Count - 1; i >= 0; i--)
+                if (pool[i] != exclude) return pool[i];
+            return null;
         }
 
         private static double WeightOf(GateConfigSO g, float depth01)

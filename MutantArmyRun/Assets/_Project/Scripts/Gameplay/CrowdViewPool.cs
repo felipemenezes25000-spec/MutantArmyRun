@@ -12,11 +12,21 @@ namespace MutantArmy.Gameplay
     /// </summary>
     public sealed class CrowdUnitView : MonoBehaviour
     {
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
+
         public Transform CachedTransform { get; private set; }
         public Animator CachedAnimator { get; private set; }
 
         private int _appliedState = -1;
         private float _appliedScale = -1f;
+
+        // tint da mutação via MaterialPropertyBlock (zero-alloc, reusado): -1 = nunca aplicado,
+        // 0 = sem tint (restaurado), 1 = tintado. Só toca o renderer quando o estado MUDA.
+        private Renderer[] _renderers;
+        private MaterialPropertyBlock _mpb;
+        private int _appliedTintState = -1;
+        private Color _appliedTint;
 
         public void Cache(int stateParamHash)
         {
@@ -26,6 +36,7 @@ namespace MutantArmy.Gameplay
             // ignorar evita 1 warning de "Parameter does not exist" POR FRAME no editor.
             if (CachedAnimator != null && !HasIntParam(CachedAnimator, stateParamHash))
                 CachedAnimator = null;
+            _renderers = GetComponentsInChildren<Renderer>(true);   // aloca 1× no Cache, nunca por frame
         }
 
         /// <summary>SetActive(false→true) reseta o Animator ao estado de entrada — força reaplicar.</summary>
@@ -33,6 +44,32 @@ namespace MutantArmy.Gameplay
         {
             _appliedState = -1;
             _appliedScale = -1f;
+            _appliedTintState = -1;   // reuso do pool: força reavaliar o tint (não vaza entre fases)
+        }
+
+        /// <summary>
+        /// Empurra (ou restaura) o tint da mutação via MPB — _BaseColor + _EmissionColor.
+        /// Só toca os renderers quando o estado de tint muda (zero-alloc por frame). Quando
+        /// <paramref name="active"/> é false, restaura branco/preto (sem vazar entre pool/fases).
+        /// </summary>
+        public void ApplyTint(bool active, Color tint)
+        {
+            if (_renderers == null || _renderers.Length == 0) return;
+            int wanted = active ? 1 : 0;
+            if (wanted == _appliedTintState && (!active || tint == _appliedTint)) return;
+            _appliedTintState = wanted;
+            _appliedTint = tint;
+
+            if (_mpb == null) _mpb = new MaterialPropertyBlock();
+            _mpb.Clear();
+            if (active)
+            {
+                _mpb.SetColor(BaseColorId, tint);
+                _mpb.SetColor(EmissionColorId, tint * 0.6f);   // brilho sutil — leitura clara da mutação
+            }
+            // bloco vazio quando inativo: limpa qualquer override anterior (restaura o material)
+            for (int i = 0; i < _renderers.Length; i++)
+                if (_renderers[i] != null) _renderers[i].SetPropertyBlock(_mpb);
         }
 
         /// <summary>1 chamada por frame por unidade viva: posição+rotação em lote, escala/anim só em mudança.</summary>
@@ -138,7 +175,8 @@ namespace MutantArmy.Gameplay
         }
 
         /// <summary>Posiciona a PRÓXIMA instância do tipo — 1 chamada por índice vivo do SoA, por frame.</summary>
-        public void Place(int typeId, Vector3 position, Quaternion rotation, float scale, int animState)
+        public void Place(int typeId, Vector3 position, Quaternion rotation, float scale, int animState,
+                          bool tintActive, Color tint)
         {
             TypeViews t = _types[typeId];
             CrowdUnitView view;
@@ -153,6 +191,7 @@ namespace MutantArmy.Gameplay
             }
             t.Used++;
             view.Apply(position, rotation, scale, animState, StateParamHash);
+            view.ApplyTint(tintActive, tint);   // tint da mutação via MPB (zero-alloc; só toca em mudança)
         }
 
         /// <summary>Fim do frame: excedente (morte/divisão/reset) → Release, nunca Destroy (doc 12 §6.4).</summary>

@@ -15,12 +15,12 @@ MonoBehaviour:
   gateId: gate_risk_titan
   gateType: 5
   value: 0
-  unitToAdd: {fileID: 0}
+  unitToAdd: {fileID: 11400000, guid: 35f7eadedb73af442b19a31907fa1ebe, type: 2}
   element: 0
   mutation: {fileID: 0}
   riskSuccessChance: 0.5
   riskRewardMult: 10
   riskFailPenalty: 0.5
-  displayLabel: "50% x10 / 50% \u2212\xBD"
+  displayLabel: "50%: SACRIF\xCDCIO \u2192 TIT\xC3 / 50% \u2212\xBD"
   icon: {fileID: 0}
   portalColor: {r: 1, g: 0.8, b: 0.2, a: 1}

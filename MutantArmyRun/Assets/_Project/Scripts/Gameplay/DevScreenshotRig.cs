@@ -18,8 +18,12 @@ namespace MutantArmy.Gameplay
     /// ScreenCapture.CaptureScreenshot: ela depende do backbuffer da janela e falha
     /// minimizada/em segundo plano (regra dura: o desktop do usuário é intocável).
     /// Captura a cada 2 s + momentos-chave (Boss Scout, 1º portal, arena, golpe final,
-    /// telas de vitória/derrota) em Build\shots com nomes ordenáveis (shot_010_menu.png…).
-    /// Application.Quit() 3 s após o fim da fase ou no watchdog de 120 s.
+    /// telas de vitória/derrota) em Build\shots com nomes ordenáveis e ROTULADOS PELA FASE
+    /// (shot_010_L1_menu.png, shot_NNN_L2_portal.png…). Joga VÁRIAS fases em sequência
+    /// (1→2→3→4): ao VENCER, avança para a próxima via StartLevel (soft reset, mesma cena)
+    /// e segue capturando — as fases 2–4 têm portais de classe/elemento/mutação curados,
+    /// então os shots mostram o exército TRANSFORMADO e as mutações ativas.
+    /// Application.Quit() ao terminar a última fase (ou na derrota) ou no watchdog de 180 s.
     /// Sem o argumento, o componente é 100% inerte (pode viver na cena Game de produção).
     /// </summary>
     public class DevScreenshotRig : MonoBehaviour
@@ -29,17 +33,23 @@ namespace MutantArmy.Gameplay
         private const string DefaultShotsDir = @"C:\Users\Felipe\Downloads\jogo test\Build\shots";
         private const string GameSceneName = "Game";
 
+        private const int FirstLevelIndex = 1;
+        private const int LevelsToPlay = 4;   // joga 1→2→3→4 antes de encerrar (variedade visual)
+
         [SerializeField] private int _width = 540;
         [SerializeField] private int _height = 960;
         [SerializeField] private float _intervalSeconds = 2f;
-        [SerializeField] private float _watchdogSeconds = 120f;
+        [SerializeField] private float _watchdogSeconds = 180f;   // 4 fases + folga (era 120 s p/ 1 fase)
         [SerializeField] private float _quitAfterFinishSeconds = 3f;
+        [SerializeField] private float _advanceDelaySeconds = 1.2f;   // deixa a vitória renderar antes de avançar
 
         private static DevScreenshotRig s_active;
         private static LevelConfigSO s_pendingLevel;   // sobrevive ao load da cena Game
 
         private string _outputDir = DefaultShotsDir;
         private int _shotIndex = 10;        // shot_010_..., shot_020_... — sempre ordenável
+        private int _currentLevelIndex = FirstLevelIndex;   // rotula os shots e dirige o avanço de fase
+        private int _levelsCleared;         // quantas fases já vencidas nesta sessão
         private bool _firstGateCaptured;
         private bool _finished;
         private float _finishedAt = -1f;
@@ -118,12 +128,23 @@ namespace MutantArmy.Gameplay
             if (GameManager.Instance == null) return;
             GameManager.Instance.StateEntered -= HandleStateEntered;
             GameManager.Instance.StateEntered += HandleStateEntered;
+            GameManager.Instance.LevelStarted -= HandleLevelStarted;
+            GameManager.Instance.LevelStarted += HandleLevelStarted;
         }
 
         private void UnsubscribeGameManager()
         {
             if (GameManager.Instance != null)
+            {
                 GameManager.Instance.StateEntered -= HandleStateEntered;
+                GameManager.Instance.LevelStarted -= HandleLevelStarted;
+            }
+        }
+
+        // fonte da verdade do rótulo de fase: qualquer StartLevel atualiza o índice dos shots
+        private void HandleLevelStarted(int levelIndex)
+        {
+            _currentLevelIndex = levelIndex;
         }
 
         // ------------------------------------------------------------------ roteiro
@@ -146,9 +167,12 @@ namespace MutantArmy.Gameplay
                 yield return StartLevelOneRoutine();
             }
 
+            // o load da cena Game troca a instância do GameManager — re-assina no objeto vivo
+            // (StateEntered/LevelStarted) para dirigir o avanço de fase e rotular os shots
+            SubscribeGameManager();
             EnsureAutoPilot();
 
-            // 3. captura periódica a cada 2 s até o fim (watchdog 120 s)
+            // 3. captura periódica a cada 2 s até o fim (watchdog 180 s — cobre 4 fases)
             float lastPeriodic = Time.realtimeSinceStartup;
             while (true)
             {
@@ -243,8 +267,42 @@ namespace MutantArmy.Gameplay
 
         private void HandleLevelFinished(LevelResult result)
         {
+            // Vitória e ainda há fases a mostrar: AVANÇA (1→2→3→4) em vez de encerrar — captura
+            // o exército transformado das fases curadas. Derrota OU última fase: encerra.
+            if (result.won) _levelsCleared++;
+            bool moreToPlay = result.won && _levelsCleared < LevelsToPlay;
+            if (moreToPlay)
+            {
+                int nextIndex = result.levelIndex + 1;
+                if (isActiveAndEnabled) StartCoroutine(AdvanceToLevelRoutine(nextIndex));
+                return;
+            }
+
             _finished = true;
             _finishedAt = Time.realtimeSinceStartup;
+        }
+
+        // Avança para a próxima fase pelo MESMO caminho do "próxima fase" (StartLevel, soft reset
+        // na mesma cena — doc 12 §2.2). Não depende de UI. Mantém o AutoPilot e segue capturando.
+        private IEnumerator AdvanceToLevelRoutine(int nextIndex)
+        {
+            yield return new WaitForSecondsRealtime(_advanceDelaySeconds);   // deixa a vitória renderar/capturar
+
+            GameSettingsSO settings = GameSettingsSO.Load();
+            LevelConfigSO level = settings != null ? settings.GetLevel(nextIndex) : null;
+            if (level == null || GameManager.Instance == null)
+            {
+                Debug.LogWarning("[DevScreenshotRig] fase " + nextIndex + " ausente — encerrando o roteiro.");
+                _finished = true;
+                _finishedAt = Time.realtimeSinceStartup;
+                yield break;
+            }
+
+            _currentLevelIndex = nextIndex;     // novos shots já saem rotulados com a fase nova
+            _firstGateCaptured = false;         // 1º portal da nova fase volta a contar
+            GameManager.Instance.StartLevel(level);
+            yield return null;
+            EnsureAutoPilot();                  // garante o piloto ativo na corrida recém-iniciada
         }
 
         private void ScheduleCapture(string tag, float delaySeconds)
@@ -286,7 +344,8 @@ namespace MutantArmy.Gameplay
                 tex.Apply(false);
                 RenderTexture.active = previous;
 
-                string file = string.Format("shot_{0:000}_{1}.png", _shotIndex, tag);
+                // rótulo da FASE no nome (shot_NNN_L2_portal.png) — identifica a variedade visual
+                string file = string.Format("shot_{0:000}_L{1}_{2}.png", _shotIndex, _currentLevelIndex, tag);
                 _shotIndex += 10;
                 File.WriteAllBytes(Path.Combine(_outputDir, file), tex.EncodeToPNG());
             }
