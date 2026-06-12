@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.BossConfigSO
   bossId: m2_final_zombie_titan
   displayNameKey: m2_final_zombie_titan_name
+  displayName: "Zumbi Tit\xE3"
   element: 0
   weaknesses: 0100000005000000
   immunities: 04000000
@@ -27,6 +28,6 @@ MonoBehaviour:
   specialAttackArea: 2.5
   specialBaseCooldown: 3.5
   arenaWaves: []
-  prefab: {fileID: 781381211656405589, guid: 46ed0562a819e394e8c82de8db345a8e, type: 3}
+  prefab: {fileID: 8223450614564286288, guid: ad7d87bff3ae36749b530b4a2591ef98, type: 3}
   scoutCardArt: {fileID: 0}
   killReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}

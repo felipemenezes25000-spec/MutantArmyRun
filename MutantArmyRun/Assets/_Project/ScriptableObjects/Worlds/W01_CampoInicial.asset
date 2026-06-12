@@ -33,7 +33,7 @@ MonoBehaviour:
   skyHorizonColor: {r: 0.8, g: 0.93, b: 1, a: 1}
   fogColor: {r: 0.76, g: 0.88, b: 0.98, a: 1}
   sunColor: {r: 1, g: 0.96, b: 0.84, a: 1}
-  ambientColor: {r: 0.64, g: 0.7, b: 0.78, a: 1}
+  ambientColor: {r: 0.7, g: 0.76, b: 0.86, a: 1}
   trackMaterial: {fileID: 2100000, guid: 2633be32ffbccfa438872047f0516802, type: 2}
   propPrefabs:
   - {fileID: 3317418946980458237, guid: 66b2aa486cf12b44289aca320b9635e9, type: 3}

@@ -64,7 +64,14 @@ namespace MutantArmy.UI
         {
             if (boss == null) return;
             if (_bossNameText != null) _bossNameText.text = DisplayName(boss);
-            if (_elementText != null) _elementText.text = "ELEMENTO: " + ElementNamePt(boss.element);
+            // Boss sem elemento (todos do MVP): a linha "ELEMENTO: SEM ELEMENTO" não informa nada —
+            // some com ela e deixa o cartão falar só da FRAQUEZA, que é a ação que importa (doc 09 §5.1).
+            if (_elementText != null)
+            {
+                bool hasElement = boss.element != ElementType.None;
+                _elementText.gameObject.SetActive(hasElement);
+                if (hasElement) _elementText.text = "ELEMENTO: " + ElementNamePt(boss.element);
+            }
             if (_weaknessText != null) _weaknessText.text = WeaknessLine(boss);
             if (_hintText != null) _hintText.text = HintLine(boss);
             if (_portrait != null)
@@ -74,8 +81,10 @@ namespace MutantArmy.UI
             }
             if (_elementIcon != null)
             {
+                // orbe do elemento acompanha a linha de elemento: some junto quando o boss é neutro
+                bool hasElement = boss.element != ElementType.None;
                 _elementIcon.color = ElementColorPt(boss.element);
-                _elementIcon.enabled = _elementIcon.sprite != null;
+                _elementIcon.enabled = hasElement && _elementIcon.sprite != null;
             }
             if (_weaknessIcon != null)
             {
@@ -156,8 +165,27 @@ namespace MutantArmy.UI
 
         private static string DisplayName(BossConfigSO boss)
         {
+            // 1) nome amigável PT-BR gravado pelo MvpContentFactory (caminho normal).
+            if (!string.IsNullOrEmpty(boss.displayName))
+                return boss.displayName.ToUpperInvariant();
+
+            // 2) fallback p/ assets antigos: humaniza a key/id (ex.: "m1_golem_stone_name"
+            // → "M1 GOLEM STONE") em vez de mostrar a chave crua de localização.
             string raw = string.IsNullOrEmpty(boss.displayNameKey) ? boss.bossId : boss.displayNameKey;
-            return string.IsNullOrEmpty(raw) ? "BOSS" : raw.ToUpperInvariant();
+            return string.IsNullOrEmpty(raw) ? "BOSS" : Humanize(raw);
+        }
+
+        /// <summary>
+        /// Converte uma key de loc ("m1_golem_stone_name") num rótulo legível ("M1 GOLEM STONE"):
+        /// tira o sufixo "_name", troca "_" por espaço e maiúsculas. Só é usado como rede de
+        /// segurança — o caminho normal usa BossConfigSO.displayName.
+        /// </summary>
+        private static string Humanize(string raw)
+        {
+            string trimmed = raw;
+            if (trimmed.EndsWith("_name", StringComparison.OrdinalIgnoreCase))
+                trimmed = trimmed.Substring(0, trimmed.Length - "_name".Length);
+            return trimmed.Replace('_', ' ').Trim().ToUpperInvariant();
         }
 
         private static string WeaknessLine(BossConfigSO boss)

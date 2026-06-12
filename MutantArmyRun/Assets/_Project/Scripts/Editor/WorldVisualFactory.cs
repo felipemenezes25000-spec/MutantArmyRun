@@ -97,7 +97,9 @@ namespace MutantArmy.Editor
                 Key = "W01", AssetName = "W01_CampoInicial",
                 SkyTop = new Color(0.34f, 0.62f, 0.99f), SkyHorizon = new Color(0.80f, 0.93f, 1.00f),
                 Fog = new Color(0.76f, 0.88f, 0.98f), Sun = new Color(1.00f, 0.96f, 0.84f),
-                Ambient = new Color(0.64f, 0.70f, 0.78f), Track = new Color(0.33f, 0.70f, 0.28f)
+                // ambiente CLARO e levemente azulado (preenche as sombras das tropas — sem ele
+                // a multidão escurece de baixo p/ cima e vira massa indistinta; doc 01 §6).
+                Ambient = new Color(0.70f, 0.76f, 0.86f), Track = new Color(0.33f, 0.70f, 0.28f)
             },
             new WorldTheme
             {
@@ -988,12 +990,13 @@ namespace MutantArmy.Editor
 
             Scene scene = EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);
 
-            // luz direcional QUENTE com sombras soft (1 realtime, doc 12 §2.4)
+            // luz direcional QUENTE com sombras soft (1 realtime, doc 12 §2.4) — intensidade
+            // 1.2 e inclinação ~50° p/ realçar as tropas e dar silhueta clara contra a pista.
             Light sun = FindDirectionalLight();
             if (sun != null)
             {
                 sun.color = new Color(1.00f, 0.95f, 0.84f);
-                sun.intensity = 1.1f;
+                sun.intensity = 1.2f;
                 sun.shadows = LightShadows.Soft;
                 sun.shadowStrength = 0.8f;
                 sun.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
@@ -1003,6 +1006,11 @@ namespace MutantArmy.Editor
             {
                 Debug.LogWarning("MAR Tools: cena Game sem directional light — rode o Setup Project.");
             }
+
+            // 2ª luz de PREENCHIMENTO fraca, vinda da frente/baixo (a câmera olha o +Z): tira o
+            // "lado escuro" das tropas que o sol único deixaria na frente, sem nova sombra
+            // (mantém o orçamento de 1 sombra realtime do doc 12 §2.4).
+            EnsureFillLight();
 
             // câmera: skybox visível + pós-processo ligado
             Camera cam = FindMainCamera();
@@ -1134,6 +1142,26 @@ namespace MutantArmy.Editor
             foreach (Light light in lights)
                 if (light.type == LightType.Directional) return light;
             return null;
+        }
+
+        /// <summary>
+        /// Luz de preenchimento direcional fraca, fria, vinda da FRENTE-BAIXO (a câmera olha
+        /// o +Z): ilumina o lado das tropas voltado para a câmera, que o sol único (vindo de
+        /// trás/cima) deixaria escuro. SEM sombras — não conta no orçamento de 1 sombra
+        /// realtime (doc 12 §2.4). Find-or-create idempotente pelo nome.
+        /// </summary>
+        private static void EnsureFillLight()
+        {
+            GameObject go = GameObject.Find("Fill Light");
+            if (go == null) go = new GameObject("Fill Light");
+            var fill = go.GetComponent<Light>();
+            if (fill == null) fill = go.AddComponent<Light>();
+            fill.type = LightType.Directional;
+            fill.color = new Color(0.74f, 0.82f, 1.00f);   // fria/azulada: contrasta com o sol quente
+            fill.intensity = 0.35f;
+            fill.shadows = LightShadows.None;
+            // aponta p/ baixo-frente (a luz "vem" de cima-frente da câmera), realça as frentes
+            go.transform.rotation = Quaternion.Euler(30f, 200f, 0f);
         }
 
         private static Camera FindMainCamera()

@@ -37,6 +37,22 @@ namespace MutantArmy.Editor
             public AnimationClip Idle, Run, Attack;
         }
 
+        /// <summary>
+        /// Paleta de classe (doc 01 §6 — mobile casual premium): cores VIVAS, saturadas e
+        /// distintas, claras o bastante para a silhueta ler à distância numa multidão de 60.
+        /// São cores BASE diretas (não multiplicam o atlas marrom do KayKit) — ver TintMaterial.
+        /// Soldado=azul vivo · Arqueiro=verde vivo · Escudeiro=amarelo/dourado · Mago=roxo vivo ·
+        /// Gigante=laranja/vermelho.
+        /// </summary>
+        private static class ClassColor
+        {
+            public static readonly Color Soldier = new Color(0.16f, 0.52f, 1.00f);   // azul vivo
+            public static readonly Color Archer = new Color(0.22f, 0.82f, 0.32f);    // verde vivo
+            public static readonly Color Shieldbearer = new Color(1.00f, 0.80f, 0.16f); // amarelo/dourado
+            public static readonly Color Mage = new Color(0.66f, 0.30f, 0.98f);      // roxo vivo
+            public static readonly Color Giant = new Color(1.00f, 0.42f, 0.14f);     // laranja/vermelho
+        }
+
         // ordem dos keywords = ordem de preferência (varre todos os clipes por keyword)
         private static readonly string[] IdleKeywords = { "idle" };
         private static readonly string[] RunKeywords = { "run", "walk", "move" };
@@ -54,12 +70,15 @@ namespace MutantArmy.Editor
             int built = 0;
 
             // ---- Tropas (PLANO §1.1): Soldado=Barbarian · Arqueiro=Rogue · Escudeiro=Knight ·
-            // ---- Mago=Mage · Gigante=Barbarian 1.3 (≈2.1× a tropa de 0.6) + recolor escuro
-            if (BuildUnit("Unit_Soldier", "Barbarian", null, 0.6f, null)) built++;
-            if (BuildUnit("Unit_Archer", "Rogue", null, 0.6f, null)) built++;
-            if (BuildUnit("Unit_Shieldbearer", "Knight", null, 0.6f, null)) built++;
-            if (BuildUnit("Unit_Mage", "Mage", null, 0.6f, null)) built++;
-            if (BuildUnit("Unit_Giant", "Barbarian", null, 1.3f, new Color(0.42f, 0.38f, 0.50f))) built++;
+            // ---- Mago=Mage · Gigante=Barbarian 1.3 (≈2.1× a tropa de 0.6).
+            // COR DE CLASSE VIBRANTE E SATURADA (doc 01 §6): silhueta legível à distância na
+            // multidão. A cor da classe DOMINA (base direta clara), nunca o atlas marrom do
+            // KayKit; ver TintMaterial. Cada classe = 1 cor forte e distinta.
+            if (BuildUnit("Unit_Soldier", "Barbarian", null, 0.6f, ClassColor.Soldier)) built++;
+            if (BuildUnit("Unit_Archer", "Rogue", null, 0.6f, ClassColor.Archer)) built++;
+            if (BuildUnit("Unit_Shieldbearer", "Knight", null, 0.6f, ClassColor.Shieldbearer)) built++;
+            if (BuildUnit("Unit_Mage", "Mage", null, 0.6f, ClassColor.Mage)) built++;
+            if (BuildUnit("Unit_Giant", "Barbarian", null, 1.3f, ClassColor.Giant)) built++;
 
             // ---- Bosses (PLANO §1.4): monstros Quaternius, escala 3.5–5, recolor por boss
             if (BuildBoss("Boss_M1_GolemStone", "Goleling_Evolved", "Flying", 4.0f,
@@ -108,8 +127,11 @@ namespace MutantArmy.Editor
                 AnimFolder + "/AC_" + unitAssetName + ".controller",
                 clips.Idle, clips.Run, clips.Attack, attackValue: 2);
 
+            // Tropa SEMPRE recebe a cor de classe vibrante (nunca o atlas marrom cru do KayKit):
+            // material URP/Lit com _BaseColor claro dominante, smoothness baixa e leve emissão
+            // da própria cor p/ "pop" sob bloom (doc 01 §6).
             Material overrideMaterial = tint.HasValue
-                ? TintMaterial("M_View_" + unitAssetName, model, tint.Value, 0f, 0.30f)
+                ? UnitClassMaterial("M_View_" + unitAssetName, model, tint.Value)
                 : null;
 
             GameObject prefab = BuildViewPrefab(
@@ -351,8 +373,57 @@ namespace MutantArmy.Editor
         }
 
         /// <summary>
-        /// Recolor CC0 (PLANO §1.1/§1.4): URP/Lit com a MESMA textura-atlas do FBX e tint
-        /// multiplicativo em _BaseColor (+ metallic/smoothness p/ o placeholder do M3).
+        /// Material de TROPA vibrante (doc 01 §6): URP/Lit com a cor de classe DOMINANTE em
+        /// _BaseColor (cor direta, NÃO multiplicada pelo atlas marrom do KayKit — por isso
+        /// NÃO bindamos _BaseMap), smoothness baixa (0.1 — fosco, sem brilho plástico) e leve
+        /// EMISSION da própria cor (~0.15) p/ "pop" sob bloom sem estourar. Resultado: silhueta
+        /// clara e colorida na multidão, em vez de massa marrom-lama.
+        /// </summary>
+        private static Material UnitClassMaterial(string name, GameObject model, Color classColor)
+        {
+            string path = ViewMaterialsFolder + "/" + name + ".mat";
+            Shader lit = Shader.Find("Universal Render Pipeline/Lit");
+            if (lit == null)
+            {
+                Debug.LogError("MAR Tools: shader 'Universal Render Pipeline/Lit' não encontrado — usando Standard.");
+                lit = Shader.Find("Standard");
+            }
+
+            var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(lit);
+                AssetDatabase.CreateAsset(material, path);
+            }
+            else if (material.shader != lit)
+            {
+                material.shader = lit;
+            }
+
+            // SEM textura: o atlas do KayKit é marrom/escuro e mataria a leitura de cor. A cor
+            // chapada de classe é exatamente o look "casual premium" das peças KayKit low-poly.
+            if (material.HasProperty("_BaseMap")) material.SetTexture("_BaseMap", null);
+            material.mainTexture = null;
+            if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", classColor);
+            material.color = classColor;
+            if (material.HasProperty("_Metallic")) material.SetFloat("_Metallic", 0f);
+            if (material.HasProperty("_Smoothness")) material.SetFloat("_Smoothness", 0.1f);
+
+            // EMISSION leve (~0.15) da própria cor: a tropa "acende" de leve sob o bloom
+            // (threshold 0.9) sem lavar — pop premium, silhueta destacada da pista.
+            material.EnableKeyword("_EMISSION");
+            if (material.HasProperty("_EmissionColor"))
+                material.SetColor("_EmissionColor", classColor * 0.15f);
+            material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+
+            material.enableInstancing = true;
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
+        /// <summary>
+        /// Recolor CC0 (PLANO §1.4): URP/Lit com a MESMA textura-atlas do FBX e tint
+        /// multiplicativo em _BaseColor (+ metallic/smoothness). Usado pelos BOSSES.
         /// </summary>
         private static Material TintMaterial(string name, GameObject model, Color tint,
                                              float metallic, float smoothness)

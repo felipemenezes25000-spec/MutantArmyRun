@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.BossConfigSO
   bossId: m3_final_scorpion_mech
   displayNameKey: m3_final_scorpion_mech_name
+  displayName: "Rob\xF4 Escorpi\xE3o"
   element: 0
   weaknesses: 03000000
   immunities: 04000000
@@ -27,6 +28,6 @@ MonoBehaviour:
   specialAttackArea: 4
   specialBaseCooldown: 3
   arenaWaves: []
-  prefab: {fileID: 781381211656405589, guid: 46ed0562a819e394e8c82de8db345a8e, type: 3}
+  prefab: {fileID: 489939764106711905, guid: 860c7b720cadbb242b9057095cb0e60a, type: 3}
   scoutCardArt: {fileID: 0}
   killReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.BossConfigSO
   bossId: m2_zombie_bruiser
   displayNameKey: m2_zombie_bruiser_name
+  displayName: Brutamontes Zumbi
   element: 0
   weaknesses: 01000000
   immunities: 04000000
@@ -27,6 +28,6 @@ MonoBehaviour:
   specialAttackArea: 2
   specialBaseCooldown: 3
   arenaWaves: []
-  prefab: {fileID: 781381211656405589, guid: 46ed0562a819e394e8c82de8db345a8e, type: 3}
+  prefab: {fileID: 3613364630414651373, guid: cf11e6dce36a6e846928ecf2aec1be9a, type: 3}
   scoutCardArt: {fileID: 0}
   killReward: {fileID: 11400000, guid: 1531c095ef3bfa8439b41b1643e6c3cc, type: 2}

@@ -106,11 +106,14 @@ namespace MutantArmy.UI
             if (_resultScreen == null || !_hasResult) yield break;
 
             LevelResult r = _lastResult;
-            // Derrota descarta as moedas da corrida (doc 12 §4.6) — o delta exibido é 0;
-            // a XP aparece sempre (comitada vitória ou derrota).
-            long coinsDelta = r.won ? r.runCoins : 0L;
+            // Vitória exibe o TOTAL ganho na fase (recompensa de fase + moedas da corrida,
+            // preenchido no ResolveEnd); derrota descarta as moedas (coinsAwarded já é 0).
+            // A XP exibida é a realmente ganha (xpAwarded). O "DOBRAR x2" dobra SÓ o delta
+            // da corrida (r.runCoins) — a recompensa de fase nunca é dobrada (CANON §11).
+            long coinsDelta = r.won ? r.coinsAwarded : 0L;
+            long doubleBase = r.won ? r.runCoins : 0L;
             bool perfect = r.won && _unitsLostThisRun == 0;
-            _resultScreen.Bind(r.won, coinsDelta, r.runXp, r.survivors, (long)r.damageDealt, perfect);
+            _resultScreen.Bind(r.won, coinsDelta, r.xpAwarded, r.survivors, (long)r.damageDealt, perfect, doubleBase);
 
             GameBootstrap root = GameBootstrap.Current;
             bool doubleReady = root != null && root.RewardedAdReady != null && root.RewardedAdReady();

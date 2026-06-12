@@ -45,7 +45,8 @@ namespace MutantArmy.UI
         public event Action<long> DoubleRequested;
 
         private readonly StringBuilder _sb = new StringBuilder(32);
-        private long _coinsDelta;
+        private long _coinsDelta;       // TOTAL exibido na vitória (recompensa de fase + corrida)
+        private long _doubleBase;       // SÓ as moedas da corrida — o que o "DOBRAR x2" acrescenta
         private bool _doubled;
         private bool _doublePending;   // rewarded em exibição: trava o botão sem conceder
 
@@ -65,10 +66,14 @@ namespace MutantArmy.UI
         /// Preenche a tela com o resultado JÁ comitado (listeners de dados rodam antes
         /// da transição de tela — doc 12 §3.2). Derrota: delta de moedas é 0 (descartadas),
         /// mas a XP aparece sempre (RunWallet comita XP integral, doc 12 §4.6).
+        /// <paramref name="coinsDelta"/> é o TOTAL exibido na vitória (recompensa de fase +
+        /// moedas da corrida); <paramref name="doubleBase"/> é SÓ a parcela dobrável pelo
+        /// rewarded — as moedas coletadas na corrida (CANON §11). Sem passar, dobra o total.
         /// </summary>
-        public void Bind(bool won, long coinsDelta, int xpDelta, int survivors, long damageDealt, bool perfect)
+        public void Bind(bool won, long coinsDelta, int xpDelta, int survivors, long damageDealt, bool perfect, long doubleBase = -1L)
         {
             _coinsDelta = coinsDelta;
+            _doubleBase = doubleBase >= 0L ? doubleBase : coinsDelta;
             _doubled = false;
             _doublePending = false;
 
@@ -101,16 +106,18 @@ namespace MutantArmy.UI
 
             if (_doubleButton != null)
             {
-                // Só vitória com ganho dobrável mostra o botão; o gate de fill de
-                // rewarded entra por SetDoubleAvailable (nunca botão morto, doc 12 §7.3).
-                _doubleButton.gameObject.SetActive(won && coinsDelta > 0);
+                // Só vitória com ganho DOBRÁVEL (moedas da corrida) mostra o botão; a
+                // recompensa de fase não é dobrável. Gate de fill entra por
+                // SetDoubleAvailable (nunca botão morto, doc 12 §7.3).
+                _doubleButton.gameObject.SetActive(won && _doubleBase > 0);
                 _doubleButton.interactable = true;
             }
-            if (_doubleButtonLabel != null && coinsDelta > 0)
+            if (_doubleButtonLabel != null && _doubleBase > 0)
             {
                 // "x2" ASCII: ✓/× fora do Latin-1 viram glifo ausente nas fontes SDF.
+                // O "+N" mostra o que o rewarded ACRESCENTA (a parcela dobrável), não o total.
                 _sb.Length = 0;
-                _sb.Append("DOBRAR x2  +").Append(coinsDelta);
+                _sb.Append("DOBRAR x2  +").Append(_doubleBase);
                 _doubleButtonLabel.SetText(_sb);
             }
         }
@@ -122,7 +129,7 @@ namespace MutantArmy.UI
         public void SetDoubleAvailable(bool available)
         {
             if (_doubleButton == null) return;
-            _doubleButton.gameObject.SetActive(available && !_doubled && _coinsDelta > 0);
+            _doubleButton.gameObject.SetActive(available && !_doubled && _doubleBase > 0);
         }
 
         /// <summary>
@@ -134,7 +141,9 @@ namespace MutantArmy.UI
             _doublePending = false;
             if (_doubled) return;
             _doubled = true;
-            RenderCoinsDelta(_coinsDelta * 2);
+            // Só a parcela da corrida é dobrada: total exibido += o delta base creditado de
+            // novo por GrantRunDouble (a recompensa de fase fica intacta — CANON §11).
+            RenderCoinsDelta(_coinsDelta + _doubleBase);
             if (_doubleButtonLabel != null) _doubleButtonLabel.text = "DOBRADO!";
             if (_doubleButton != null) _doubleButton.interactable = false;
         }
@@ -152,9 +161,10 @@ namespace MutantArmy.UI
             _doublePending = true;
 
             // A tela é PASSIVA: nada é creditado nem exibido como dobrado aqui — só o
-            // pedido sobe; a recompensa depende do rewarded completar (CANON §11).
+            // pedido sobe; a recompensa depende do rewarded completar (CANON §11). Sobe a
+            // parcela DOBRÁVEL (moedas da corrida) — é o que GrantRunDouble credita de novo.
             if (_doubleButton != null) _doubleButton.interactable = false;
-            if (DoubleRequested != null) DoubleRequested(_coinsDelta);
+            if (DoubleRequested != null) DoubleRequested(_doubleBase);
         }
 
         private void RenderCoinsDelta(long delta)

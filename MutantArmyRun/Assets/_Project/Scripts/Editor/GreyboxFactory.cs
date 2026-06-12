@@ -473,24 +473,35 @@ namespace MutantArmy.Editor
             var segmentPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SegmentPrefabPath);
             var bossPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);
 
+            // À prova de ORDEM (greybox vs UnitVisual/WorldVisual): só preenche o que ainda
+            // estiver vazio. mesh/material da tropa são o fallback INSTANCED — o UnitVisualFactory
+            // mexe só em viewPrefab, então estes nunca colidem e podem ir incondicionalmente.
+            // Já boss.prefab e world.trackSegmentPrefabs SÃO preenchidos pelas Visual factories:
+            // se já vierem setados (ex.: modelo Quaternius), o greybox NÃO sobrescreve.
             foreach (UnitConfigSO unit in LoadAllAssets<UnitConfigSO>(SoRoot + "/Units"))
             {
-                unit.mesh = capsule;
-                unit.material = MaterialForUnit(unit, mats);
+                if (unit.mesh == null) unit.mesh = capsule;
+                if (unit.material == null) unit.material = MaterialForUnit(unit, mats);
                 EditorUtility.SetDirty(unit);
             }
 
             foreach (BossConfigSO boss in LoadAllAssets<BossConfigSO>(SoRoot + "/Bosses"))
             {
-                boss.prefab = bossPrefab;
-                EditorUtility.SetDirty(boss);
+                if (boss.prefab == null)   // não sobrescreve o modelo Quaternius já atribuído (#2)
+                {
+                    boss.prefab = bossPrefab;
+                    EditorUtility.SetDirty(boss);
+                }
             }
 
             foreach (WorldConfigSO world in LoadAllAssets<WorldConfigSO>(SoRoot + "/Worlds"))
             {
                 // skybox/música seguem nulos no greybox (escopo da tarefa)
-                world.trackSegmentPrefabs = new[] { segmentPrefab };
-                EditorUtility.SetDirty(world);
+                if (world.trackSegmentPrefabs == null || world.trackSegmentPrefabs.Length == 0)
+                {
+                    world.trackSegmentPrefabs = new[] { segmentPrefab };
+                    EditorUtility.SetDirty(world);
+                }
             }
         }
 

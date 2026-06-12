@@ -58,6 +58,9 @@ namespace MutantArmy.Meta
                 GameManager.Instance.RunSnapshot = () => (RunCoins, RunXp);
                 GameManager.Instance.RunCommitter = won => CommitRun(won);
                 GameManager.Instance.LevelRewardGranter = GrantLevelReward;
+                // Só CONSULTA o valor da recompensa para a tela EXIBIR o total — o crédito
+                // segue exclusivamente por LevelRewardGranter (nunca duplica, doc 12 §4.6).
+                GameManager.Instance.LevelRewardProvider = GetLevelReward;
             }
         }
 

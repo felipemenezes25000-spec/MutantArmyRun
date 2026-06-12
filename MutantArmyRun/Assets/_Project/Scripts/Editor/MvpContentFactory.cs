@@ -378,30 +378,30 @@ namespace MutantArmy.Editor
 
             // HP base do golem = aparição da fase 3 (400); as demais fases escalam via
             // bossHpMultiplier do LevelConfigSO (doc 05 §7.1: 100/220/400/550/700/900).
-            set.Golem = ConfigureBoss("Boss_M1_GolemStone", "m1_golem_stone",
+            set.Golem = ConfigureBoss("Boss_M1_GolemStone", "m1_golem_stone", "Golem de Pedra",
                 weaknesses: new[] { ElementType.Fire }, immunities: new ElementType[0],
                 bodyType: BodyType.Organic, maxHp: 400f, contactDps: 6f,
                 entranceSeconds: 1.8f, telegraphSeconds: 1.2f,
                 specialDamage: 25f, specialArea: 3f, specialCooldown: 3.5f,
                 killReward: rewards.BossDefault);
 
-            set.WoodGiant = ConfigureBoss("Boss_M1_WoodGiant", "m1_final_wood_giant",
+            set.WoodGiant = ConfigureBoss("Boss_M1_WoodGiant", "m1_final_wood_giant", "Gigante de Madeira",
                 new[] { ElementType.Fire }, new ElementType[0],
                 BodyType.Organic, 1600f, 8f, 2.0f, 1.2f, 30f, 4f, 3.5f,
                 rewards.WorldBoss);
 
-            set.Bruiser = ConfigureBoss("Boss_M2_ZombieBruiser", "m2_zombie_bruiser",
+            set.Bruiser = ConfigureBoss("Boss_M2_ZombieBruiser", "m2_zombie_bruiser", "Brutamontes Zumbi",
                 new[] { ElementType.Fire }, new[] { ElementType.Poison },
                 BodyType.Undead, 1000f, 8f, 1.6f, 1.0f, 28f, 2f, 3.0f,
                 rewards.BossDefault);
 
             // Fraquezas listadas com Luz por consistência de canon (Luz é pós-MVP — doc 05 §7.4).
-            set.Titan = ConfigureBoss("Boss_M2_ZombieTitan", "m2_final_zombie_titan",
+            set.Titan = ConfigureBoss("Boss_M2_ZombieTitan", "m2_final_zombie_titan", "Zumbi Titã",
                 new[] { ElementType.Fire, ElementType.Light }, new[] { ElementType.Poison },
                 BodyType.Undead, 2800f, 10f, 2.0f, 1.2f, 35f, 2.5f, 3.5f,
                 rewards.WorldBoss);
 
-            set.Scorpion = ConfigureBoss("Boss_M3_ScorpionMech", "m3_final_scorpion_mech",
+            set.Scorpion = ConfigureBoss("Boss_M3_ScorpionMech", "m3_final_scorpion_mech", "Robô Escorpião",
                 new[] { ElementType.Lightning }, new[] { ElementType.Poison },
                 BodyType.Machine, 3000f, 12f, 2.0f, 1.1f, 40f, 4f, 3.0f,
                 rewards.WorldBoss);
@@ -409,7 +409,7 @@ namespace MutantArmy.Editor
             return set;
         }
 
-        private static BossConfigSO ConfigureBoss(string assetName, string bossId,
+        private static BossConfigSO ConfigureBoss(string assetName, string bossId, string displayName,
                                                   ElementType[] weaknesses, ElementType[] immunities,
                                                   BodyType bodyType, float maxHp, float contactDps,
                                                   float entranceSeconds, float telegraphSeconds,
@@ -419,6 +419,7 @@ namespace MutantArmy.Editor
             var boss = LoadOrCreate<BossConfigSO>(Root + "/Bosses/" + assetName + ".asset");
             boss.bossId = bossId;
             boss.displayNameKey = bossId + "_name";
+            boss.displayName = displayName;     // nome amigável PT-BR (CANON §6) — o Boss Scout exibe este campo
             boss.element = ElementType.None;
             boss.weaknesses = weaknesses;
             boss.immunities = immunities;

@@ -35,7 +35,8 @@ namespace MutantArmy.Core
         public Func<bool, LevelResult> ResultBuilder { get; set; }     // LevelManager.BuildResult
         public Func<(int coins, int xp)> RunSnapshot { get; set; }     // EconomySystem: delta da RunWallet (lido ANTES do commit)
         public Action<bool> RunCommitter { get; set; }                 // EconomySystem.CommitRun (XP sempre)
-        public Action<int> LevelRewardGranter { get; set; }            // EconomySystem.GrantLevelReward
+        public Action<int> LevelRewardGranter { get; set; }            // EconomySystem.GrantLevelReward (CREDITA)
+        public Func<int, int> LevelRewardProvider { get; set; }        // EconomySystem.GetLevelReward (só CONSULTA p/ exibição — não credita)
         public Action<LevelResult> LevelEndRecorder { get; set; }      // SaveSystem.RecordLevelEnd (save imediato)
 
         // ---- Hooks do revive (CANON §11: 1×/fase) ----
@@ -141,12 +142,22 @@ namespace MutantArmy.Core
             // Delta da corrida (runCoins/runXp) vem da Meta ANTES do commit zerar a RunWallet:
             // Gameplay não enxerga Meta (§2.3), então o result é completado AQUI — mantém a
             // ordem "result construído antes do commit" do doc 12 §4.1.
+            int runCoins = 0;
+            int runXp = 0;
             if (RunSnapshot != null)
             {
-                var (coins, xp) = RunSnapshot();
-                result.runCoins = coins;
-                result.runXp = xp;
+                (runCoins, runXp) = RunSnapshot();
+                result.runCoins = runCoins;
+                result.runXp = runXp;
             }
+
+            // TOTAL ganho na fase, para a tela de resultado EXIBIR (não credita nada — o
+            // crédito é feito UMA vez por RunCommitter/LevelRewardGranter abaixo). Vitória:
+            // recompensa de fase (CANON §8) + moedas da corrida; derrota: moedas descartadas,
+            // delta 0, mas a XP ganha aparece sempre.
+            int levelReward = won && LevelRewardProvider != null ? LevelRewardProvider(levelIndex) : 0;
+            result.coinsAwarded = won ? (long)levelReward + runCoins : 0L;
+            result.xpAwarded = runXp;
 
             if (RunCommitter != null) RunCommitter(won);                       // RunWallet → carteira (§4.6); XP sempre
             if (won && LevelRewardGranter != null) LevelRewardGranter(levelIndex);

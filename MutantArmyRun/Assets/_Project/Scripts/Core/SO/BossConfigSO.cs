@@ -24,6 +24,8 @@ namespace MutantArmy.Core
     public class BossConfigSO : ScriptableObject
     {
         public string bossId, displayNameKey;
+        public string displayName;             // nome amigável PT-BR já resolvido (ex.: "Golem de Pedra");
+                                               // o Boss Scout usa este campo direto — sem passar pela tabela de loc.
         public ElementType element;
         public ElementType[] weaknesses;       // Zumbi Titã: Fire + Light
         public ElementType[] immunities;       // Zumbi Titã: Poison

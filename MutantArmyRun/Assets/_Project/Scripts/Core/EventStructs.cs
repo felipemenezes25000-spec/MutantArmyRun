@@ -62,7 +62,12 @@ namespace MutantArmy.Core
 
     /// <summary>
     /// Resultado de fim de fase (doc 12 §3.2/§4.1): vitória ou derrota + stats da corrida.
-    /// A tela de resultado é passiva e mostra o DELTA (runCoins/runXp), nunca o total da carteira.
+    /// A tela de resultado é passiva e mostra o TOTAL creditado na fase (coinsAwarded/
+    /// xpAwarded), nunca o total da carteira. runCoins/runXp guardam só o delta DA CORRIDA
+    /// (base do "DOBRAR x2", que dobra apenas as moedas coletadas — CANON §11); coinsAwarded
+    /// soma a recompensa de vitória da fase (GrantLevelReward, CANON §8) ao runCoins, que é
+    /// o número grande exibido na vitória. O GameManager.ResolveEnd preenche os campos
+    /// *Awarded ANTES do Raise — a tela só mostra.
     /// </summary>
     public struct LevelResult
     {
@@ -70,12 +75,22 @@ namespace MutantArmy.Core
         public bool won;
         public int survivors;         // unidades vivas no fim (alimenta LevelRecord.bestSurvivors)
         public float damageDealt;     // dano total causado ao boss na corrida
-        public int runCoins;          // moedas da RunWallet ANTES do commit (delta exibido na UI)
+        public int runCoins;          // moedas SÓ da RunWallet ANTES do commit (base do "DOBRAR x2")
         public int runXp;             // XP da corrida (comitada SEMPRE, vitória ou derrota)
         public float durationSeconds;
+        public long coinsAwarded;     // TOTAL creditado na fase = recompensa de vitória + runCoins (delta exibido)
+        public int xpAwarded;         // TOTAL de XP ganho na fase (delta exibido)
 
         public LevelResult(int levelIndex, bool won, int survivors, float damageDealt,
                            int runCoins, int runXp, float durationSeconds)
+            : this(levelIndex, won, survivors, damageDealt, runCoins, runXp, durationSeconds,
+                   coinsAwarded: 0L, xpAwarded: 0)
+        {
+        }
+
+        public LevelResult(int levelIndex, bool won, int survivors, float damageDealt,
+                           int runCoins, int runXp, float durationSeconds,
+                           long coinsAwarded, int xpAwarded)
         {
             this.levelIndex = levelIndex;
             this.won = won;
@@ -84,6 +99,8 @@ namespace MutantArmy.Core
             this.runCoins = runCoins;
             this.runXp = runXp;
             this.durationSeconds = durationSeconds;
+            this.coinsAwarded = coinsAwarded;
+            this.xpAwarded = xpAwarded;
         }
     }
 

@@ -22,10 +22,11 @@ function Run-Method($name, $method, $log) {
 }
 
 Run-Method "1.ImportConfigurator" "MutantArmy.Editor.ImportConfigurator.ConfigureAll" "fac-1-import.log"
-Run-Method "2.UiSkinFactory"      "MutantArmy.Editor.UiSkinFactory.BuildAll"          "fac-2-uiskin.log"
-Run-Method "3.UnitVisualFactory"  "MutantArmy.Editor.UnitVisualFactory.BuildAll"      "fac-3-units.log"
+Run-Method "2.MvpContentFactory"  "MutantArmy.Editor.MvpContentFactory.CreateAll"     "fac-2-content.log"
+Run-Method "3.UiSkinFactory"      "MutantArmy.Editor.UiSkinFactory.BuildAll"          "fac-3-uiskin.log"
 Run-Method "4.ProjectSetup"       "MutantArmy.Editor.ProjectSetup.SetupProject"       "fac-4-setup.log"
 Run-Method "5.GreyboxFactory"     "MutantArmy.Editor.GreyboxFactory.BuildAll"         "fac-5-greybox.log"
-Run-Method "6.WorldVisualFactory" "MutantArmy.Editor.WorldVisualFactory.BuildAll"     "fac-6-world.log"
-Run-Method "7.JuiceFactory"       "MutantArmy.Editor.JuiceFactory.BuildAll"           "fac-7-juice.log"
+Run-Method "6.UnitVisualFactory"  "MutantArmy.Editor.UnitVisualFactory.BuildAll"      "fac-6-units.log"
+Run-Method "7.WorldVisualFactory" "MutantArmy.Editor.WorldVisualFactory.BuildAll"     "fac-7-world.log"
+Run-Method "8.JuiceFactory"       "MutantArmy.Editor.JuiceFactory.BuildAll"           "fac-8-juice.log"
 "=== TODAS AS FACTORIES OK ==="
