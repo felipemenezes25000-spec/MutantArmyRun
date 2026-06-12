@@ -26,6 +26,12 @@ namespace MutantArmy.Gameplay
         [SerializeField] private ParticleSystem _coinFanfarePrefab;    // moeda voadora do overflow de Supply
         [SerializeField] private ParticleSystem _despawnBurstPrefab;   // 1 VFX agregado por lote removido
 
+        [Header("Juice (preenchidos pelo MAR Tools/Build Juice)")]
+        [SerializeField] private ParticleSystem _gateBurstPrefab;      // burst no consumo de portal (tintado)
+        [SerializeField] private ParticleSystem _popBurstPrefab;       // pop pequeno da cascata de multiplicação
+        [SerializeField] private ParticleSystem _confettiPrefab;       // vitória: 2 emissores laterais
+        [SerializeField] private Renderer _telegraphRenderer;          // anel vermelho pulsante (alpha via MPB)
+
         private struct ActiveVfx
         {
             public ParticleSystem Ps;
@@ -42,6 +48,10 @@ namespace MutantArmy.Gameplay
         private bool _slowMoActive;
         private readonly Countdown _telegraphTimer = new Countdown();
         private bool _telegraphActive;
+        private float _telegraphArea = 1f;
+        private MaterialPropertyBlock _telegraphMpb;
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int ColorId = Shader.PropertyToID("_Color");
 
         public void Init()   // chamado pelo bootstrap da cena Game (doc 12 §3.3)
         {
@@ -75,6 +85,7 @@ namespace MutantArmy.Gameplay
         {
             _telegraphTimer.Set(seconds);
             _telegraphActive = true;
+            _telegraphArea = Mathf.Max(0.5f, area);
             if (_telegraphDecal == null) return;
             // o especial mira a massa do exército: decal no centróide, escala = área de efeito
             _telegraphDecal.position = CrowdManager.Instance != null
@@ -82,6 +93,33 @@ namespace MutantArmy.Gameplay
                 : Vector3.zero;
             _telegraphDecal.localScale = new Vector3(area, 1f, area);
             _telegraphDecal.gameObject.SetActive(true);
+        }
+
+        /// <summary>Burst de portal consumido — tintado pela cor do GateConfigSO (honestidade visual §3.4).</summary>
+        public void PlayGateBurst(Vector3 position, Color tint)
+        {
+            Play(_gateBurstPrefab, position, priority: 2, tint);
+        }
+
+        /// <summary>Pop pequeno da cascata de multiplicação (1 por unidade visível, com stagger no chamador).</summary>
+        public void PlayPopBurst(Vector3 position)
+        {
+            Play(_popBurstPrefab, position, priority: 1, null);
+        }
+
+        /// <summary>
+        /// Confete de vitória: 2 emissores nas laterais do enquadramento, apontados para
+        /// dentro (doc 09 §4.4). Prioridade máxima — vitória nunca sofre drop de orçamento.
+        /// </summary>
+        public void PlayConfetti()
+        {
+            if (_confettiPrefab == null) return;
+            Camera cam = Camera.main;
+            if (cam == null) return;
+            Transform t = cam.transform;
+            Vector3 center = t.position + t.forward * 7f + Vector3.up * 1.5f;
+            Play(_confettiPrefab, center - t.right * 3.5f, priority: 3, null);
+            Play(_confettiPrefab, center + t.right * 3.5f, priority: 3, null);
         }
 
         /// <summary>Fanfarra da conversão de Supply (CANON §3.2) — 1 chamada por pop do meter.</summary>
@@ -99,11 +137,22 @@ namespace MutantArmy.Gameplay
         /// <summary>Toca um sistema pooled respeitando o orçamento. Retorna false no drop silencioso.</summary>
         public bool Play(ParticleSystem prefab, Vector3 position, int priority)
         {
+            return Play(prefab, position, priority, null);
+        }
+
+        /// <summary>Variante com tint: sobrescreve o startColor da instância pooled antes do Play.</summary>
+        public bool Play(ParticleSystem prefab, Vector3 position, int priority, Color? tint)
+        {
             if (prefab == null) return false;   // hook sem asset (scaffold sem arte): silencioso
             if (!TryReserveBudget(prefab, priority)) return false;
 
             ParticleSystem ps = GetPool(prefab).Get();
             ps.transform.position = position;
+            if (tint.HasValue)
+            {
+                ParticleSystem.MainModule main = ps.main;
+                main.startColor = tint.Value;
+            }
             ps.Play(true);
             _active.Add(new ActiveVfx { Ps = ps, SourcePrefab = prefab, Priority = priority });
             return true;
@@ -125,6 +174,7 @@ namespace MutantArmy.Gameplay
             if (_telegraphActive)
             {
                 _telegraphTimer.Tick(Time.deltaTime);   // scaled: sincronizado com o windup do boss
+                PulseTelegraph();                       // anel vermelho PULSANTE: leitura clara do perigo
                 if (_telegraphTimer.Done)
                 {
                     _telegraphActive = false;
@@ -147,6 +197,25 @@ namespace MutantArmy.Gameplay
                     _active.RemoveAt(i);
                 }
             }
+        }
+
+        // Anel do telegraph pulsa em escala (±12%) e alpha (0.35–0.85) — urgência crescente
+        // ao fim do windup. MPB: nunca instancia material em runtime (doc 12 §6.4).
+        private void PulseTelegraph()
+        {
+            if (_telegraphDecal == null) return;
+
+            float urgency = 1f + 6f * Mathf.Clamp01(1f - _telegraphTimer.Remaining);   // acelera no fim
+            float wave = Mathf.Sin(Time.time * 9f * urgency);
+            float scale = _telegraphArea * (1f + 0.12f * wave);
+            _telegraphDecal.localScale = new Vector3(scale, 1f, scale);
+
+            if (_telegraphRenderer == null) return;
+            if (_telegraphMpb == null) _telegraphMpb = new MaterialPropertyBlock();
+            var color = new Color(1f, 0.15f, 0.10f, Mathf.Lerp(0.35f, 0.85f, (wave + 1f) * 0.5f));
+            _telegraphMpb.SetColor(BaseColorId, color);
+            _telegraphMpb.SetColor(ColorId, color);
+            _telegraphRenderer.SetPropertyBlock(_telegraphMpb);
         }
 
         private bool TryReserveBudget(ParticleSystem prefab, int priority)

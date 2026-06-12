@@ -4,7 +4,8 @@
     "references": [
         "MutantArmy.Domain",
         "MutantArmy.Core",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "noEngineReferences": false,
     "autoReferenced": true

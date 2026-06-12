@@ -1,0 +1,453 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.4/staging' branch; Version is '6000.4.8f1 (f8b72d3d7343) revision 16299821'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Channel LicenseClient-Felipe doesn't exist
+OS: 'Windows 11  (10.0.26200) Professional' Language: 'pt' Physical Memory: 32694 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-06-12T10:34:23Z
+[Licensing::Module] Successfully launched the LicensingClient (PId: 440)
+
+COMMAND LINE ARGUMENTS:
+D:\6000.4.8f1\Editor\Unity.exe
+-batchmode
+-nographics
+-quit
+-projectPath
+C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+-executeMethod
+MutantArmy.Editor.ProjectSetup.SetupProject
+-logFile
+C:\Users\Felipe\Downloads\jogo test\fac-4-setup.log
+Successfully changed project path to: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+C:/Users/Felipe/Downloads/jogo test/MutantArmyRun
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Player connection [24488]  Target information:
+
+Player connection [24488]  * "[IP] 172.29.112.1 [Port] 55504 [Flags] 2 [Guid] 3293210749 [EditorId] 3293210749 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [24488]  * "[IP] 192.168.56.1 [Port] 55504 [Flags] 2 [Guid] 3293210749 [EditorId] 3293210749 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [24488]  * "[IP] 192.168.15.133 [Port] 55504 [Flags] 2 [Guid] 3293210749 [EditorId] 3293210749 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [24488] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [24488] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Starting IPC server.
+Waiting for clients to connect on \\.\pipe\Unity-LicenseClient-Felipe, press Ctrl-C to exit.
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Felipe" at "2026-06-12T10:34:23.7842154Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 440, path: "D:/6000.4.8f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Package Manager] Connected to IPC stream "Upm-11692" after 0.4 seconds.
+[Licensing::Module] Licensing is not yet initialized.
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.1+9fbee8e
+  Session Id:              705c042288f445399f1354507c58add2
+  Correlation Id:          52bcdd08e3dd1c3b40527455429b865d
+  External correlation Id: 7471689656273453311
+  Machine Id:              +wcfUDhktwXGsUv466LQ/t6VYpk=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-Felipe" (connect: 0.37s, validation: 0.41s, handshake: 0.12s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Felipe-notifications" at "2026-06-12T10:34:24.3122138Z"
+[Licensing::Module] Connected to LicensingClient (PId: 440, launch time: 0.00, total connection time: 0.90s)
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 4674205611919-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.01
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.97s
+[Licensing::Module] Licensing is initialized (took 0.25s).
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Artifact Garbage Collection - Removed 9 unused hashed content files
+Initialize engine version: 6000.4.8f1 (f8b72d3d7343)
+[Subsystems] Discovering subsystems at path D:/6000.4.8f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/Felipe/Downloads/jogo test/MutantArmyRun/Assets
+Forcing GfxDevice: Null
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Initialize mono
+Mono path[0] = 'D:/6000.4.8f1/Editor/Data/Managed'
+Mono path[1] = 'D:/6000.4.8f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'D:/6000.4.8f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56692
+CodeReloadManager initialized
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.UWP.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Registered in 0.010643 seconds.
+Native extension for Android target not found
+Native extension for UWP target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.475 seconds
+Domain Reload Profiling: 1127ms
+	BeginReloadAssembly (229ms)
+		CreateAndSetChildDomain (12ms)
+	RebuildCommonClasses (50ms)
+	RebuildNativeTypeToScriptingClass (14ms)
+	initialDomainReloadingComplete (90ms)
+	LoadAllAssembliesAndSetupDomain (267ms)
+		LoadAssemblies (219ms)
+		AnalyzeDomain (255ms)
+			TypeCache.Refresh (253ms)
+				TypeCache.ScanAssembly (236ms)
+	FinalizeReload (477ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (99ms)
+			BeforeProcessingInitializeOnLoad (94ms)
+			ProcessInitializeOnLoadAttributes (121ms)
+			ProcessInitializeOnLoadMethodAttributes (84ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 49 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.searcher@4.9.4 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.searcher@d45a78918735)
+    com.unity.burst@1.8.29 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.burst@6bb9aca3ef38)
+    com.unity.mathematics@1.3.3 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.mathematics@19a9377c4ffa)
+    com.unity.nuget.mono-cecil@1.11.6 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.test-framework.performance@3.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.test-framework.performance@aa81a99c4a75)
+  Built-in packages:
+    com.unity.render-pipelines.universal@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.universal@13e5115b98bf)
+    com.unity.ugui@2.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.ugui@a9ea81766fbd)
+    com.unity.test-framework@1.6.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.test-framework@76560ee600cb)
+    com.unity.modules.accessibility@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.physics2d)
+    com.unity.modules.screencapture@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.terrainphysics)
+    com.unity.modules.tilemap@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.tilemap)
+    com.unity.modules.ui@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.video)
+    com.unity.modules.vr@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vr)
+    com.unity.modules.wind@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.hierarchycore)
+    com.unity.ext.nunit@2.0.5 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.ext.nunit@d8c07649098d)
+    com.unity.render-pipelines.core@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.core@6f62546dd936)
+    com.unity.shadergraph@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.shadergraph@33f3b0a71b9a)
+    com.unity.render-pipelines.universal-config@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.universal-config@0db4263b9e6b)
+    com.unity.collections@6.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.collections@5b6ebd78ccc0)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.04 seconds
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:80
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - 200 - application/grpc 37.8943ms
+Starting: D:\6000.4.8f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: C:/Users/Felipe/Downloads/jogo test/MutantArmyRun
+DisplayProgressbar: Compiling Scripts
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.runtime.interopservices.windowsruntime has duplicate hint path. Ignoring "D:\6000.4.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Runtime.InteropServices.WindowsRuntime.dll" in favor of "D:\6000.4.8f1\Editor\Data\NetStandard\Extensions\2.0.0\System.Runtime.InteropServices.WindowsRuntime.dll"
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.componentmodel.composition has duplicate hint path. Ignoring "D:\6000.4.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\System.ComponentModel.Composition.dll" in favor of "D:\6000.4.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.ComponentModel.Composition.dll"
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Burst.Cecil, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.burst@6bb9aca3ef38\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - 200 - application/grpc 138.8949ms
+ExitCode: 0 Duration: 0s517ms
+[546/688    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+*** Tundra build success (0.47 seconds), 1 items updated, 688 evaluated
+AssetDatabase: script compilation time: 1.112076s
+Begin MonoManager ReloadAssembly
+Assembly Assembly-CSharp-Editor-firstpass.dll at Library/ScriptAssemblies/Assembly-CSharp-Editor-firstpass.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp-Editor.dll at Library/ScriptAssemblies/Assembly-CSharp-Editor.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp-firstpass.dll at Library/ScriptAssemblies/Assembly-CSharp-firstpass.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp.dll at Library/ScriptAssemblies/Assembly-CSharp.dll not valid. Loading of assembly skipped.
+Assembly TestNewCustomAssembly.dll at Library/ScriptAssemblies/TestNewCustomAssembly.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.BurstCompatibilityGen.dll at Library/ScriptAssemblies/Unity.Collections.BurstCompatibilityGen.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.DocCodeSamples.dll at Library/ScriptAssemblies/Unity.Collections.DocCodeSamples.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.PerformanceTests.dll at Library/ScriptAssemblies/Unity.Collections.PerformanceTests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.Tests.dll at Library/ScriptAssemblies/Unity.Collections.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.Tests.Playmode.dll at Library/ScriptAssemblies/Unity.Collections.Tests.Playmode.dll not valid. Loading of assembly skipped.
+Assembly Unity.Mathematics.Tests.dll at Library/ScriptAssemblies/Unity.Mathematics.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Nuget.Mono-Cecil.dll at Library/ScriptAssemblies/Unity.Nuget.Mono-Cecil.dll not valid. Loading of assembly skipped.
+Assembly Unity.PathTracing.Editor.Tests.dll at Library/ScriptAssemblies/Unity.PathTracing.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.PathTracing.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.PathTracing.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Core.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Core.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Config.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Config.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Searcher.EditorTests.dll at Library/ScriptAssemblies/Unity.Searcher.EditorTests.dll not valid. Loading of assembly skipped.
+Assembly Unity.ShaderGraph.Editor.Tests.dll at Library/ScriptAssemblies/Unity.ShaderGraph.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.TextMeshPro.Editor.Tests.dll at Library/ScriptAssemblies/Unity.TextMeshPro.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.TextMeshPro.Tests.dll at Library/ScriptAssemblies/Unity.TextMeshPro.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.UnifiedRayTracing.Editor.Tests.dll at Library/ScriptAssemblies/Unity.UnifiedRayTracing.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly UnityEditor.UI.Common.Tests.dll at Library/ScriptAssemblies/UnityEditor.UI.Common.Tests.dll not valid. Loading of assembly skipped.
+Assembly UnityEditor.UI.EditorTests.dll at Library/ScriptAssemblies/UnityEditor.UI.EditorTests.dll not valid. Loading of assembly skipped.
+Assembly UnityEngine.UI.Tests.dll at Library/ScriptAssemblies/UnityEngine.UI.Tests.dll not valid. Loading of assembly skipped.
+Native extension for Android target not found
+Native extension for UWP target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  3.168 seconds
+Domain Reload Profiling: 4156ms
+	BeginReloadAssembly (431ms)
+		DisableScriptedObjects (50ms)
+		CreateAndSetChildDomain (164ms)
+	RebuildCommonClasses (70ms)
+	RebuildNativeTypeToScriptingClass (15ms)
+	initialDomainReloadingComplete (79ms)
+	LoadAllAssembliesAndSetupDomain (392ms)
+		LoadAssemblies (404ms)
+		AnalyzeDomain (146ms)
+			TypeCache.Refresh (97ms)
+				TypeCache.ScanAssembly (84ms)
+			BuildScriptInfoCaches (38ms)
+			ResolveRequiredComponents (10ms)
+	FinalizeReload (3169ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (50ms)
+			BeforeProcessingInitializeOnLoad (194ms)
+			ProcessInitializeOnLoadAttributes (2410ms)
+			ProcessInitializeOnLoadMethodAttributes (251ms)
+			AfterProcessingInitializeOnLoad (6ms)
+		AwakeInstancesAfterBackupRestoration (45ms)
+(Values over 0.050ms)
+Asset Pipeline Refresh (id=cd0cd53ec6a84a64f93582726ed06954): Total: 5.841 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=3570 ms
+		Asset DB Callback time: managed=64 ms, native=44 ms
+		Scripting: domain reloads=1, domain reload time=992 ms, compile time=1114 ms, other=55 ms
+		Project Asset Count: scripts=850, non-scripts=2433
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokePackagesCallback: 47.475ms
+	ApplyChangesToAssetFolders: 0.998ms
+	Scan: 97.537ms
+	CategorizeScriptCompilationAssets: 23.478ms
+	ProcessAssetsWithTransientArtifactChanges: 48.037ms
+	CategorizeAssets: 58.020ms
+	CompileScripts: 1113.793ms
+	ImportOutOfDateAssets: 3174.710ms (3171.923ms without children)
+		UnloadImportedAssets: 1.860ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.403ms
+		OnDemandSchedulerStart: 0.489ms
+	PostProcessAllAssets: 64.291ms
+		MonoPostProcessAllAssets: 64.180ms
+			UniversalRenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 38.932ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 7.099ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 3.396ms
+			SyncVS.PostprocessSyncProject 2.378ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.955ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.450ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.313ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.190ms
+	UnloadStreamsBegin: 1.191ms
+	PersistCurrentRevisions: 0.086ms
+	GenerateScriptTypeHashes: 3.099ms
+	GenerateScriptTypeSerializationHashes: 5.581ms
+	Untracked: 1197.094ms
+
+Application.AssetDatabase Initial Refresh End
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Scanning for USB devices : 26.796ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-MutantArmyRun
+Unloading 84 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 3407 unused Assets / (9.6 MB). Loaded Objects now: 4187.
+Memory consumption went from 175.8 MB to 166.1 MB.
+Total: 13.804000 ms (FindLiveObjects: 0.609500 ms CreateObjectMapping: 0.313300 ms MarkObjects: 6.467400 ms  DeleteObjects: 6.245800 ms)
+
+Start importing Assets/_Project/Art/UI/Generated/menu_gradient.png using Guid(bff8ecb5fe096d247acfb8c877e5b407) (TextureImporter) -> (Import Result ID: 'b6a91a912b4d9971bc28bffd9a45a6e3') in 0.0183106 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=3ea11e3950e39bc148bf7022e9b03b7f DependenciesID=98d26c72214a5baf3f0a1f0401312587 StaticDependenciesID=fd0abaca9921b08e8f831c8e1ae10bd1 
+Asset Pipeline Refresh (id=5326c191c683b6a45a98e1ea59b87892): Total: 0.217 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Start importing Assets/_Project/Art/UI/Fonts/KenneyFuture SDF.asset using Guid(c6dd4b92f8199ce48af4fbcc50f9d6de) (NativeFormatImporter) -> (Import Result ID: 'dfcd8d14e8b7e3c696930abfb1caa67f') in 0.0048388 seconds [static dependencies only]. Details - ImportResultOutputID=2a8fe764744be20ef9b1efada36bb927 DependenciesID=9f5b1556f1f7cd388c536c35999cc28b StaticDependenciesID=5621c781dc18cf34b3faeae8cf0aca8e 
+Asset Pipeline Refresh (id=5fbac2ba8baca46499d8fdab2a625276): Total: 0.034 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+MAR Tools: UI skin pronto — sprites Kenney 9-slice, gradiente do menu e fonte TMP com outline.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+MutantArmy.Editor.UiSkinFactory:BuildAll () (at Assets/_Project/Scripts/Editor/UiSkinFactory.cs:104)
+MutantArmy.Editor.ProjectSetup:SetupProject () (at Assets/_Project/Scripts/Editor/ProjectSetup.cs:59)
+
+(Filename: Assets/_Project/Scripts/Editor/UiSkinFactory.cs Line: 104)
+
+Unloading 65 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 25 unused Assets / (35.1 KB). Loaded Objects now: 5547.
+Memory consumption went from 163.9 MB to 163.9 MB.
+Total: 7.697500 ms (FindLiveObjects: 0.258100 ms CreateObjectMapping: 0.121800 ms MarkObjects: 7.244900 ms  DeleteObjects: 0.072100 ms)
+
+Start importing Assets/_Project/Art/UI/Fonts/KenneyFuture SDF.asset using Guid(c6dd4b92f8199ce48af4fbcc50f9d6de) (NativeFormatImporter) -> (Import Result ID: 'fcc08daa4dba3cff974742b81762b373') in 0.0091681 seconds [static dependencies only]. Details - ImportResultOutputID=2a8fe764744be20ef9b1efada36bb927 DependenciesID=7f0c106a0778afb485f5b9cf395a4fc3 StaticDependenciesID=0019c5ed12e0ca2f6d1c3f178c3262d4 
+Start importing Assets/_Project/Resources/GameSettings.asset using Guid(79e681e7535882445a4ff44320774752) (NativeFormatImporter) -> (Import Result ID: 'b10052d93cba4011adaa731dfcf38c81') in 0.0029097 seconds [static dependencies only]. Details - ImportResultOutputID=278c83fe5f87d3890f4cf281fc60500c DependenciesID=6b2bd7d31f390d8dc5562df07a3e5837 StaticDependenciesID=3c54fba3044ea0fa0885ce9b9e828fec 
+Asset Pipeline Refresh (id=495cd8e086500a548bdd991204b2fb9d): Total: 0.072 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Start importing Assets/_Project/Scenes/Boot.unity using Guid(310326c0d67532444b4ed6f7bc4c9da0) (DefaultImporter) -> (Import Result ID: 'ea6ef1a32177e88e0acc94bd0e5a7f80') in 0.0018245 seconds [static dependencies only]. Details - ImportResultOutputID=a33c8fe4077c9ee8708693ed331a694c DependenciesID=5f674f327a3b05a60565ad8138fcf369 StaticDependenciesID=bea79d16a2dddc87e5ea53a73027741c 
+Asset Pipeline Refresh (id=06130e73b2d2a0f40ad3ca69e41dd786): Total: 0.039 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Unloading 24 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 1509 unused Assets / (8.9 MB). Loaded Objects now: 4219.
+Memory consumption went from 171.1 MB to 162.2 MB.
+Total: 10.650300 ms (FindLiveObjects: 0.596300 ms CreateObjectMapping: 0.287000 ms MarkObjects: 8.200900 ms  DeleteObjects: 1.565100 ms)
+
+Start importing Assets/_Project/Scenes/Main.unity using Guid(1c517a3718ddeb94f8e9392a6eba4a77) (DefaultImporter) -> (Import Result ID: 'b7308e61ec566b14ab5f14fbd66830ed') in 0.0010809 seconds [static dependencies only]. Details - ImportResultOutputID=458a15975a41013f717830b0686b87c8 DependenciesID=3bece6c52cf5e404aaf46caf881d7ba8 StaticDependenciesID=f308e8978829ce3f8e63f02844d38363 
+Asset Pipeline Refresh (id=8fd413c166d24d040ba7a70389d7b998): Total: 0.037 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Unloading 22 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 160 unused Assets / (90.7 KB). Loaded Objects now: 4219.
+Memory consumption went from 166.1 MB to 166.1 MB.
+Total: 7.187200 ms (FindLiveObjects: 0.160200 ms CreateObjectMapping: 0.077200 ms MarkObjects: 6.741300 ms  DeleteObjects: 0.207900 ms)
+
+Start importing Assets/_Project/Scenes/Game.unity using Guid(cba93d2146e41904488a8d6d03d4ea0b) (DefaultImporter) -> (Import Result ID: 'e9d16090836df48dbec1bc5a39cc78a0') in 0.0010421 seconds [static dependencies only]. Details - ImportResultOutputID=0a7f70d6e00893d5b713b1520cd00783 DependenciesID=4629be72b9a7cd4deb6b4e53aa64c83e StaticDependenciesID=c6dae9eb363aafe085ced362bcee71b6 
+Asset Pipeline Refresh (id=32282f343d2215549855cc7769e84744): Total: 0.040 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+MAR Tools: cenas Boot/Main/Game criadas, UI premium ligada e Build Settings atualizado.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+MutantArmy.Editor.ProjectSetup:SetupProject () (at Assets/_Project/Scripts/Editor/ProjectSetup.cs:75)
+
+(Filename: Assets/_Project/Scripts/Editor/ProjectSetup.cs Line: 75)
+
+Batchmode quit successfully invoked - shutting down!
+Clearing [KenneyFuture SDF] dynamic font asset data.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+TMPro.EditorEventCallbacks/<>c:<InitializeFontAssetResourceChangeCallBacks>b__0_0 () (at ./Library/PackageCache/com.unity.ugui@a9ea81766fbd/Editor/TMP/TMP_EditorResourceManager.cs:36)
+UnityEditor.EditorApplication:Internal_EditorApplicationQuit ()
+
+(Filename: ./Library/PackageCache/com.unity.ugui@a9ea81766fbd/Editor/TMP/TMP_EditorResourceManager.cs Line: 36)
+
+Killing ADB server in 2,1054169 seconds.
+Start importing Assets/_Project/Art/UI/Fonts/KenneyFuture SDF.asset using Guid(c6dd4b92f8199ce48af4fbcc50f9d6de) (NativeFormatImporter) -> (Import Result ID: 'e2bb5819a66d9b3acff5aa208c7e39f1') in 0.0041784 seconds [static dependencies only]. Details - ImportResultOutputID=2a8fe764744be20ef9b1efada36bb927 DependenciesID=9cfa111518391e4cccb1f11b99774b56 StaticDependenciesID=17905670414f406145c71ba094805fb1 
+Asset Pipeline Refresh (id=4b1f0ca3234106b48be5623998c02147): Total: 0.041 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-Felipe-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-Felipe channel disconnected successfully.
+AcceleratorClientConnectionCallback - disconnected - :0
+Shut down.
+Cleanup mono
+CodeReloadManager destroyed
+abort_threads: Failed aborting id: 0000000000004C9C, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 00000000000065BC, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 0000000000004C9C, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 00000000000065BC, mono_thread_manage will ignore it
+
+debugger-agent: Unable to listen on 3516
+Exiting batchmode successfully now!
+Exiting without the bug reporter. Application will terminate with return code 0

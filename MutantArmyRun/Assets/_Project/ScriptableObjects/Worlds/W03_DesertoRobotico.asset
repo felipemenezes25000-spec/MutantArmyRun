@@ -22,8 +22,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 553f9da55aa15614b82ffa299d2797a7, type: 2}
   - {fileID: 11400000, guid: 8be75f24a48401746a6ac9b644db6960, type: 2}
   worldBoss: {fileID: 11400000, guid: 5ab3faf0ac858344da939957ad7e2f4c, type: 2}
-  skyboxMaterial: {fileID: 0}
+  skyboxMaterial: {fileID: 2100000, guid: 250a0862ba42ed147967d628818139c5, type: 2}
   trackSegmentPrefabs:
-  - {fileID: 8906817117229079529, guid: 868cca6b978840d419f292b010c9ed6b, type: 3}
+  - {fileID: 7744021811491854551, guid: afd51ec019a8ca64fab81a71d0f0a11d, type: 3}
+  - {fileID: 6293876010852392549, guid: 2f0aa716e357a3842905f18ea8b22720, type: 3}
   musicTrack: {fileID: 0}
   worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
+  skyTopColor: {r: 0.3, g: 0.55, b: 0.92, a: 1}
+  skyHorizonColor: {r: 1, g: 0.8, b: 0.55, a: 1}
+  fogColor: {r: 0.95, g: 0.79, b: 0.58, a: 1}
+  sunColor: {r: 1, g: 0.88, b: 0.68, a: 1}
+  ambientColor: {r: 0.78, g: 0.68, b: 0.55, a: 1}
+  trackMaterial: {fileID: 2100000, guid: db8f7ca96f61ceb4a817f1936493bc6f, type: 2}
+  propPrefabs:
+  - {fileID: 4369600093211519526, guid: 216736198203b7c49830b90fcf2438de, type: 3}
+  - {fileID: 1721061679174171552, guid: b465b7f34af876e409043aca6be0e4a1, type: 3}
+  - {fileID: 4171266741336779057, guid: a9c724e710b5b2b4b872f4eb6eec2b77, type: 3}
+  - {fileID: 1400509716115243731, guid: d1f9e5764e4c3c9438b7a5f1a4a22a6f, type: 3}
+  - {fileID: 4486415779092767877, guid: 8e6d6498f1640ad4bbb8a72f615ce66a, type: 3}
+  - {fileID: 5006789843860002327, guid: 25a2b68408fdcf645bfa422af4966973, type: 3}
+  - {fileID: 8862763345479110637, guid: 98130ff0994b9d64b9f502f053252d8d, type: 3}
+  - {fileID: 1492695748755217795, guid: a719c67b6a02be64291979ca26e978e6, type: 3}
+  - {fileID: 5368556160771071200, guid: 80ffce426906bb740977d7ce754e24aa, type: 3}
+  - {fileID: 4810786497859219196, guid: e85b60b66a174a045978f32942c5de56, type: 3}
+  - {fileID: 266749497234596154, guid: b9cdd53c76cc7c449bc42cbc2f109ee8, type: 3}
+  - {fileID: 4475747351987741835, guid: b610fa2d264f10949a7b6815173555e3, type: 3}

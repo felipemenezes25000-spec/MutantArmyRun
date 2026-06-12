@@ -1,0 +1,798 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.4/staging' branch; Version is '6000.4.8f1 (f8b72d3d7343) revision 16299821'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Channel LicenseClient-Felipe doesn't exist
+OS: 'Windows 11  (10.0.26200) Professional' Language: 'pt' Physical Memory: 32694 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-06-12T10:37:02Z
+[Licensing::Module] Successfully launched the LicensingClient (PId: 19972)
+
+COMMAND LINE ARGUMENTS:
+D:\6000.4.8f1\Editor\Unity.exe
+-batchmode
+-nographics
+-projectPath
+C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+-runTests
+-testPlatform
+EditMode
+-testResults
+C:\Users\Felipe\Downloads\jogo test\t-edit.xml
+-logFile
+C:\Users\Felipe\Downloads\jogo test\t-edit.log
+Successfully changed project path to: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+C:/Users/Felipe/Downloads/jogo test/MutantArmyRun
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Player connection [25016]  Target information:
+
+Player connection [25016]  * "[IP] 172.29.112.1 [Port] 55504 [Flags] 2 [Guid] 1743932764 [EditorId] 1743932764 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [25016]  * "[IP] 192.168.56.1 [Port] 55504 [Flags] 2 [Guid] 1743932764 [EditorId] 1743932764 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [25016]  * "[IP] 192.168.15.133 [Port] 55504 [Flags] 2 [Guid] 1743932764 [EditorId] 1743932764 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-GQ1GO5L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [25016] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [25016] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Starting IPC server.
+Waiting for clients to connect on \\.\pipe\Unity-LicenseClient-Felipe, press Ctrl-C to exit.
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Felipe" at "2026-06-12T10:37:03.2676655Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 19972, path: "D:/6000.4.8f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Package Manager] Connected to IPC stream "Upm-38288" after 0.4 seconds.
+[Licensing::Module] Licensing is not yet initialized.
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.1+9fbee8e
+  Session Id:              cb5c4aa4ef04456ab4056655a833df2c
+  Correlation Id:          c56fc9b59d0f66d259e9c15eb045d7bf
+  External correlation Id: 1351276135916805014
+  Machine Id:              +wcfUDhktwXGsUv466LQ/t6VYpk=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-Felipe" (connect: 0.37s, validation: 0.69s, handshake: 0.12s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Felipe-notifications" at "2026-06-12T10:37:04.0796228Z"
+[Licensing::Module] Connected to LicensingClient (PId: 19972, launch time: 0.01, total connection time: 1.19s)
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 4674205611919-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.01
+[Licensing::Module] Licensing Background thread has ended after 1.26s
+[Licensing::Module] Licensing is initialized (took 0.50s).
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Artifact Garbage Collection - Removed 1 unused hashed content files
+Initialize engine version: 6000.4.8f1 (f8b72d3d7343)
+[Subsystems] Discovering subsystems at path D:/6000.4.8f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/Felipe/Downloads/jogo test/MutantArmyRun/Assets
+Forcing GfxDevice: Null
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Initialize mono
+Mono path[0] = 'D:/6000.4.8f1/Editor/Data/Managed'
+Mono path[1] = 'D:/6000.4.8f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'D:/6000.4.8f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56288
+CodeReloadManager initialized
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.UWP.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/6000.4.8f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Registered in 0.011003 seconds.
+Native extension for Android target not found
+Native extension for UWP target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.481 seconds
+Domain Reload Profiling: 1115ms
+	BeginReloadAssembly (215ms)
+		CreateAndSetChildDomain (15ms)
+	RebuildCommonClasses (50ms)
+	RebuildNativeTypeToScriptingClass (14ms)
+	initialDomainReloadingComplete (87ms)
+	LoadAllAssembliesAndSetupDomain (265ms)
+		LoadAssemblies (202ms)
+		AnalyzeDomain (253ms)
+			TypeCache.Refresh (251ms)
+				TypeCache.ScanAssembly (235ms)
+	FinalizeReload (484ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (98ms)
+			BeforeProcessingInitializeOnLoad (95ms)
+			ProcessInitializeOnLoadAttributes (128ms)
+			ProcessInitializeOnLoadMethodAttributes (89ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 49 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.searcher@4.9.4 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.searcher@d45a78918735)
+    com.unity.burst@1.8.29 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.burst@6bb9aca3ef38)
+    com.unity.mathematics@1.3.3 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.mathematics@19a9377c4ffa)
+    com.unity.nuget.mono-cecil@1.11.6 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.test-framework.performance@3.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.test-framework.performance@aa81a99c4a75)
+  Built-in packages:
+    com.unity.render-pipelines.universal@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.universal@13e5115b98bf)
+    com.unity.ugui@2.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.ugui@a9ea81766fbd)
+    com.unity.test-framework@1.6.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.test-framework@76560ee600cb)
+    com.unity.modules.accessibility@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.physics2d)
+    com.unity.modules.screencapture@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.terrainphysics)
+    com.unity.modules.tilemap@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.tilemap)
+    com.unity.modules.ui@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.video)
+    com.unity.modules.vr@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.vr)
+    com.unity.modules.wind@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.modules.hierarchycore)
+    com.unity.ext.nunit@2.0.5 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.ext.nunit@d8c07649098d)
+    com.unity.render-pipelines.core@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.core@6f62546dd936)
+    com.unity.shadergraph@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.shadergraph@33f3b0a71b9a)
+    com.unity.render-pipelines.universal-config@17.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.render-pipelines.universal-config@0db4263b9e6b)
+    com.unity.collections@6.4.0 (location: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun\Library\PackageCache\com.unity.collections@5b6ebd78ccc0)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.04 seconds
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:80
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\Felipe\Downloads\jogo test\MutantArmyRun
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - 200 - application/grpc 33.2505ms
+Starting: D:\6000.4.8f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: C:/Users/Felipe/Downloads/jogo test/MutantArmyRun
+DisplayProgressbar: Compiling Scripts
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.runtime.interopservices.windowsruntime has duplicate hint path. Ignoring "D:\6000.4.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Runtime.InteropServices.WindowsRuntime.dll" in favor of "D:\6000.4.8f1\Editor\Data\NetStandard\Extensions\2.0.0\System.Runtime.InteropServices.WindowsRuntime.dll"
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.componentmodel.composition has duplicate hint path. Ignoring "D:\6000.4.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\System.ComponentModel.Composition.dll" in favor of "D:\6000.4.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.ComponentModel.Composition.dll"
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Burst.Cecil, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.burst@6bb9aca3ef38\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - 200 - application/grpc 100.1302ms
+ExitCode: 0 Duration: 0s366ms
+[546/688    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+*** Tundra build success (0.32 seconds), 1 items updated, 688 evaluated
+AssetDatabase: script compilation time: 0.893287s
+Begin MonoManager ReloadAssembly
+Assembly Assembly-CSharp-Editor-firstpass.dll at Library/ScriptAssemblies/Assembly-CSharp-Editor-firstpass.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp-Editor.dll at Library/ScriptAssemblies/Assembly-CSharp-Editor.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp-firstpass.dll at Library/ScriptAssemblies/Assembly-CSharp-firstpass.dll not valid. Loading of assembly skipped.
+Assembly Assembly-CSharp.dll at Library/ScriptAssemblies/Assembly-CSharp.dll not valid. Loading of assembly skipped.
+Assembly TestNewCustomAssembly.dll at Library/ScriptAssemblies/TestNewCustomAssembly.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.BurstCompatibilityGen.dll at Library/ScriptAssemblies/Unity.Collections.BurstCompatibilityGen.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.DocCodeSamples.dll at Library/ScriptAssemblies/Unity.Collections.DocCodeSamples.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.PerformanceTests.dll at Library/ScriptAssemblies/Unity.Collections.PerformanceTests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.Tests.dll at Library/ScriptAssemblies/Unity.Collections.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Collections.Tests.Playmode.dll at Library/ScriptAssemblies/Unity.Collections.Tests.Playmode.dll not valid. Loading of assembly skipped.
+Assembly Unity.Mathematics.Tests.dll at Library/ScriptAssemblies/Unity.Mathematics.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Nuget.Mono-Cecil.dll at Library/ScriptAssemblies/Unity.Nuget.Mono-Cecil.dll not valid. Loading of assembly skipped.
+Assembly Unity.PathTracing.Editor.Tests.dll at Library/ScriptAssemblies/Unity.PathTracing.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.PathTracing.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.PathTracing.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Core.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Core.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Config.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Config.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Editor.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.RenderPipelines.Universal.Runtime.Tests.dll at Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Runtime.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.Searcher.EditorTests.dll at Library/ScriptAssemblies/Unity.Searcher.EditorTests.dll not valid. Loading of assembly skipped.
+Assembly Unity.ShaderGraph.Editor.Tests.dll at Library/ScriptAssemblies/Unity.ShaderGraph.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.TextMeshPro.Editor.Tests.dll at Library/ScriptAssemblies/Unity.TextMeshPro.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.TextMeshPro.Tests.dll at Library/ScriptAssemblies/Unity.TextMeshPro.Tests.dll not valid. Loading of assembly skipped.
+Assembly Unity.UnifiedRayTracing.Editor.Tests.dll at Library/ScriptAssemblies/Unity.UnifiedRayTracing.Editor.Tests.dll not valid. Loading of assembly skipped.
+Assembly UnityEditor.UI.Common.Tests.dll at Library/ScriptAssemblies/UnityEditor.UI.Common.Tests.dll not valid. Loading of assembly skipped.
+Assembly UnityEditor.UI.EditorTests.dll at Library/ScriptAssemblies/UnityEditor.UI.EditorTests.dll not valid. Loading of assembly skipped.
+Assembly UnityEngine.UI.Tests.dll at Library/ScriptAssemblies/UnityEngine.UI.Tests.dll not valid. Loading of assembly skipped.
+Native extension for Android target not found
+Native extension for UWP target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:False
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  2.968 seconds
+Domain Reload Profiling: 3931ms
+	BeginReloadAssembly (429ms)
+		DisableScriptedObjects (60ms)
+		CreateAndSetChildDomain (146ms)
+	RebuildCommonClasses (41ms)
+	RebuildNativeTypeToScriptingClass (13ms)
+	initialDomainReloadingComplete (76ms)
+	LoadAllAssembliesAndSetupDomain (403ms)
+		LoadAssemblies (416ms)
+		AnalyzeDomain (148ms)
+			TypeCache.Refresh (101ms)
+				TypeCache.ScanAssembly (91ms)
+			BuildScriptInfoCaches (35ms)
+			ResolveRequiredComponents (11ms)
+	FinalizeReload (2969ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (52ms)
+			BeforeProcessingInitializeOnLoad (178ms)
+			ProcessInitializeOnLoadAttributes (2276ms)
+			ProcessInitializeOnLoadMethodAttributes (204ms)
+			AfterProcessingInitializeOnLoad (3ms)
+		AwakeInstancesAfterBackupRestoration (37ms)
+(Values over 0.050ms)
+Asset Pipeline Refresh (id=619521d78b8bc1943839638749e6cf8f): Total: 5.352 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=3373 ms
+		Asset DB Callback time: managed=31 ms, native=40 ms
+		Scripting: domain reloads=1, domain reload time=966 ms, compile time=895 ms, other=44 ms
+		Project Asset Count: scripts=866, non-scripts=2562
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokePackagesCallback: 44.144ms
+	ApplyChangesToAssetFolders: 0.846ms
+	Scan: 105.980ms
+	CategorizeScriptCompilationAssets: 19.365ms
+	ProcessAssetsWithTransientArtifactChanges: 51.846ms
+	CategorizeAssets: 60.623ms
+	CompileScripts: 894.525ms
+	ImportOutOfDateAssets: 2974.198ms (2971.708ms without children)
+		UnloadImportedAssets: 1.464ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.561ms
+		OnDemandSchedulerStart: 0.437ms
+	PostProcessAllAssets: 31.215ms
+		MonoPostProcessAllAssets: 31.131ms
+			UniversalRenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 12.944ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 3.257ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 1.892ms
+			SyncVS.PostprocessSyncProject 1.256ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 1.190ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.514ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.247ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.234ms
+	UnloadStreamsBegin: 1.244ms
+	PersistCurrentRevisions: 0.106ms
+	GenerateScriptTypeHashes: 4.022ms
+	GenerateScriptTypeSerializationHashes: 6.757ms
+	Untracked: 1153.627ms
+
+Application.AssetDatabase Initial Refresh End
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Scanning for USB devices : 26.095ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-MutantArmyRun
+Unloading 84 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 3407 unused Assets / (9.8 MB). Loaded Objects now: 4187.
+Memory consumption went from 171.1 MB to 161.2 MB.
+Total: 14.899500 ms (FindLiveObjects: 0.348900 ms CreateObjectMapping: 0.292300 ms MarkObjects: 6.868500 ms  DeleteObjects: 7.385300 ms)
+
+Microsoft Media Foundation video decoding to texture disabled: graphics device is Null, only Direct3D 11 and Direct3D 12 (only on desktop) are supported for hardware-accelerated video decoding.
+[Project] Loading completed in 8.693 seconds
+	Project init time: 				8.158 seconds
+		Template init time: 		0.000 seconds
+		Package Manager init time: 		0.905 seconds
+		Asset Database init time: 		0.284 seconds
+		Global illumination init time: 	0.003 seconds
+		Assemblies load time: 			1.174 seconds
+		Unity extensions init time: 	0.021 seconds
+		Asset Database refresh time: 	5.352 seconds
+	Scene opening time: 			0.202 seconds
+##utp:{"type":"ProjectInfo","version":2,"phase":"Immediate","time":1781260631572,"processId":38288,"projectLoad":8.6929635,"projectInit":8.1575064,"templateInit":0.0,"packageManagerInit":0.9046135,"assetDatabaseInit":0.2842964,"globalIlluminationInit":0.0033685,"assembliesLoad":1.1741749,"unityExtensionsInit":0.0205193,"assetDatabaseRefresh":5.3524237,"sceneOpening":0.2016013}
+##utp:{"type":"EditorInfo","version":2,"phase":"Immediate","time":1781260631572,"processId":38288,"editorVersion":"6000.4.8f1 (f8b72d3d7343)","branch":"6000.4/staging","buildType":"Release","platform":"Windows"}
+[Licensing::Client] Successfully resolved entitlement details
+Running tests for ExecutionSettings with details:
+targetPlatform = 
+playerHeartbeatTimeout = 600
+filters[0] = 
+   Filter with settings:
+   testMode = EditMode
+   targetPlatform = 
+   testNames = null
+   groupNames = null
+   categoryNames = null
+   assemblyNames = null
+ignoreTests = {}
+featureFlags = null
+
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:InitializeAndExecuteRun (string[]) (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/CommandLineTest/Executer.cs:53)
+UnityEditor.TestTools.TestRunner.CommandLineTest.TestStarter:InitializeAndExecuteRun () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/CommandLineTest/TestStarter.cs:64)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/CommandLineTest/Executer.cs Line: 53)
+
+DisplayProgressbar: Material Upgrader re-import
+Start importing Assets/_Project/Art/Materials/M_Obstacle_Greybox.mat using Guid(103a6114c33de3f4283831dc10ec0c43) (NativeFormatImporter) -> (Import Result ID: '0767f21c741e93a67b1143bd33581ada') in 0.0097414 seconds [static dependencies only]. Details - ImportResultOutputID=398efe9f28f86ef16c4d4ac581449f30 DependenciesID=582e7286a49b4ce550ec636eb09bacaa StaticDependenciesID=7e732133534379f49540e1d650daed39 
+Start importing Assets/_Project/Art/Models/Materials/Mage_mage_texture.mat using Guid(a036480cbf1dfbf4e9531dd6a50df100) (NativeFormatImporter) -> (Import Result ID: '6b542d3eca1adf5d7041da6751dea182') in 0.0036184 seconds [static dependencies only]. Details - ImportResultOutputID=18009df24e43b61ad802f639e2c93e52 DependenciesID=9c82c715721ca8d8a60abbf7d2044284 StaticDependenciesID=873c48f1852103f92f2c858320072c27 
+Start importing Assets/_Project/Art/Models/Materials/wand_mage_texture.mat using Guid(f062c1b518b9abc4d96d3e1c8049bc0a) (NativeFormatImporter) -> (Import Result ID: '4fa0b7c532115bd71cd82f46cf7a135b') in 0.0028825 seconds [static dependencies only]. Details - ImportResultOutputID=5866fff99dd723617f18963f6fdcea43 DependenciesID=cd78e1ac19f5c0975cce8cc3e7f125a6 StaticDependenciesID=78228ff6e898e594db2be747d70ec3c7 
+Start importing Assets/_Project/VFX/Materials/M_VFX_Smoke.mat using Guid(f037917c368bbf846afb9c95cf8aa4be) (NativeFormatImporter) -> (Import Result ID: 'c470d228b77eed6465fb47da72e1f8e4') in 0.0029757 seconds [static dependencies only]. Details - ImportResultOutputID=ec50748be64c954b6829f7f726721a8f DependenciesID=9e7a0a994f19c04fbcbedc5ec9343f9b StaticDependenciesID=4cd3b369e1f95bb71d289629dfaffced 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/Decal.mat using Guid(31d0dcc6f2dd4e4408d18036a2c93862) (NativeFormatImporter) -> (Import Result ID: '2f087c68a09831bfc3e224c771dc4b3b') in 0.0029074 seconds [static dependencies only]. Details - ImportResultOutputID=7981e750e4a0a0381d2f3a6ab3f482cb DependenciesID=f44d78de89c86686005c45d701dcb169 StaticDependenciesID=a737e2f554d88d839173bcd2d07a2d7f 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/Lit.mat using Guid(31321ba15b8f8eb4c954353edc038b1d) (NativeFormatImporter) -> (Import Result ID: 'e253e2e063e486d23477a7d6015ff76c') in 0.0032934 seconds [static dependencies only]. Details - ImportResultOutputID=0bda2be740cfa1757b896643206cac1f DependenciesID=f7304b3ae95f0f10a70359685e7fef79 StaticDependenciesID=a989d18b31397dfa71d5926b4c05dcc7 
+Start importing Assets/_Project/Art/Models/Materials/RogueHooded_rogue_texture.mat using Guid(31a27593ecc3d4e45ab9777a1a06e433) (NativeFormatImporter) -> (Import Result ID: '71ceb805c61b03258fb5b5b0f6990270') in 0.0031565 seconds [static dependencies only]. Details - ImportResultOutputID=2b339c0332701e811c99abc34ab24210 DependenciesID=82af1a591694058445f10f9e08e8a359 StaticDependenciesID=aac764b41f829b077da09898c0c4c519 
+Start importing Assets/_Project/Art/Materials/World/M_W03_PalmLeaves.mat using Guid(3145ff49661726849ba4bd22b8f0f80b) (NativeFormatImporter) -> (Import Result ID: 'ee3e46d875d5dfe49f57741de14edecd') in 0.0030081 seconds [static dependencies only]. Details - ImportResultOutputID=e8a77a2d4f2b77ee730833760017aecb DependenciesID=5b93220a7f97b6baca87a68d1fc1344d StaticDependenciesID=143c7a92e84d9505ccb1cc0de10d5410 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/Mesh2D-Unlit-Default.mat using Guid(71942363c5608a64bb62421349d39c9c) (NativeFormatImporter) -> (Import Result ID: '5be33f4ab45b5fad22f3c270adc852b0') in 0.0040776 seconds [static dependencies only]. Details - ImportResultOutputID=4ad68ed565a0bb13fbb47ea1d5059f77 DependenciesID=894a8a46a4fa8cb92d1406a53e8b5949 StaticDependenciesID=546c6e1245aa151fdc91b2f53b058863 
+Start importing Assets/_Project/Art/Models/Materials/Tribal_Atlas.mat using Guid(c192e8a6b698e7848a81949eb449eee3) (NativeFormatImporter) -> (Import Result ID: '9376d95504b214a2e704546b94ae1b9c') in 0.0029811 seconds [static dependencies only]. Details - ImportResultOutputID=65db2432de23c4f8200edfc9e84e3a2b DependenciesID=58629b23769d0a9887eb0c823f793b6a StaticDependenciesID=a6390dfd3108949571a19aa14fb89395 
+Start importing Assets/_Project/Art/Materials/World/M_Track_W02.mat using Guid(f1f080b0654d77141a9d0a1285b6ffed) (NativeFormatImporter) -> (Import Result ID: 'e4db27ccd60303778c1e20856932d251') in 0.0031442 seconds [static dependencies only]. Details - ImportResultOutputID=b4ae83dc958e990ff8b9b26e1a18c52e DependenciesID=685381ecaf09a8a9aeb3d7a5bc9e8c42 StaticDependenciesID=6691d16eaa58b3aae8281f51d0da4d66 
+Start importing Assets/_Project/Art/Models/Materials/mug_full_barbarian_texture.mat using Guid(f19a0aa203a1d9f40acd97313f1b7686) (NativeFormatImporter) -> (Import Result ID: '1878145d12593adf010549c3aad37b7d') in 0.0028272 seconds [static dependencies only]. Details - ImportResultOutputID=d605bc69f8e54aa77af74fa7733e2d7f DependenciesID=91cf627240399284cfdf573ba0a1e8e1 StaticDependenciesID=1c5eef6753b806886c39185c77a66154 
+Start importing Assets/_Project/Art/Materials/Views/M_View_Unit_Giant.mat using Guid(32f4edc7d2deb3c49810980edf9778bd) (NativeFormatImporter) -> (Import Result ID: '927659164de33d566024215903ea5705') in 0.0027833 seconds [static dependencies only]. Details - ImportResultOutputID=20bffb7c89ca66357b2d42ebfe11bfbe DependenciesID=ecf529d38413a175b1077f41c1db7d53 StaticDependenciesID=54a2cd351db5c96b6f5d47d8e86584ef 
+Start importing Assets/_Project/Art/Materials/World/M_W03_Cactus.mat using Guid(72df385678a1bce42a663739a54677bd) (NativeFormatImporter) -> (Import Result ID: '1460a40ade9bc95f4f5c32aaef94b236') in 0.002989 seconds [static dependencies only]. Details - ImportResultOutputID=cc79840b044165019be891d78636d5a3 DependenciesID=c87370b1b4940594fae77ce41d071be8 StaticDependenciesID=864dca6924255f3af9bf17fb09a7dc0a 
+Start importing Assets/_Project/Art/Materials/M_Unit_Giant.mat using Guid(92c4d58228849694d805cb94e8d30322) (NativeFormatImporter) -> (Import Result ID: '2d636a35bd6079550e61486471070558') in 0.0027847 seconds [static dependencies only]. Details - ImportResultOutputID=38a88026916ea9b44e0d12d50395efdd DependenciesID=c092a4b898cdaed1071ad98146ac4ad9 StaticDependenciesID=ab120cbb627d45e6a237dde067863e69 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/SceneTemplates/Materials/Emissive.mat using Guid(92f845725428c954b878da352f657fe5) (NativeFormatImporter) -> (Import Result ID: '846f44a7f41240f28ecb582c363b188b') in 0.003493 seconds [static dependencies only]. Details - ImportResultOutputID=b80fa26cee763ca527a6d4b2e2988b0d DependenciesID=b67ee74993de15ba154cfa3ecf892cc1 StaticDependenciesID=f0ce67ea5991b1e0ed1d6c6a58213c39 
+Start importing Assets/_Project/VFX/Materials/M_VFX_Spark.mat using Guid(a29df2b5609fd9044b2487c363aa8708) (NativeFormatImporter) -> (Import Result ID: '5f748b53dbd2bf2c3561e347f70fbce3') in 0.0029249 seconds [static dependencies only]. Details - ImportResultOutputID=23dd4045eef77cafbcef7d435a2c4812 DependenciesID=fd5799b9b37dfa029be9b83b328c87b5 StaticDependenciesID=707963ec3a76de49c4e7bb4699e7d4e5 
+Start importing Assets/_Project/Art/Materials/World/M_W02_Metal.mat using Guid(a25e249e79fe7634b99ee04dbce08e15) (NativeFormatImporter) -> (Import Result ID: 'd84039dcd367a2b7c61d02956801ceab') in 0.00304 seconds [static dependencies only]. Details - ImportResultOutputID=ab3b530e49996db0139f484f8c9a83ef DependenciesID=bdf79d3b839fd2deb27556481cdf8c05 StaticDependenciesID=f4cbde33303456104c132dfe14109b10 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/SceneTemplates/Materials/Gold.mat using Guid(c2e40fa84d53ccd428f640eac126b1fb) (NativeFormatImporter) -> (Import Result ID: 'fa5e543bf18680c08c4f980e2138e747') in 0.0032419 seconds [static dependencies only]. Details - ImportResultOutputID=5ac116db96b2c61bd1025ff0f4691532 DependenciesID=8e21166efb29649511dbb20eb787b6f8 StaticDependenciesID=16a2384753d27ae79419d63755cefba6 
+Start importing Assets/_Project/Art/Models/Materials/sword_2handed_knight_texture.mat using Guid(237dabcfba1b6b14cb832d6fd1c77311) (NativeFormatImporter) -> (Import Result ID: 'cfb3c290270b9fc077390788ee101907') in 0.0030171 seconds [static dependencies only]. Details - ImportResultOutputID=23438aef866848e80e7916d379f6855d DependenciesID=78e30fe2dcaa9a7fed662236c343a74e StaticDependenciesID=a7815d6378c4cda90451183308c50df4 
+Start importing Assets/_Project/Art/Materials/Skybox/M_Sky_W02.mat using Guid(439a176b4b79cb24aaf7ce4043f8b1df) (NativeFormatImporter) -> (Import Result ID: '2a3c27af73040394331ccc100f228ae2') in 0.003205 seconds [static dependencies only]. Details - ImportResultOutputID=bfae00da9415f7453395c561a644a49b DependenciesID=93a1034e6dca6a95ff276644450ae387 StaticDependenciesID=70b894b30ca206606bb22eeb3c7a98bc 
+Start importing Assets/_Project/Art/Materials/World/M_W01_Flower.mat using Guid(633501149d66bc4419a515e0a1d9bf5d) (NativeFormatImporter) -> (Import Result ID: '30e901a0f24c53a39ea7b8d570b9f075') in 0.0027942 seconds [static dependencies only]. Details - ImportResultOutputID=af40dbd97594ac679629315347bdbee3 DependenciesID=cfbfd95d815aa34ff62a1cd232c52854 StaticDependenciesID=c379367095168b60ddf63f0446f408be 
+Start importing Assets/_Project/Art/Materials/Views/M_View_Boss_M3_ScorpionMech.mat using Guid(632d952836ab37c4eb7cfa3a7e465a9b) (NativeFormatImporter) -> (Import Result ID: '07c1c2ff7a2d6b5fb2d7030348a5ce59') in 0.0029884 seconds [static dependencies only]. Details - ImportResultOutputID=f8f433c178729dce8273dc14d25c7923 DependenciesID=20fccbc9ef21930845b8b28b7f0db79c StaticDependenciesID=d92d58235872e789322845e9e93aeea5 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Mage_skeleton.mat using Guid(b3988311d762f534db403b88703e99f1) (NativeFormatImporter) -> (Import Result ID: '374e212d2d9202b1d49e82a0b39b7e8c') in 0.0028372 seconds [static dependencies only]. Details - ImportResultOutputID=6fc00d0f7d835298e8d4986f296e85b7 DependenciesID=50d1c41bef1924fbdb808c9b17587426 StaticDependenciesID=64a87e6c82c5eaabf59fc72d04db64ab 
+Start importing Assets/_Project/Art/Models/Materials/Orc_Skull_Atlas.mat using Guid(b31967e2833f1154ebd9067d137743a5) (NativeFormatImporter) -> (Import Result ID: '95faf2013dda9fef12f75a4971284c11') in 0.003519 seconds [static dependencies only]. Details - ImportResultOutputID=f27de7711e9a7c9161e9d8f193bb6ef8 DependenciesID=491bfd29eeeaffd9c096fbdf96df35d4 StaticDependenciesID=97a82904f482edb6dbbd6208bb3a820a 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/SceneTemplates/Materials/Metal_Black.mat using Guid(b34b07a45ba63ce47896c9e674f3a7a7) (NativeFormatImporter) -> (Import Result ID: '6fdccde0e12770cc1423be3af06a050c') in 0.0030372 seconds [static dependencies only]. Details - ImportResultOutputID=7f085cc3e5d97af6d8465cf9023c288e DependenciesID=27f980df3e8ba557cc8a4f24eb5a8f1f StaticDependenciesID=7566ced6c16a61d261bceebee62f8181 
+Start importing Assets/_Project/VFX/Materials/M_VFX_Confetti.mat using Guid(d36444b789f04d5499da33febc2b3c46) (NativeFormatImporter) -> (Import Result ID: 'f2707ba183c8f5439eb3ad9181465ccb') in 0.0030643 seconds [static dependencies only]. Details - ImportResultOutputID=e71af48c0a5b9ed25b32c21cfe890969 DependenciesID=ca0bee8013019f5b1ddad5a137d53bff StaticDependenciesID=40ff31936bc96a0c567cc4a52ca9cae8 
+Start importing Assets/_Project/Art/Models/Materials/Alien_Atlas.mat using Guid(e37b999f06432ce4f869dff17bfcbe54) (NativeFormatImporter) -> (Import Result ID: 'c8731dba71f2450d48a7c7e49dcc7213') in 0.0031395 seconds [static dependencies only]. Details - ImportResultOutputID=fa19f6cbb3edc5388da63752d25ab8f0 DependenciesID=f43d1cb808c3a5cd46faddfff3d10130 StaticDependenciesID=b068df6bcf10463115d89f94f68db359 
+Start importing Assets/_Project/Art/Materials/World/M_TMP_GateLabel.mat using Guid(f3c8dcd56b9b4304d861792f9d8f9e33) (NativeFormatImporter) -> (Import Result ID: '95dfaf1f440ef6f32ec8c755035f6180') in 0.0038045 seconds [static dependencies only]. Details - ImportResultOutputID=786a127b77e47c8d687dcbb7711a9bf4 DependenciesID=07a57e41d586200f6032e70f054d782f StaticDependenciesID=b6f594fbb8bf02876eb879729226bc57 
+Start importing Assets/_Project/Art/Materials/M_Boss_Greybox.mat using Guid(04088b4871b6b2b44ab8346d3fcd4139) (NativeFormatImporter) -> (Import Result ID: '4f21be2d348697cf9c3dff02c3289380') in 0.0032315 seconds [static dependencies only]. Details - ImportResultOutputID=feeee24614a14bd3c33f92e0f95be751 DependenciesID=c8c7a350f3548118b91f5e99f9e696f4 StaticDependenciesID=9aa5cce86384b911c97715054f448024 
+Start importing Assets/_Project/Art/Models/Materials/dagger_rogue_texture.mat using Guid(14b7cca50b4bbd942abe7f54c047108a) (NativeFormatImporter) -> (Import Result ID: '5d5864b44c71b71b21641f4c37ebb9ce') in 0.002884 seconds [static dependencies only]. Details - ImportResultOutputID=39a298153cbf8dea2bc4b480dfaec3ac DependenciesID=ba69b9726c08510daa334229c95a8069 StaticDependenciesID=17cae480be134fb621408ca311ea8596 
+Start importing Assets/_Project/Art/Models/Materials/smokebomb_rogue_texture.mat using Guid(149957a09745c2348972bad2e0feca2a) (NativeFormatImporter) -> (Import Result ID: '0387c42ae124e3a21e7254a4ef8c8948') in 0.0028982 seconds [static dependencies only]. Details - ImportResultOutputID=450e719d9abde8f98b9ddf76f555fa03 DependenciesID=997a41cd014756b21d800df844715c42 StaticDependenciesID=6935ddb9a7a75a0cfa6d1f51daa83777 
+Start importing Assets/_Project/Art/Models/Materials/shield_badge_knight_texture.mat using Guid(24f86f84db70000439d4bb0597cba546) (NativeFormatImporter) -> (Import Result ID: '4d930cb7e4566d95a2c409ef521ef019') in 0.0028736 seconds [static dependencies only]. Details - ImportResultOutputID=802cf8d2cc1c2856675dc35dcf9c87df DependenciesID=973969756f7efd2c5189497f995f6854 StaticDependenciesID=7c4cab30f43bbe0769132d61c9a21c1a 
+Start importing Assets/_Project/Art/Models/Materials/arrow_rogue_texture.mat using Guid(44e82ede009910a4fbe2b52341a1e825) (NativeFormatImporter) -> (Import Result ID: '3ef99b1b2da88ab7711af252e4915f5c') in 0.0036672 seconds [static dependencies only]. Details - ImportResultOutputID=2340b6fd1954b62a0849a51c3a7ea743 DependenciesID=5f01e8b0512a872245b1adaffa2b3e16 StaticDependenciesID=10dfe26b3bb2889c43736e0b056c3051 
+Start importing Assets/_Project/Art/Materials/Views/M_View_Boss_M1_GolemStone.mat using Guid(84931cb343ac99048984bc3485543323) (NativeFormatImporter) -> (Import Result ID: 'aa53ca3bda4a360903cda08c29fb12a7') in 0.0029062 seconds [static dependencies only]. Details - ImportResultOutputID=c919d4c647e22e5c99712e29ea80eba8 DependenciesID=43c39729f41a5dccc8919c95c7a71e24 StaticDependenciesID=9a85e153ade8877cf510daf98dced0c8 
+Start importing Assets/_Project/Art/Models/Materials/Yeti_Atlas.mat using Guid(84ac0513625f8344888bc52d543694a2) (NativeFormatImporter) -> (Import Result ID: 'b45b97d72abd83756889f4d9249afbc8') in 0.0028715 seconds [static dependencies only]. Details - ImportResultOutputID=d5549c478c4dfd6cf34123877062fd08 DependenciesID=583881e4d32ab8e990e8a59e237137e2 StaticDependenciesID=52b8a6a0c0af354cc246640ee7137b97 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/Mesh2D-Lit-Default.mat using Guid(9452ae1262a74094f8a68013fbcd1834) (NativeFormatImporter) -> (Import Result ID: '92690a1ab6dbcdeab9b3e701596d4cdf') in 0.0031013 seconds [static dependencies only]. Details - ImportResultOutputID=d6424f44ea9a6cc5996a332ce9c4c257 DependenciesID=3a63220fc51fdf040b30d253722d9bc2 StaticDependenciesID=6405a766761e3b91b65a79155ce635d3 
+Start importing Assets/_Project/VFX/Materials/M_VFX_Telegraph.mat using Guid(a4bd6a7a5dc0b9940acc064a24a55734) (NativeFormatImporter) -> (Import Result ID: 'd7e0932a218cfb0934f60afde2751ae7') in 0.0029945 seconds [static dependencies only]. Details - ImportResultOutputID=cc47dd65736c1f2f6a5e642da90e73ab DependenciesID=ad02a9a03a80112d9776589bb2171ead StaticDependenciesID=59ba26834cc680f95833cbc25fed21fa 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/SpriteMask-Default.mat using Guid(15d0c3709176029428a0da2f8cecf0b5) (NativeFormatImporter) -> (Import Result ID: '73caccb945914696629707c92cbeb039') in 0.0031578 seconds [static dependencies only]. Details - ImportResultOutputID=260823e111e6f265612accf074a57c13 DependenciesID=8ff072fce1fda839a496886d297f8177 StaticDependenciesID=0556106f4462357022893424c782ebb4 
+Start importing Assets/_Project/Art/Materials/Skybox/M_Sky_W03.mat using Guid(250a0862ba42ed147967d628818139c5) (NativeFormatImporter) -> (Import Result ID: '66778bd3b0918bbf33dfe69d49e598ae') in 0.0027257 seconds [static dependencies only]. Details - ImportResultOutputID=db7990b61fb24c2bacbf69c9aafc1e79 DependenciesID=74f04ca36c473409738b0e9c22fadaa8 StaticDependenciesID=db99635a76b2c5a100e20e4c575c470e 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/SpatialMappingOcclusion.mat using Guid(b51db210fe78df745a372851b3db949e) (NativeFormatImporter) -> (Import Result ID: '9db051ca72a4084b1e69d6c53f14e210') in 0.003789 seconds [static dependencies only]. Details - ImportResultOutputID=83353b00b09944d7180623fca15f223f DependenciesID=383ccbb238c795b18cc584ad20dc7c12 StaticDependenciesID=ccd68a74522cf02aad41eb9e1c4cfb85 
+Start importing Assets/_Project/Art/Models/Materials/Knight_knight_texture.mat using Guid(0611427dacea6de4e8a070f3758315cf) (NativeFormatImporter) -> (Import Result ID: '5d8a57be70bfbf8101ae8e8227b5ff89') in 0.0029252 seconds [static dependencies only]. Details - ImportResultOutputID=b6c9596bea02ff9f0b7fd075c7dc0180 DependenciesID=a495bab7b57b7ccf0de6fde5da4e61fe StaticDependenciesID=e1c277abb404e11a63bc8fae3e365569 
+Start importing Assets/_Project/Art/Materials/World/M_Track_W01.mat using Guid(2633be32ffbccfa438872047f0516802) (NativeFormatImporter) -> (Import Result ID: '27baea4f3fc7b9e77748f3c4d46d600c') in 0.0029641 seconds [static dependencies only]. Details - ImportResultOutputID=50ee78a0198899e1f9e89599466018e2 DependenciesID=1cefa5d0ee92aa89242232518f6ff3a4 StaticDependenciesID=225b86ca00a8ac6f7f0afc7a2c036c9e 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/SceneTemplates/Materials/Ground.mat using Guid(761d8e1f988ed2345a28312145c79c6e) (NativeFormatImporter) -> (Import Result ID: 'a38ee28884d1137a2a02eaf4e3194c8d') in 0.003225 seconds [static dependencies only]. Details - ImportResultOutputID=b8f60ed9c50f78d44872eea32efd7219 DependenciesID=0644c30c3f3e243c39318f12570325b8 StaticDependenciesID=e1857c112f6f13f3ca972d5725a8f58c 
+Start importing Assets/_Project/Art/Materials/Skybox/M_Sky_W01.mat using Guid(a6fb5f8d048294940ad866f1a2ba5922) (NativeFormatImporter) -> (Import Result ID: 'f1b2961e2d65965dbeb14c4211c99424') in 0.0027375 seconds [static dependencies only]. Details - ImportResultOutputID=60508567bd859122a56b2a5e7310b34a DependenciesID=f90feec0acdbeb67c429d79a5445b58b StaticDependenciesID=fc3064c5dbea5d91fd62062b2c37f536 
+Start importing Assets/_Project/Art/Models/Materials/MushroomKing_Atlas.mat using Guid(a63feab07340edb4b9c59f39896c64e1) (NativeFormatImporter) -> (Import Result ID: '4d551d6f70770484903ce9ddce543db4') in 0.0030726 seconds [static dependencies only]. Details - ImportResultOutputID=e3c324f99e750a108a09ede5d1443c76 DependenciesID=8569073c23491c0e83438f22e1b8d602 StaticDependenciesID=1bda6869dd7f183066b459a314115c42 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/RenderAs2D-Flattening.mat using Guid(b697f6a938056384e968ccf6527dac83) (NativeFormatImporter) -> (Import Result ID: '88c8a3c50a98789afe0a92853b42db5a') in 0.0036397 seconds [static dependencies only]. Details - ImportResultOutputID=89dd966e79ab646fa1a2f2638f32c56a DependenciesID=84a065630863848525e8e6a3438e5289 StaticDependenciesID=08a1c81039f5e1f5a9bb8c795a16aae0 
+Start importing Assets/_Project/Art/Materials/M_Unit_Mage.mat using Guid(d6ea1e8f5e21ddb4d842f461e34a042e) (NativeFormatImporter) -> (Import Result ID: '36e8af9d101a2e14467a0db0efb12b94') in 0.0034749 seconds [static dependencies only]. Details - ImportResultOutputID=ab958ac93b56b8196ee4cc5631cd7746 DependenciesID=f6c24b9de221e61de7be6396c13403ee StaticDependenciesID=d588ee5cd5ec1241b1053c423c3e1219 
+Start importing Assets/_Project/Art/Models/Materials/shield_round_color_knight_texture.mat using Guid(e6f35b1b7c088dc48a1bacf8ab54b2ef) (NativeFormatImporter) -> (Import Result ID: '2ad41538eb760bbed26e24a1d4562c2b') in 0.0030026 seconds [static dependencies only]. Details - ImportResultOutputID=1be34b0443b7e971bcfb5a6177aeac7c DependenciesID=7c7fd99bacbf6cdf37f5439c58e61f6e StaticDependenciesID=18a75ad334394dd73c42fc4e3062ae39 
+Start importing Assets/_Project/Art/Models/Materials/spellbook_open_mage_texture.mat using Guid(07e4acccd903eb042af0820a6fa43a69) (NativeFormatImporter) -> (Import Result ID: '9f5a54819d457827253f4e638c54a0d9') in 0.0029526 seconds [static dependencies only]. Details - ImportResultOutputID=2590607870d9cd5451d6746bfd33c4af DependenciesID=e0042a467ca6112b7c89579766ca7283 StaticDependenciesID=e05a4e3c8ad22c1eba4e74c6f70a2364 
+Start importing Assets/_Project/Art/Models/Materials/shield_square_knight_texture.mat using Guid(1731c613caf296b4e8643e98f64255ba) (NativeFormatImporter) -> (Import Result ID: 'd6d1f5df7bcdaf6d3f1ed89e6f441c4a') in 0.0032949 seconds [static dependencies only]. Details - ImportResultOutputID=46aefc83f60c0000bbe210eb285ac5bd DependenciesID=580c61d7b1dbd701323c5a90f7e43b07 StaticDependenciesID=44e120dd56409a3abd80ba8c164c1438 
+Start importing Assets/_Project/Art/Models/Materials/Barbarian_barbarian_texture.mat using Guid(17e722d552cac734f92abb0032d23371) (NativeFormatImporter) -> (Import Result ID: '6dc02f108501ba2f71b5e25b10538275') in 0.0028534 seconds [static dependencies only]. Details - ImportResultOutputID=350a29b262884bde5a3ca93ac18985af DependenciesID=43ce6a6bfb228462751de6d74ab54726 StaticDependenciesID=7547eaef7a82c309dcd4a83d22171652 
+Start importing Assets/_Project/Art/Materials/World/M_W03_Rock.mat using Guid(47ace0293edd7324e9d2a7b0ee8a0134) (NativeFormatImporter) -> (Import Result ID: '017de6b9a29220d7af7b2e2bfc57ac13') in 0.0029698 seconds [static dependencies only]. Details - ImportResultOutputID=a00b0b45e7d3986f99022ecc9ce28cd7 DependenciesID=f8fbf99a6d0d4fbe8ad46cba2d4aecb9 StaticDependenciesID=32f92673d8748925ffc44e2583906e1e 
+Start importing Assets/_Project/Art/Materials/Views/M_View_Boss_M1_WoodGiant.mat using Guid(b7f89b46f503c90438a81baedebac3cc) (NativeFormatImporter) -> (Import Result ID: '972aea690f321c07fc966e7ae77059e4') in 0.0030077 seconds [static dependencies only]. Details - ImportResultOutputID=e902591d6eb47fa74e4c947f639b7757 DependenciesID=966af19d6fb280c539a3b62b9b9922fa StaticDependenciesID=5c9eb5d5588a75f48820826ce32562d8 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Rogue_skeleton.mat using Guid(d7aa5723b66b5d04ea8ab9adb8e32b97) (NativeFormatImporter) -> (Import Result ID: '00e356c948a88131d0f83cbc7f21d218') in 0.002932 seconds [static dependencies only]. Details - ImportResultOutputID=0d6e5ce67334437818a6481588e5c5ef DependenciesID=7167f15a5203674d630b771150a9b97c StaticDependenciesID=245f5fa367e28ab6b54ec3d4958f4c60 
+Start importing Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat using Guid(e73a58f6e2794ae7b1b7e50b7fb811b0) (NativeFormatImporter) -> (Import Result ID: '0ae998edf2c6ed4c40fcb9dd43d9a390') in 0.0032158 seconds [static dependencies only]. Details - ImportResultOutputID=dd25834b38265a9506272e190f76f4b3 DependenciesID=a9b027c79dba9b2ccc50a4a4675fda90 StaticDependenciesID=788f6e8bd12abff87561b3da37c4275c 
+Start importing Assets/_Project/VFX/Materials/M_VFX_Burst.mat using Guid(e7da6f969e52a454d9aad8a15b76cdda) (NativeFormatImporter) -> (Import Result ID: '1f5e7c050e55eb9c878cdc94fae14557') in 0.0030805 seconds [static dependencies only]. Details - ImportResultOutputID=3e4c6fb8ba532cb08913e024431e5a5c DependenciesID=7b2fecffe7ab58bcd244fc5313941e8e StaticDependenciesID=4a9e5ddc46c20b5668e6d503dae1471e 
+Start importing Assets/_Project/Art/Materials/M_Track_Greybox.mat using Guid(f7e739140163768418de008f0dd282b7) (NativeFormatImporter) -> (Import Result ID: 'd8d6f2051422dc2a20dc400682aee4ba') in 0.0029787 seconds [static dependencies only]. Details - ImportResultOutputID=4a4fd872c9a7234197262f6842f5e134 DependenciesID=8c07a17ab70a9223c06532f4a5849144 StaticDependenciesID=62035c444d9177166a14e616a972b468 
+Start importing Assets/_Project/Art/Materials/World/M_W01_Leaves.mat using Guid(48b174f244981c1458679ed362980f29) (NativeFormatImporter) -> (Import Result ID: '6f17708693106d295042a6151b65d297') in 0.0026774 seconds [static dependencies only]. Details - ImportResultOutputID=5cf89837c8a8087128027ddec5ad371b DependenciesID=d505ed2d900db74da21f2fa0e2b40715 StaticDependenciesID=0b6497a8ddb2e71f606dba24441b75f7 
+Start importing Assets/_Project/Art/Materials/World/M_W01_Rock.mat using Guid(482e3b0e1f34cee4b968d90e796fa590) (NativeFormatImporter) -> (Import Result ID: '44e413358eec20a51be89b7b6a9c463d') in 0.0030616 seconds [static dependencies only]. Details - ImportResultOutputID=be08087724b28112de23b088521b893c DependenciesID=d25618e717f8a64395744b9d24976793 StaticDependenciesID=41067c7415c7af7e81c34ac736e7c0f8 
+Start importing Assets/_Project/Art/Materials/Views/M_View_Boss_M2_ZombieTitan.mat using Guid(48ee12cab388b8242b8f3696bc66be06) (NativeFormatImporter) -> (Import Result ID: '3b48845b5aa89fe3f62eb7007a474392') in 0.0026771 seconds [static dependencies only]. Details - ImportResultOutputID=1cc0b7f370a7d63e174d4fe6015cee45 DependenciesID=ae1c6f7d8b1cdacd2385a6385e62a190 StaticDependenciesID=50e69c70443e7fcf683f886fbaff0530 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/FullscreenInvertColors.mat using Guid(78a08787ca30045abb69f6f7dd878e09) (NativeFormatImporter) -> (Import Result ID: 'a2830239020e31e55f6cb44e8db87a81') in 0.0041663 seconds [static dependencies only]. Details - ImportResultOutputID=fbdb289d80b4dfb0c6052ef310e5dcdd DependenciesID=7fd73b6da6c13033970c5495802baac1 StaticDependenciesID=bdce3bbd45c97c04b13243a1129814a6 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/SpatialMappingWireframe.mat using Guid(9875a245ac49007498213638a307faa1) (NativeFormatImporter) -> (Import Result ID: '854240d5bab8418d3bdf037a72224d54') in 0.0038965 seconds [static dependencies only]. Details - ImportResultOutputID=8c31672e2bac47a169cb80ad26c91f14 DependenciesID=2d7e65880a5db11e6ac1042a61758cc4 StaticDependenciesID=a67d771a8b35f9d941e74c50b54089ff 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/ParticlesUnlit.mat using Guid(e823cd5b5d27c0f4b8256e7c12ee3e6d) (NativeFormatImporter) -> (Import Result ID: '32b9cd6ba059184ff743f30604407ae8') in 0.0028407 seconds [static dependencies only]. Details - ImportResultOutputID=b67e18eb4124e2799c46d67987c41908 DependenciesID=bae7068fe6546d80340e14fe8dc4982a StaticDependenciesID=be9b1593a0322b4f115e702504d88097 
+Start importing Assets/_Project/Art/Models/Materials/Rogue_rogue_texture.mat using Guid(1969636925f0d5640bb6d62ca08796b2) (NativeFormatImporter) -> (Import Result ID: 'dd449309edc1560c390a2e14d1bab27b') in 0.003205 seconds [static dependencies only]. Details - ImportResultOutputID=aa2d57a06755f12872ba4fe658607806 DependenciesID=f2d5e58660f38861f29afc1bbff43eb0 StaticDependenciesID=33fa6ca4e09f138fc6ec4570363d09fe 
+Start importing Assets/_Project/Art/Materials/World/M_W02_City.mat using Guid(39efec3aa4ec63a4cacefbc77ada484e) (NativeFormatImporter) -> (Import Result ID: 'd8b5b0adf94c53eabbbc4b8e6602dca5') in 0.0027272 seconds [static dependencies only]. Details - ImportResultOutputID=c9437c947a7f1c2f7611010792b9602c DependenciesID=fae91edfe91926f9df6ac47efe215d51 StaticDependenciesID=692e38f2c85e2a69001ed64cf515f74a 
+Start importing Assets/_Project/Art/Models/Materials/staff_mage_texture.mat using Guid(49f2a2102d0f84b4ea2189cb05e99b12) (NativeFormatImporter) -> (Import Result ID: '3ae134badb33c82cfcac53b3e6e19a99') in 0.0030587 seconds [static dependencies only]. Details - ImportResultOutputID=5d63f3bffefbba2ac2a0c2f72299f428 DependenciesID=ae9fead809745ae0c8619c84ec1e405c StaticDependenciesID=be896c9cec33f06542ed9a2b7b88cc87 
+Start importing Assets/_Project/Art/Models/Materials/axe_2handed_barbarian_texture.mat using Guid(4948007abf47e254082beccdb1e82130) (NativeFormatImporter) -> (Import Result ID: 'f0d1adf396576e602d4182c1e380350b') in 0.0027755 seconds [static dependencies only]. Details - ImportResultOutputID=5d9a2f1a5a6b6d4e909739bcad243e32 DependenciesID=51289e0bb5bf39b02786b01f3386ca65 StaticDependenciesID=7bad071c6066680a504da4282f2ba9fd 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/TerrainLit.mat using Guid(594ea882c5a793440b60ff72d896021e) (NativeFormatImporter) -> (Import Result ID: '8f64e337c84c291ad0b7423ec6ea32ff') in 0.0028388 seconds [static dependencies only]. Details - ImportResultOutputID=c95acde64ce51149914305e76303a8da DependenciesID=ba60f2a68aed8971d3782440da17f252 StaticDependenciesID=71cd8be062b18a84f746b30b970f0b01 
+Start importing Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Outline.mat using Guid(79459efec17a4d00a321bdcc27bbc385) (NativeFormatImporter) -> (Import Result ID: '1eb35ccd6cb07146b07fb7d8c4ac1256') in 0.0029845 seconds [static dependencies only]. Details - ImportResultOutputID=aad797138ba8884899a230f4d7da5341 DependenciesID=23f8407c72b1cdba7ad7bcba7e98ce27 StaticDependenciesID=1ea563723582ce3f40f70d3253e3ef45 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Warrior_Glow.mat using Guid(897a5a0de19eb6c4891840464e232d4d) (NativeFormatImporter) -> (Import Result ID: '27934e41fa7b33fbb6e1fb5f51e07189') in 0.0029749 seconds [static dependencies only]. Details - ImportResultOutputID=983d55f212f1a62d4ef567bcaa4a3271 DependenciesID=25255eb08c46347b5d52ff05a7e4e0ca StaticDependenciesID=81bbb611cc249bbe1b55ffefa1ac376a 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat using Guid(a97c105638bdf8b4a8650670310a4cd3) (NativeFormatImporter) -> (Import Result ID: 'f7c6a828eeddecaf95e90d816a9144f4') in 0.0028031 seconds [static dependencies only]. Details - ImportResultOutputID=22ca11cdc46a4de1abce948da0746b2e DependenciesID=ef1dd38f6d352a38f725caaddbcc8fcc StaticDependenciesID=d7a5b56f42572016fe7006064e84b507 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Mage_Glow.mat using Guid(b94c005585f67cd40baa0fa2ee808631) (NativeFormatImporter) -> (Import Result ID: 'a0f9fc7123dba10b80a32fac4d44e54f') in 0.0027863 seconds [static dependencies only]. Details - ImportResultOutputID=0e7a13962d1dac9c50d100e4128e103d DependenciesID=6af12e55501f74d74654916948c2b9a5 StaticDependenciesID=57802e57da2046b34c27fd631e2cafd0 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Warrior_skeleton.mat using Guid(d9f88c111b7b57f419723068c3496974) (NativeFormatImporter) -> (Import Result ID: 'f51b858c09e0d608103b143bda82ad44') in 0.0027808 seconds [static dependencies only]. Details - ImportResultOutputID=7dca2475afc0857c94dba47408aab8e3 DependenciesID=abad6fd80c73c3613b2b336c3c291a08 StaticDependenciesID=c3e1d570707968584bd81745f654c3c9 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/SceneTemplates/Materials/White.mat using Guid(f96821bbefeea864b9b418af4b8615ac) (NativeFormatImporter) -> (Import Result ID: '4e050d2d4984e5d0b278bbbbc42f926e') in 0.0031093 seconds [static dependencies only]. Details - ImportResultOutputID=134e72518c318e56de564f27d152f02c DependenciesID=bc94b86fa7f6b6a4edbb90fa61f0d5f6 StaticDependenciesID=ca7d6bc3218ed699fbbbf7e9c0c31951 
+Start importing Assets/_Project/Art/Models/Materials/Goleling_Evolved_Atlas.mat using Guid(2a31afc6f72061742bcab063843c75fc) (NativeFormatImporter) -> (Import Result ID: '4d5fc77dab32ebfa17d5eef427dca6fc') in 0.0029124 seconds [static dependencies only]. Details - ImportResultOutputID=966fa1dfa03a0263017ddebe0288a3a9 DependenciesID=fd65ef7d6656464b6af9aace2f041ae4 StaticDependenciesID=4c85c7209b56b6eecf7389e92c48197a 
+Start importing Assets/_Project/Art/Materials/World/M_Gate_Panel.mat using Guid(4a4a8e8bed77d454b98e0305f18fef0f) (NativeFormatImporter) -> (Import Result ID: 'df35859d386f0b702f7605c45401471e') in 0.0038273 seconds [static dependencies only]. Details - ImportResultOutputID=9fc9b290b65d280ed89759d4c1e8dbf9 DependenciesID=d0cdaa87619ab0e83d876ec60aca6e8e StaticDependenciesID=2756993f936da70586136d83e1a5797f 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/SimpleLit.mat using Guid(6a1143ee683302f4aa628c052723efc1) (NativeFormatImporter) -> (Import Result ID: '06fd271014b08ab1bc3c810b1e6a1775') in 0.0040954 seconds [static dependencies only]. Details - ImportResultOutputID=7684fb890051bebc6300c62adba95777 DependenciesID=01ef15c2c7ace1ae0522c44d10225e4c StaticDependenciesID=a576486a76d764e399e9d843838139a9 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/RendererFeatures/SurfaceCacheGIRendererFeature/FallbackMaterial.mat using Guid(8a239b3da89050c4e89ac06b168fc684) (NativeFormatImporter) -> (Import Result ID: '97c0aa4703b85cc01a137ccb39ee13ae') in 0.0036638 seconds [static dependencies only]. Details - ImportResultOutputID=e6dd59b155dac1e853623ca2bbb912ec DependenciesID=be7e0626a73f2d8a5cc6faf5add5038f StaticDependenciesID=ddfe57dd7a5224e2238b2a52f7978275 
+Start importing Assets/_Project/Art/Materials/World/M_TrackStripe.mat using Guid(aa6db0bf4c530b346918a84b821a2330) (NativeFormatImporter) -> (Import Result ID: '7100be17f6dac06b0a6b1a71501e3e5c') in 0.0027222 seconds [static dependencies only]. Details - ImportResultOutputID=b23cf3b1690dfb8d9c6f1c7fba281fb3 DependenciesID=208382e11f33d8264354b9cfb0af632c StaticDependenciesID=573e5955760423f22779488e5ee9a484 
+Start importing Assets/_Project/Art/Models/Materials/Orc_Atlas.mat using Guid(dad858d8e669fdb4bb253a4303b6d0aa) (NativeFormatImporter) -> (Import Result ID: 'f73d54fd5aebf65d3b43a62cdc9d9648') in 0.0029732 seconds [static dependencies only]. Details - ImportResultOutputID=0fddfc1bb629fe970025dea788a03363 DependenciesID=e71b81477cb412d392d46c487ff7be69 StaticDependenciesID=95a04b523e163ab3e9e377e108bd577d 
+Start importing Assets/_Project/Art/Materials/World/M_Gate_Trim.mat using Guid(3b3d3950e4b802741abdcfd9900d5b12) (NativeFormatImporter) -> (Import Result ID: '5f28e2ce842f721c65e2075b69f56373') in 0.0026351 seconds [static dependencies only]. Details - ImportResultOutputID=fbd6e0a709598889528fe2c7483aa06f DependenciesID=5dc9cfd09be5963beba65fadee35f302 StaticDependenciesID=3556b1044d9437129381d5c710ec8e35 
+Start importing Assets/_Project/Art/Materials/M_Gate_Positive.mat using Guid(5bbafae86487e2b4abe8c2a547dcc32b) (NativeFormatImporter) -> (Import Result ID: 'c73d04ac79be4cf7cd042cf18932d885') in 0.0031851 seconds [static dependencies only]. Details - ImportResultOutputID=04e62ee3315cdc446b7861194cff8fbf DependenciesID=fcb18c3fc28e6fd06a3382d2124c2168 StaticDependenciesID=1a362ea495eda15e284256d4c460d7ba 
+Start importing Assets/_Project/Art/Materials/World/M_W03_DeadWood.mat using Guid(ab46b2b2f9451de4d963929ebdd0925e) (NativeFormatImporter) -> (Import Result ID: 'bb383e3ffa6a1b7bc527e44a71bca240') in 0.0029628 seconds [static dependencies only]. Details - ImportResultOutputID=fb1bf1a393460af922ee2fe4aa1e89b9 DependenciesID=8543a073f8123421a82405ec524130fa StaticDependenciesID=667c17333e4804481701740600adb889 
+Start importing Assets/_Project/Art/Materials/World/M_W03_Flower.mat using Guid(ab2861fdf614ad2468a20d38b31b1014) (NativeFormatImporter) -> (Import Result ID: '1e3aae74f004c3d0121553b91e1fb673') in 0.0030537 seconds [static dependencies only]. Details - ImportResultOutputID=0bdf0ce471c0f13853a85225ce4d044f DependenciesID=ddad4de1223fa577b5ed7466618cac20 StaticDependenciesID=f5d295165a213862e2aa1abe69d46a5e 
+Start importing Assets/_Project/Art/Models/Materials/Dragon_Evolved_Atlas.mat using Guid(db72f5daaa1d0164a99af1ff926e1eae) (NativeFormatImporter) -> (Import Result ID: '68eec2e264af5434937229458f49b689') in 0.0029822 seconds [static dependencies only]. Details - ImportResultOutputID=b70b0d72e9a07f9baf6201991ba1de6a DependenciesID=4a7dace9bb4a6642eaca6d1b08d9c5d6 StaticDependenciesID=ac16044823f3298416217c1e6a270cfc 
+Start importing Assets/_Project/Art/Models/Materials/shield_spikes_color_knight_texture.mat using Guid(db2ad3f82f0b4ec41b299a5beec88259) (NativeFormatImporter) -> (Import Result ID: '7d6a195c87966108c824d53039680a2b') in 0.0029347 seconds [static dependencies only]. Details - ImportResultOutputID=d0a9cec25fa03788fc60ed4524347889 DependenciesID=f8a3db2ddd8a61c7421f7af3790e3cee StaticDependenciesID=31b2a65732a19ab39c0f24bf5a6dc97f 
+Start importing Assets/_Project/Art/Materials/World/M_Track_W03.mat using Guid(db8f7ca96f61ceb4a817f1936493bc6f) (NativeFormatImporter) -> (Import Result ID: '3e0c89de45cf780e90c9f65aa4dc0e69') in 0.0026184 seconds [static dependencies only]. Details - ImportResultOutputID=30d64ffc3321900d82fe142fb1307610 DependenciesID=31b072da37f1eecca3147e0b88a4e40f StaticDependenciesID=4f7ce5b1c5055f3719be22d6973c0064 
+Start importing Assets/_Project/Art/Materials/M_Unit_Shieldbearer.mat using Guid(4c3e46bf446b4e44dad015847532593b) (NativeFormatImporter) -> (Import Result ID: '920488fb5940d1106b7cbb316d393577') in 0.0026483 seconds [static dependencies only]. Details - ImportResultOutputID=a1cabe7eed95529f2a9addc87cd4308c DependenciesID=e2bd4b3f54e5a2907d2a3b99460a38ba StaticDependenciesID=8b14d7b77ed9a0153274ea85b2258a5c 
+Start importing Assets/_Project/Art/Models/Materials/quiver_rogue_texture.mat using Guid(6cecca7ab2a299c409befd4272870adb) (NativeFormatImporter) -> (Import Result ID: 'dafe7e298e6854d4e0167a62c67cb7b7') in 0.0027285 seconds [static dependencies only]. Details - ImportResultOutputID=fbe48f696ed84027f217e34320b9c2a2 DependenciesID=a4b09d9ed08677cea4f432950df0266e StaticDependenciesID=09adba649ecf2590a3b5bc1c218f8283 
+Start importing Assets/_Project/Art/Materials/Views/M_View_Boss_M2_ZombieBruiser.mat using Guid(ac56929bc801fb34088b609cbc268276) (NativeFormatImporter) -> (Import Result ID: '41c27395b5d383783cf52bb84ce7f8cf') in 0.0029446 seconds [static dependencies only]. Details - ImportResultOutputID=0377773f57e02efc71c4be62f0ca36ab DependenciesID=37eac60fa17758162e684b56b780195a StaticDependenciesID=ccc211dee24d91c32ea42e9e356e1a2a 
+Start importing Assets/_Project/Art/Materials/M_Unit_Soldier.mat using Guid(2d8b188715e9c2646bb00570ab5964ac) (NativeFormatImporter) -> (Import Result ID: 'c6a6b79a80206e03e5d390321bde4aa0') in 0.0031814 seconds [static dependencies only]. Details - ImportResultOutputID=2a27d995ad8eb24fcf8100b0125c78df DependenciesID=4dfc4e7160019784bc5606a39b68b472 StaticDependenciesID=26fefb6b52c0166d9c495b2c1fd3300f 
+Start importing Assets/_Project/Art/Models/Materials/Demon_Atlas.mat using Guid(3dc9906c57060be46b3e0cd03d67ee73) (NativeFormatImporter) -> (Import Result ID: '96c0f4e6ed3fdf0c503a011dc9174edd') in 0.0028513 seconds [static dependencies only]. Details - ImportResultOutputID=00f058bd6d612f12d729ca2d94e34392 DependenciesID=29cbb08c197f28bc4497ba6a19175b11 StaticDependenciesID=ac825585d2d61e1552782adf13115a32 
+Start importing Assets/_Project/Art/Materials/World/M_W01_Trunk.mat using Guid(4d0b87979980c014c9ba47f2cfedcb05) (NativeFormatImporter) -> (Import Result ID: 'bc11e16bf036d7b5c94a517cf2da1b22') in 0.002846 seconds [static dependencies only]. Details - ImportResultOutputID=dac88bd5171508aa8aa3a3f3b9cab5fd DependenciesID=edae19b08c200d928c2a7431121e27cf StaticDependenciesID=4a7eca9feff75ae382e32d8517dad163 
+Start importing Assets/_Project/Art/Models/Materials/crossbow_1handed_rogue_texture.mat using Guid(6d8cae50349eced45ac8a2db42283157) (NativeFormatImporter) -> (Import Result ID: '8443bbf67ac0567cf43be8866804a82d') in 0.0028508 seconds [static dependencies only]. Details - ImportResultOutputID=4b1b2f192ecb4ea042ecf8ccca3329df DependenciesID=c6faae706ff5ae2b20f55c24645c57c8 StaticDependenciesID=718e3e747e30c1fda52b563e7be8c4ae 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Rogue_Glow.mat using Guid(8d5a5b8d9947dcd4d854f9bd15730ff5) (NativeFormatImporter) -> (Import Result ID: 'fddafb739f69995644db7f6af368090d') in 0.0030331 seconds [static dependencies only]. Details - ImportResultOutputID=a0a44823793961e2bf7d3cb106e89d41 DependenciesID=1e2ae3db483b6a2d5322fe283bf5fdf8 StaticDependenciesID=750fad841b2904f5ccb348964d987994 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat using Guid(9dfc825aed78fcd4ba02077103263b40) (NativeFormatImporter) -> (Import Result ID: '83b76f6f2b0497e86647f4426791c839') in 0.0030165 seconds [static dependencies only]. Details - ImportResultOutputID=1487b5282f24651035393235ba08ab7d DependenciesID=641f4360ff2d2a1d49f3eb7318dab6b0 StaticDependenciesID=f65a2aa7c1ad289186181f36c884a7f1 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Minion_Glow.mat using Guid(adc234c56232dfc48b6dfee2206e90f4) (NativeFormatImporter) -> (Import Result ID: '7758f60d8a56e0ea6b2a7fbf1887f062') in 0.0027653 seconds [static dependencies only]. Details - ImportResultOutputID=c1bcac594ba9fda3c628321b59d08bfc DependenciesID=c08377878468a6c124db3b46613db376 StaticDependenciesID=1f95826586d52fee05a88e2f90e1797f 
+Start importing Assets/_Project/Art/Materials/M_Gate_Negative.mat using Guid(0efdb53ba57da374789f9bdb3be610bd) (NativeFormatImporter) -> (Import Result ID: 'c87789dcad2b7ddcf5fede5ff2b4adf6') in 0.002764 seconds [static dependencies only]. Details - ImportResultOutputID=6112cf0c38d831ba7119c5e84cd00f08 DependenciesID=6da78a87619888550de60a634b56ea6b StaticDependenciesID=b7b1320ad8ef630e8c7b3ff0c476cfda 
+Start importing Assets/_Project/Art/Materials/World/M_W03_Scrap.mat using Guid(4e049f73a80f61042bef18d0ef39d62a) (NativeFormatImporter) -> (Import Result ID: 'adf11acc4104a7cb00e65e835468e28d') in 0.0028523 seconds [static dependencies only]. Details - ImportResultOutputID=223b26f532edc8241e7e97537de53b42 DependenciesID=37c4833052ea0a2bb00504d3e59290a3 StaticDependenciesID=2828130d1217a27a728b3aca04473934 
+Start importing Assets/_Project/Art/Materials/World/M_W02_Lamp.mat using Guid(eee85393eacf1e54d945c4ac80b83d1a) (NativeFormatImporter) -> (Import Result ID: '213a22204f8a1adf31e40dd90a284719') in 0.002776 seconds [static dependencies only]. Details - ImportResultOutputID=06d09f3ea58a88663072607b7c14a2e4 DependenciesID=275ee2896ee2ac5ef56a2be1d5c15f61 StaticDependenciesID=2dd65a72240f279d358f926f40d94999 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/SceneTemplates/Materials/Black.mat using Guid(4f1ef37ae953c484bbc5d5e4049147e5) (NativeFormatImporter) -> (Import Result ID: '2a5f8d2163b45ba87a10f0054e026e01') in 0.002997 seconds [static dependencies only]. Details - ImportResultOutputID=036f93a340669f186935d82cf2b93f92 DependenciesID=05caf8e5fb935fe661f03b68d80fbd47 StaticDependenciesID=ef64bea84ee4df238a70abb715337f6a 
+Start importing Assets/_Project/Art/Materials/World/M_W03_Metal.mat using Guid(5fdd6074ce62f6d4894d16d858a08a03) (NativeFormatImporter) -> (Import Result ID: '6e87db4d376b0751b88e8b0dc5ae896e') in 0.0030594 seconds [static dependencies only]. Details - ImportResultOutputID=7b06c6bdc420b80c5505a3d767785c1d DependenciesID=34f99effc30257eb3922df2db41b39b5 StaticDependenciesID=c76e322b278e210cdcb6a768e257c0a0 
+Start importing Assets/_Project/Art/Materials/M_Unit_Archer.mat using Guid(7f806659471c56544baec6962a182b38) (NativeFormatImporter) -> (Import Result ID: 'd537ecdb6798b018133842358ddc5dbd') in 0.002935 seconds [static dependencies only]. Details - ImportResultOutputID=9ed603a8ea8f691a3be5a915a66d9aaf DependenciesID=44ca532768590e672a854e51d20dc342 StaticDependenciesID=f8341e4013f3478037e6162642763613 
+Start importing Assets/_Project/Art/Models/Materials/Skeleton_Minion_skeleton.mat using Guid(efd0087c4f424f14d81c75d464f389ba) (NativeFormatImporter) -> (Import Result ID: '32ff0cd6eb2a583b22f3600d29457b30') in 0.0031995 seconds [static dependencies only]. Details - ImportResultOutputID=b6f7241175b69cf84bf0c766960f859b DependenciesID=201f404ef7aa48cb23244e00ce3e26e9 StaticDependenciesID=2fd00dec08e7c51ca11b534be7473293 
+Start importing Assets/_Project/Art/Materials/World/M_Gate_Sparkle.mat using Guid(ef4c15018e7f27441aa7e267d6804534) (NativeFormatImporter) -> (Import Result ID: '3f76255fd32ea03f32c92e935f2121c1') in 0.0030935 seconds [static dependencies only]. Details - ImportResultOutputID=fefed6274bf67ffc2e78d06f1d8be260 DependenciesID=c70a9cb70da303fab8107729f59ce309 StaticDependenciesID=6fde5463c5aedada2954d373cb7edebf 
+Start importing Assets/_Project/Art/Models/Materials/sword_1handed_knight_texture.mat using Guid(ff793eb168ce4354a95f857239cbbea5) (NativeFormatImporter) -> (Import Result ID: '30040c9b2eb6b3bb70f4c397dac0bf24') in 0.0037437 seconds [static dependencies only]. Details - ImportResultOutputID=1fff8c8a3ac0a3628d4babcc6d8444f9 DependenciesID=ed5c4e46038b85136709a7fface07662 StaticDependenciesID=eb1d488855cffe744ec9ce49b78750ad 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-Black.ttf using Guid(1062c701058745940ae5dca6219c64c8) (TrueTypeFontImporter) -> (Import Result ID: 'bc27a5a087e1a9696d309093a608a05c') in 0.0065393 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=1f6b427bcf6811905e7df3cdc4beb00c DependenciesID=f4fcd38d5d90e3b8f744f44e79d93060 StaticDependenciesID=8769043cd60802e4899c1ca40720c3bd 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-Regular.ttf using Guid(30dc370b164eefc43b95744fc796dad0) (TrueTypeFontImporter) -> (Import Result ID: 'a523ec07ab2a32da51cdd6d6c01666aa') in 0.0040701 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=66e6f95a9e40f8563bbf8b9741052763 DependenciesID=48405f908e04357934b34bf256dd5437 StaticDependenciesID=6ddff9a7f74ffa96cd9d58d9ef00ebbb 
+Start importing Assets/_Project/Art/UI/Fonts/KenneyFuture.ttf using Guid(e071f67601014e841a5b19a737fcb71a) (TrueTypeFontImporter) -> (Import Result ID: 'aa55b259853906cd0dd275e387a76515') in 0.0028763 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=04643e3c85b1fe1f4cd6f6972f246e11 DependenciesID=2815ff6cf1e4a630f6e488a7e2abc2e0 StaticDependenciesID=f2d59f064bc0ef159fc282baa3de3a15 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-ThinItalic.ttf using Guid(b2ea3b3f1765e544b9eb5bd1a93a91ce) (TrueTypeFontImporter) -> (Import Result ID: 'f0bf6296925ec8cde9d5124eedcdc614') in 0.0038867 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=5dcb7a172f2418198236902eb861f3d3 DependenciesID=3dc8f0c8ed759cddd6ef68087b2673c4 StaticDependenciesID=e962e16016a5315e1f58de7473fc0201 
+Start importing Assets/TextMesh Pro/Fonts/LiberationSans.ttf using Guid(e3265ab4bf004d28a9537516768c1c75) (TrueTypeFontImporter) -> (Import Result ID: '323d59e8d27884f2366b48f753aa657f') in 0.3458922 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=2eef6926c3a5b396e6e589b4b8b8b52e DependenciesID=ecd2b20cc7051938a5dab19ca8c9ad82 StaticDependenciesID=0ce0cac4f5b6567b103b6ac0fe7476b2 
+Start importing Packages/com.unity.render-pipelines.core/Runtime/Debugging/Prefabs/Fonts/PerfectDOSVGA437.ttf using Guid(74a5091d8707f334b9a5c31ef71a64ba) (TrueTypeFontImporter) -> (Import Result ID: 'f23f83ecfef54fa5e502e4584bbb4fe1') in 0.0040561 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0816cf6a0590bde5d992c13efc87b0ec DependenciesID=62cbb02289e680a52c176ba9c27645b9 StaticDependenciesID=10a64186dc1499722a0edb3f50a15d7c 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-Medium.ttf using Guid(a51a3aebb43ac044989270407476b208) (TrueTypeFontImporter) -> (Import Result ID: '110e529d3b0fa982305ef299973696fe') in 0.0039678 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=edbc0a49cb69f68763e8028213b48b41 DependenciesID=90bfb7254bed038754a0889d7a4fcb44 StaticDependenciesID=b81d2aef7af8a61e89aa237e7339be1c 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-Bold.ttf using Guid(3750c318f40cab44a97d3a81beaefeb3) (TrueTypeFontImporter) -> (Import Result ID: 'f99794e54f9d6ccabd0147981b7c14f8') in 0.0039861 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=b3076253d70c83b5b519609aeb7d36b7 DependenciesID=0c6458aac5be400fb1ca56ea3f8003fb StaticDependenciesID=44b3ad6ad599e865cc58040387922510 
+Start importing Assets/_Project/Art/UI/Fonts/Kenney Future.ttf using Guid(28346e46b7346ab4698aa821130c803b) (TrueTypeFontImporter) -> (Import Result ID: '55210305e39c35e8dac039974147ec2a') in 0.0031691 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=b8c9f1470193e8f6d4ec670a12e2adae DependenciesID=af9cceb810f57819a25f1be49f55ac23 StaticDependenciesID=157718589950776a51e67dacdf8f0260 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-Italic.ttf using Guid(c839255fc8f6b4b4d90bf8c1af9f9bd1) (TrueTypeFontImporter) -> (Import Result ID: '89f9a404dcf37ac73d47b1834a7e84b1') in 0.0040252 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=6658813fad56f54796c1f50f7dedaab9 DependenciesID=08abfc86d367740ac96bec26edcb6395 StaticDependenciesID=a48ab3a3651538d58dda5c848d1dae53 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-Thin.ttf using Guid(19a9abb883540be48b75b951a927ae03) (TrueTypeFontImporter) -> (Import Result ID: 'aa4248014b9cd00a1faa41bfaeaf04f6') in 0.0043136 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=b895562f0d99eee58233cbbb67856bc5 DependenciesID=5e7f98e685662f96b5f08e9cce61ff70 StaticDependenciesID=be4856d7870e5b80a733ba509901d682 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-MediumItalic.ttf using Guid(d93c1bc57fdf1ac4dad1bf04fac05464) (TrueTypeFontImporter) -> (Import Result ID: 'edf7a0a9dd5c3e5c94dac643e883f585') in 0.0040798 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=9142617353603815881ee863f48bffc4 DependenciesID=631e68951feb5b0ec4bfd041b4f4e437 StaticDependenciesID=a623c885c89de8a57aed423d2edf4cec 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-BlackItalic.ttf using Guid(f95147a9bab9fe649b8070170fa7ebd2) (TrueTypeFontImporter) -> (Import Result ID: '7a17990ab8ededa8da15b06cac782332') in 0.0042105 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=112849eff3a0fb78c6e8b2050b6a2afb DependenciesID=a14e2b795c8350022b82d045a76dead3 StaticDependenciesID=c78a76017fc52cd8de1a7d737eb47037 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-Light.ttf using Guid(2a29e27936eb547458f646f71125b264) (TrueTypeFontImporter) -> (Import Result ID: 'e6779633578fea008dc60b7c7d50e891') in 0.0041963 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=5d34cbbc3b3b2ebc82e0685424994a7f DependenciesID=d0c95bb4cd7d042fce42ca780629d412 StaticDependenciesID=f3c48e44c13a01b9ebc158712116b70c 
+Start importing Assets/_Project/Art/UI/Fonts/Kenney Future Narrow.ttf using Guid(4d3483e60a5fdb347866926f0bb14e8e) (TrueTypeFontImporter) -> (Import Result ID: '4a3b88206578c79d622368a8c301f1c0') in 0.0029697 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=8d60d93d44bd49b1c51a646bcb4d25e6 DependenciesID=af2345aa1e981f513b978980ac2d0a83 StaticDependenciesID=7c6c865ae01983ac4dc037cbeec67052 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-LightItalic.ttf using Guid(5e63515167650a541b309ba3bfd4db3d) (TrueTypeFontImporter) -> (Import Result ID: '434468cd243955013f78e6f18a6a61d2') in 0.0044962 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=6be90ad68a70c4a9be88bf553212a9de DependenciesID=52b7ad79ddc9a4c84e5d4389a926214b StaticDependenciesID=bb5991833a2585ac67324304622128d7 
+Start importing Packages/com.unity.searcher/Editor/Resources/FlatSkin/Font/Roboto-BoldItalic.ttf using Guid(dfb97a9307a577a41bcacba34b9a7e32) (TrueTypeFontImporter) -> (Import Result ID: '0a0acec96464dbe61b84354f452ef9fb') in 0.0043639 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0311032ec867baeca3e908ee0924a08c DependenciesID=f558ddffc02d7c22dbf0689609ae542f StaticDependenciesID=cda386059291959e47d318b4c13944db 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/BuiltIn/BuiltIn Lit Basic.shadergraph using Guid(2019d78ad3d1c5c4a8d309a857ca449f) (ScriptedImporter)Launched and connected shader compiler UnityShaderCompiler.exe after 0.02 seconds
+ -> (Import Result ID: 'ce0e4694678d1d49e92c47a48d8c6d8a') in 0.4649652 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=f8a930a3f5e732b107d29dfc55d7b975 DependenciesID=ca4c56bb09e7683cbbcd4153c8f3c827 StaticDependenciesID=c4d56035752e57e77144d7cef665aef2 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/ArnoldStandardSurface/ArnoldStandardSurfaceTransparent.shadergraph using Guid(30fa68ce467463643a86b839ca0eb195) (ScriptedImporter) -> (Import Result ID: '2f804a9717bea2ba8302acb911bf4692') in 0.2418087 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=367652f149722b10b20265c3a0214da1 DependenciesID=fc1a78d875a1f9c4bed45f2793ff7c9d StaticDependenciesID=88d8d17e3ded986c1388ce57ef2fd2b8 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/AutodeskInteractive/AutodeskInteractiveMasked.shadergraph using Guid(80aa867ac363ac043847b06ad71604cd) (ScriptedImporter) -> (Import Result ID: '421fcc27913474904eb2f180de70e191') in 0.1604704 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=51ce70cebb52ef775a1125dcf08258b8 DependenciesID=804f9bde36d88cf596f2c489e7c03563 StaticDependenciesID=f225c9563410f7419ba6839cba1b7c3f 
+Start importing Assets/TextMesh Pro/Shaders/TMP_SDF-URP Unlit.shadergraph using Guid(124c112a6e8f1a54e8b0870e881b56d8) (ScriptedImporter) -> (Import Result ID: '13cd671543109e727bb75493199ecc74') in 0.206941 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=688d704cebb62926d34f7810d7b17621 DependenciesID=ae8646603609e78049e459ef793eb067 StaticDependenciesID=4d92b72681b670909d260e51fc098945 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/0_Lit Basic.shadergraph using Guid(a2407126e3372f64cacb75ed466a5621) (ScriptedImporter) -> (Import Result ID: '1b3e828099b89d97853330dfecdb65c3') in 0.2198951 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=23bbf9a06c1744889cfac74491cc9d8a DependenciesID=44fd814a83c29b3d48c37ea091bbcf54 StaticDependenciesID=2e25f65f84f5adfb6d267ac14cd4f15f 
+Start importing Assets/TextMesh Pro/Shaders/TMP_SDF-URP Lit.shadergraph using Guid(a3d800b099a06e0478fb790c5e79057a) (ScriptedImporter) -> (Import Result ID: 'bfc903c664afe2d53cf18dfb3d469723') in 0.275296 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=5e58fe9df01c406ffc88795617387c2c DependenciesID=e26bd48e5eda6e5cfd0bbe79732c2912 StaticDependenciesID=77208b9b8a965d435931d12f078c70b4 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/Unlit Simple.shadergraph using Guid(2476a2d151e824143af40dce1fc93a12) (ScriptedImporter) -> (Import Result ID: '04e76ca14e4a71bcff54553e5e13ff3e') in 0.1804089 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0e4634374f257c69426d8407b7cd8cc9 DependenciesID=8f54d6ee278b5bbe86258ff4473e279f StaticDependenciesID=582fb5030312040de8b6b06aae7a8f07 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/2D/VFXSpriteLit.shadergraph using Guid(24a73dccd7b6fad4798be282f96a21f4) (ScriptedImporter) -> (Import Result ID: 'a14feb2d2a3f4288e1ceb3ace1c26280') in 0.1669048 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=7f28413a438277c0a7db605a3b11926c DependenciesID=fc878f671a3fd2d6c6dab9ab26174725 StaticDependenciesID=9ff367b96aad3d03de75fc458b5cc63b 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/PhysicalMaterial3DsMax/PhysicalMaterial3DsMax.shadergraph using Guid(44245ab89240f51459a5077d7145c452) (ScriptedImporter) -> (Import Result ID: '38d2b2b458f05ec68f62549cd5d6bcfa') in 0.1886166 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=9dc449218f30bd7e2102a6cec7b20a4b DependenciesID=32d29ea9daf17c33cd60a68689f60a50 StaticDependenciesID=13deecba99a1aa83f89dc1f87cb513c8 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/GraphTemplates/2D/1_2D Sprite Unlit.shadergraph using Guid(25a0ebb4827f3cc47a1af2c79005f65b) (ScriptedImporter) -> (Import Result ID: '596b87cdaf489f82ccd44628b98c821e') in 0.1299519 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ff24f76bee0c2cb52507e6395fc6fed7 DependenciesID=d2f3ff16a438c0ebf195ae78a5137d3c StaticDependenciesID=018d5a676ce6b576fcfe813052a13339 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/BuiltIn/BuiltIn Unlit Basic.shadergraph using Guid(9618d41bb71f74048bb6cace8785b93d) (ScriptedImporter) -> (Import Result ID: 'a1c10f20ce9a6c72b1c1cc7c92417bc2') in 0.0877261 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=7ad9e7ca2cc616e67764da75ea486aa2 DependenciesID=90abe160b5975c74f424fbaf8a9222d8 StaticDependenciesID=2ac172b19b95b16bc99d6e1471e65cc4 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/2_Particle Lit.shadergraph using Guid(a680d9a9f8b66514abbfd3ae1c8f77f7) (ScriptedImporter) -> (Import Result ID: '69fba7aecf36a3696918d8d0a5b3dce1') in 0.1639275 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=2851af8bcd1567e55021287d2d21c89d DependenciesID=28664605195e770f3c0edabac218df93 StaticDependenciesID=736e49b2aa9b1879387ad984d242d66b 
+Start importing Assets/TextMesh Pro/Shaders/TMP_SDF-HDRP UNLIT.shadergraph using Guid(f63d574838ccfb44f84acc05fed0af48) (ScriptedImporter) -> (Import Result ID: 'e73ec381e139fe41ec036677ae04581f') in 0.0352734 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=cdecf8282673f6846d2a6b31e10d03bb DependenciesID=e0d1d2a3e77c2be9b028366084b204b8 StaticDependenciesID=349217185f197da7ae2fb8cb5e464158 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/GraphTemplates/UITKBasicTemplate.shadergraph using Guid(0738648e2f2f84b489a2f0076b69e30a) (ScriptedImporter) -> (Import Result ID: '92f42668b63c3499ad173015dabd3a36') in 0.0824075 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=52c2545ff8d1ec04234d2cb5e8288914 DependenciesID=fae967565aae6812adfa77ade53f61ae StaticDependenciesID=952bc4536cf7ad364dae7947b6df8016 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/1_Decal Material Volume.shadergraph using Guid(1716ff8c1e51af14280cc97fbcba3b11) (ScriptedImporter) -> (Import Result ID: 'e84ccb7f862d0584b65809f2fe8d581b') in 0.1555494 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=a14de2e93884dedbe674c5351ba0b8ee DependenciesID=e60d420571e9fe247f5e9d26901fae74 StaticDependenciesID=864a5a960fd14e2f97be69ed62c49d4b 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/ArnoldStandardSurface/ArnoldStandardSurface.shadergraph using Guid(3739e562a03fc0b4982d8aa66cc50865) (ScriptedImporter) -> (Import Result ID: '94b8cd999f4c7635bf8ffb2f7b5c6acb') in 0.1560375 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=24ee4c247655716117be0c75443bf590 DependenciesID=1b811359e8b924fa4a8b03374c3ae58f StaticDependenciesID=27c2ff44df1d539951c42a09dc3b8dae 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/2D/VFXSpriteUnlit.shadergraph using Guid(d7288f66e4fb0634c9afef98c31b722a) (ScriptedImporter) -> (Import Result ID: '7fd17ce74a3e384063b5929c19264b7e') in 0.1392426 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=7fe1be672370828fd7c14ab81dccde36 DependenciesID=1683755e4d8c2bebbbee8a09b46d5b4c StaticDependenciesID=4950db00f806de0114b75629d56fd4ca 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/0_Decal Simple.shadergraph using Guid(39144937a5efe954dac51acbbe54157e) (ScriptedImporter) -> (Import Result ID: 'f267c0a7556282ac13fc899d66e9b726') in 0.1798686 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=5bb5587b02ef7199d46be41198d67f0a DependenciesID=2a27a79ae5ba1cc521d11759abdd32f2 StaticDependenciesID=e1c521167883f8aeee39b30589a13097 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree8_PBRLit.shadergraph using Guid(9920c1f1781549a46ba081a2a15a16ec) (ScriptedImporter) -> (Import Result ID: '728e8409c988211e0e4c27c9d20165f7') in 0.4411897 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=7ef990247813ea3b1c63b49f77538d07 DependenciesID=023654a9cb852b6e76ca206155119539 StaticDependenciesID=98e8093249204c2e70ba90ddc2e82b12 
+Start importing Packages/com.unity.render-pipelines.universal/Runtime/Materials/PhysicalMaterial3DsMax/PhysicalMaterial3DsMaxTransparent.shadergraph using Guid(1a207e3bee00db44b940e6f362a8e148) (ScriptedImporter) -> (Import Result ID: '606c7e06620f16e9995d63a691a9f50a') in 0.1729364 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=60b3c24e934118d6a59bd2f6aae9d454 DependenciesID=47430966451b7aa17559076bd12c4c21 StaticDependenciesID=f1c4913a49e4db3f9700040a40c8c8a9 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/UGUI Canvas Basic.shadergraph using Guid(5a4a765e921b8554eb959f7cf697b3be) (ScriptedImporter) -> (Import Result ID: 'ef50d2e483307e51be3779b03c7b0e12') in 0.1231812 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=1fac57eb0152c51ce5bbde521f096767 DependenciesID=18c7dd72a615264ca5eeed2891ae96fa StaticDependenciesID=6964909b285201e949374507011a51e0 
+Start importing Assets/TextMesh Pro/Shaders/TMP_SDF-HDRP LIT.shadergraph using Guid(ca2ed216f98028c4dae6c5224a952b3c) (ScriptedImporter) -> (Import Result ID: 'c5e6aedb237fb4e19adc3c61f573cb77') in 0.0365713 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=9612617ad5c1a0b6827fdfb11bd374eb DependenciesID=9825fa5d0d592fe8bfbeba481cc37de4 StaticDependenciesID=912206566273b28d14e05264cace116f 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/Decal.shadergraph using Guid(9b4e681081e2b4c469111bb649e2f7ee) (ScriptedImporter) -> (Import Result ID: '3534b12bcbf3c4ebd9d40799b5503b5a') in 0.1293769 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=1402d62fe207cd1e7a00f6e903a39c93 DependenciesID=683af1fa427f48230dd777ba4507f5af StaticDependenciesID=6833719633bf5dc6318dd56707e4d650 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree9_URP.shadergraph using Guid(cbd3e1cc4ae141c42a30e33b4d666a61) (ScriptedImporter) -> (Import Result ID: '6638b77399c42714d6758d36b9f4bfbe') in 0.3116284 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=d1553293be3bbcb55e861708039729f4 DependenciesID=2ecb2bae78d8587f1f125edc37cb0a7c StaticDependenciesID=63ce5cdb606bddb176a4a202b2f6797f 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/FullscreenInvertColors.shadergraph using Guid(fb6390f650ca44a5ba3246d8dda47927) (ScriptedImporter) -> (Import Result ID: 'c3fe6fe17d1fd76d3a063b809b45279c') in 0.1515032 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=4c7e3a2b617678178f5e1186557b4f7a DependenciesID=eda0d96f1c02364f6f7aee2ddc1f28bf StaticDependenciesID=eea1017ea7af16ce850888e952fbb000 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/AutodeskInteractive/AutodeskInteractiveTransparent.shadergraph using Guid(5c81372d981403744adbdda4433c9c11) (ScriptedImporter) -> (Import Result ID: '8e10aa9c5bf421f9226dc4c931f2af86') in 0.1970996 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=e0f6c7ec645e9c1f38f2300bbfa1de3e DependenciesID=d02e327d2ee4238e0d8a66a6912789d9 StaticDependenciesID=5446af8d4dd74f663244caa478ad9559 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/GraphTemplates/Terrain Standard 4 Layers URP.shadergraph using Guid(bc3def193b270c649b041063a70a1a1f) (ScriptedImporter)Shader 'Hidden/Terrain/Terrain Standard 4 Layers URP': dependency 'AddPassShader' shader 'Hidden/Hidden/Terrain/Terrain Standard 4 Layers URP_AddPass' not found
+Shader 'Hidden/Terrain/Terrain Standard 4 Layers URP': dependency 'BaseMapGenShader' shader 'Hidden/Hidden/Terrain/Terrain Standard 4 Layers URP_BaseMapGen' not found
+Shader 'Hidden/Terrain/Terrain Standard 4 Layers URP': dependency 'AddPassShader' shader 'Hidden/Hidden/Terrain/Terrain Standard 4 Layers URP_AddPass' not found
+Shader 'Hidden/Terrain/Terrain Standard 4 Layers URP': dependency 'BaseMapGenShader' shader 'Hidden/Hidden/Terrain/Terrain Standard 4 Layers URP_BaseMapGen' not found
+ -> (Import Result ID: '75e88c6f9b52bc7b49c683f8dde0cf61') in 0.5223836 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=11f882cab0b29593cea75cb59c723e74 DependenciesID=6766ffd0b8a0b7499d473d1baaa1c4df StaticDependenciesID=f44394cc76e02be8962c80bc907abdaf 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/UGUI Canvas Meter.shadergraph using Guid(9d4e8ca8c5046914c87ca6ccef140dac) (ScriptedImporter) -> (Import Result ID: '5951063b0a8d88005bd25afc1e138b7f') in 0.1382003 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=1b5e6d8aff437afe3445f2e13a68b3b0 DependenciesID=d6c8584ea4aff8396835ff5480a20713 StaticDependenciesID=1526b99989750ac190f0b3b6870a5281 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/GraphTemplates/2D/0_2D Sprite Lit.shadergraph using Guid(bde135b320597544b9ac325092409f8b) (ScriptedImporter) -> (Import Result ID: '6082f9494d41a35898a730658d5329ac') in 0.1524422 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=bf9e15d15f4323a7b6d7dddaa155b7c6 DependenciesID=3470f287390d5d143444b83a45051f5b StaticDependenciesID=f8a1e740385fead106c300b0770db528 
+Start importing Packages/com.unity.render-pipelines.universal/Shaders/AutodeskInteractive/AutodeskInteractive.shadergraph using Guid(0e9d5a909a1f7e84882a534d0d11e49f) (ScriptedImporter) -> (Import Result ID: '9d69ce91baff4c2e3eddfcf7ce280e82') in 0.1781788 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=3373e4792f01cd235b302a4a6929610b DependenciesID=3fe8b2279b699e339bb6b082d30ade0b StaticDependenciesID=d714f8b7f09a8a2e44338dd01d100e22 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/GraphTemplates/UITKFullTemplate.shadergraph using Guid(3e01bbae25716b24ea9da11102b44902) (ScriptedImporter) -> (Import Result ID: '0bb5a042706563c863ef998c280c7262') in 0.11533 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=f5653004f1af1fd54f9f043ac5f6a8f6 DependenciesID=183c71046830435552a072b4d52245bc StaticDependenciesID=1726c81881f57dd4534cca27fd5d8880 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Custom Render Texture.shadergraph using Guid(7ef2cf71ad164fe479662ae612dff99e) (ScriptedImporter) -> (Import Result ID: 'ecfced80e6282f09b065e8c2fdf8824d') in 0.0405563 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=4bfb8afedaeefa20ac016815082e7fe8 DependenciesID=f4c147936ffe180d83c4a24d8c9e914f StaticDependenciesID=41d45674b058354426143686701877af 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/1_Lit Full.shadergraph using Guid(aee84ce0dab81b049bb88017d78a63cd) (ScriptedImporter) -> (Import Result ID: 'dd8f55e06804e14f16dfa6246b463221') in 0.2971343 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=9bbbf9bbcc720cbecb5357fe442ce2f2 DependenciesID=5331f04fe447f7335fa73eb3115c203c StaticDependenciesID=e13261df1337bfc10ad3196561943d11 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/Terrain Simple.shadergraph using Guid(def488a52add6574d9f295a507032cb8) (ScriptedImporter)Shader 'Hidden/Terrain/Terrain Simple': dependency 'AddPassShader' shader 'Hidden/Hidden/Terrain/Terrain Simple_AddPass' not found
+Shader 'Hidden/Terrain/Terrain Simple': dependency 'BaseMapGenShader' shader 'Hidden/Hidden/Terrain/Terrain Simple_BaseMapGen' not found
+Shader 'Hidden/Terrain/Terrain Simple': dependency 'AddPassShader' shader 'Hidden/Hidden/Terrain/Terrain Simple_AddPass' not found
+Shader 'Hidden/Terrain/Terrain Simple': dependency 'BaseMapGenShader' shader 'Hidden/Hidden/Terrain/Terrain Simple_BaseMapGen' not found
+ -> (Import Result ID: '44a14bcedf5abd00f7e1010437edc3fd') in 0.423801 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=b52568c624978979fabf26cef8548a60 DependenciesID=9de61d0b9a811b5e0dc9a66d0d51132f StaticDependenciesID=f3799f07e79dda16a8fa35a4c55a5777 
+Start importing Packages/com.unity.shadergraph/GraphTemplates/Cross Pipeline/0_Particle Unlit.shadergraph using Guid(af66091e0eca0c04a9c3584ae867418a) (ScriptedImporter) -> (Import Result ID: '24d2ad09af3307b67437ed4208302b5e') in 0.145263 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=70a470a6070fce6b7cf417cddf81f74a DependenciesID=8adf3c9394e3304da9336626b90123ff StaticDependenciesID=963d003d343f6a0ac0c73bd28884f793 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/GraphTemplates/2D/2_2D Sprite Custom Lit.shadergraph using Guid(bfad0aba0faa90547b68abd10bb6be86) (ScriptedImporter) -> (Import Result ID: 'f3bdfbe7c6e8028dace2ea34060921cd') in 0.1505581 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=d51723b814fcb30601842ed36b8de5c0 DependenciesID=28b6bc7b7e92027e2f2fd929da67d135 StaticDependenciesID=15486bbabab4e080c747202a902b017f 
+Start importing Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/GraphTemplates/Fullscreen Basic URP.shadergraph using Guid(df41eefe8c13d444ca890dddbbc61f8d) (ScriptedImporter) -> (Import Result ID: 'f59a2ea4aa68a108a1a34c131ee3d0f2') in 0.0979401 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=dcdde39e74ad170080ef11fe6812239d DependenciesID=276c80b52c9a0bede19e32760d2e90b8 StaticDependenciesID=38ff65e11d4e873315ef35ad175d4691 
+Start importing Assets/_Project/Art/Models/Props/W02/Streetlight_Single.fbx using Guid(20c63edf01ee78146b91d9619e17626c) (FBXImporter) -> (Import Result ID: '8277b62f7f64fd6b1e0864f5c0ebc909') in 0.0524591 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=68017ed9dd8a07dc776f42342496d3f3 DependenciesID=345e0a58174362f6627c05603f12c3c0 StaticDependenciesID=bc5f7c923d787a463566e54bdaafac94 
+Start importing Assets/_Project/Art/Models/Props/City/building_C.fbx using Guid(60dfc240fc9e4604099a6092c89d6ad5) (FBXImporter) -> (Import Result ID: '5755714beba3f46de563e900e5e61804') in 0.0286502 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=b756b91b7d1d61cc5fc10e558924bc35 DependenciesID=d646b9a49bab46a717b0e2745a0044de StaticDependenciesID=7f3c29f7d98dccf919cfe49d93439964 
+Start importing Assets/_Project/Art/Models/Props/W02/dumpster.fbx using Guid(90d0706b8e4128d4cb8c5afe8e6049ac) (FBXImporter) -> (Import Result ID: '75e45fb234da0cf04faf6d024138d416') in 0.0296934 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ab843c0e1a4085e67a36c4301a4462a7 DependenciesID=ee8eea7e268d675e79467025162e5f76 StaticDependenciesID=47413b8d8ab4bcd7971b1abc34a154c2 
+Start importing Assets/_Project/Art/Models/Props/W02/building_A.fbx using Guid(908f8366d40ecde48ac3ff65d8e0a2f9) (FBXImporter) -> (Import Result ID: 'cb65756525d4c09816f7925314610b8b') in 0.0236232 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=a5b67f03a0653e805a6e5fa160a6f809 DependenciesID=7e99467b17751a04f1f23c52ed3d687b StaticDependenciesID=91f137eaec06515143f3739901e7b035 
+Start importing Assets/_Project/Art/Models/Props/W03/CommonTree_Dead_1.fbx using Guid(c0662cadf10bd9f4e9279d1d9af4dd78) (FBXImporter) -> (Import Result ID: '09edf76da93acabb95db0e7608a66087') in 0.0218043 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ec4ddb4bce1ff227c9f33e92bdaf9223 DependenciesID=8d1569420b062354a22f9bd661fcc737 StaticDependenciesID=22c39b246359075f823a556a80169acc 
+Start importing Assets/_Project/Art/Models/Props/City/building_B.fbx using Guid(119b9aeb2a543924f83a1681562c50ab) (FBXImporter) -> (Import Result ID: 'e1bda65d1b45812ecdf43bdbea9beeef') in 0.0214393 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=963c4eed93311b4129291a22a2872a32 DependenciesID=70f28d5b92ad63575a02dc6f51621af3 StaticDependenciesID=6e9c272619e42b38e04731f8b054e8a3 
+Start importing Assets/_Project/Art/Models/Props/City/bench.fbx using Guid(3160a65e2df8c2f4895665fff144c163) (FBXImporter) -> (Import Result ID: 'b8128ee0a7c6285dea20a68948989552') in 0.0195685 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0883ee906190160b59c40064550c9917 DependenciesID=2c20e1abee6a5afe7d6d69a757373121 StaticDependenciesID=4c3f615ca7e46c488e9171d61435cc41 
+Start importing Assets/_Project/Art/Models/Props/Nature/Bush_1.fbx using Guid(917a9b09cb515db49b554fa76b840691) (FBXImporter) -> (Import Result ID: '157660e085fc92baa6a739bd9018acb8') in 0.0175405 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=e0d1915e9ef27d101e134070ddfa0d82 DependenciesID=87329b63697cf2a30e84b532d2d1b1ba StaticDependenciesID=e0dd5c7cd9637ffdd256ed2eddf12a12 
+Start importing Assets/_Project/Art/Models/Props/Streets/Street_Straight.fbx using Guid(0203a2e2f6caa7246b046cba454328a5) (FBXImporter) -> (Import Result ID: '14d9dd801b74c2b4caa3bdc93651dea2') in 0.0184982 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=661cade4be67712447160cb34188c9c1 DependenciesID=1bd505fe6b7c642868fec6b0472cafe9 StaticDependenciesID=3a754ef24a10785cf0b50929756f8d60 
+Start importing Assets/_Project/Art/Models/Props/W03/Sign_Stop.fbx using Guid(621af4bb998a6eb4ba51232af7ceccbd) (FBXImporter) -> (Import Result ID: '2d423258abf386ab217ae7965dbb5768') in 0.0176809 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=e022e91a96a49ab995bcee37133e4a71 DependenciesID=7f9cc1d83ccd17e71413c414acb3e101 StaticDependenciesID=794d2a02e01efcc36e5f2148ed404488 
+Start importing Assets/_Project/Art/Models/Props/Nature/CommonTree_3.fbx using Guid(82f02c87bde795d408786b0b9bf870ef) (FBXImporter) -> (Import Result ID: '9322e409fcb59c1f29a6f9609d955eaf') in 0.0204286 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0c10efd2a39d93abfcd134e1596385a9 DependenciesID=bfe24cca0c531e0bc6059e465487f01b StaticDependenciesID=c6a624bf9c4a6726198fa7846d55d2e7 
+Start importing Assets/_Project/Art/Models/Props/W02/firehydrant.fbx using Guid(a2ca5f783d4fb514baaeab9b7620fb2b) (FBXImporter) -> (Import Result ID: 'a1faad5b3eed44753ccd1dc004fd5eb1') in 0.0213297 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=fdf8792272b40611d4ff5b247290b1fb DependenciesID=a9f1c45597761fb8711cdf279783ad04 StaticDependenciesID=9aa2f629105931f9cf608725b25e694e 
+Start importing Assets/_Project/Art/Models/Props/Nature/Rock_2.fbx using Guid(b2ac45ce1a44b9345afb1133a8196f91) (FBXImporter) -> (Import Result ID: '12e0e8a4f4d2fd34e180e9c55193cb3b') in 0.017716 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=650b04c882fd9377f0870e318067dfae DependenciesID=db2430d58b4f1bd23ede4acfa18bd919 StaticDependenciesID=cb3bb7460efb70db809960b393f0e906 
+Start importing Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/Mesh/SamplesFixture.fbx using Guid(b28fa67a0ff82c5478f27368dc627683) (FBXImporter) -> (Import Result ID: 'a19840d2fbc9ca1986e9071cb9de8864') in 0.021951 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ca69878912023949ad1882565546096e DependenciesID=7196b88280c34b86b5eeeacd08d94d9c StaticDependenciesID=f7ffbdee57f4069b030835a8394b49ed 
+Start importing Assets/_Project/Art/Models/Props/Streets/Sign_Stop.fbx using Guid(0312d9f94634ef94fbf10af9f829d27d) (FBXImporter) -> (Import Result ID: '8e8cee0c6f718ea15776ddd2e4584483') in 0.0212995 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=8eb980874e256b66b41ffc49e7c16f53 DependenciesID=45165eaa607a080fae13b85aaaa9aa77 StaticDependenciesID=831864767b087250ed90b3b1a7b90949 
+Start importing Assets/_Project/Art/Models/Props/Nature/Cactus_3.fbx using Guid(136d941ce167d3e498255efa779529c6) (FBXImporter) -> (Import Result ID: 'd01b9d62b5723cb5089fb6e374027e70') in 0.0200413 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=437b670f13d631a81dc89f61e51a87ca DependenciesID=54973f2037a9bbcbc280f4e596fb8d76 StaticDependenciesID=ef75d8358d9c74770316a24840016126 
+Start importing Assets/_Project/Art/Models/Props/Nature/PalmTree_1.fbx using Guid(835afb1d17897e64ea064c1162467d32) (FBXImporter) -> (Import Result ID: 'ca318ea9821b2291edad86950ac99eb1') in 0.0223505 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=9dbd4442c8b71baff5e7c558b610758b DependenciesID=367990642a465bd4873d1af3bdc3956a StaticDependenciesID=4e64ea01df6d09bea49c83fa1f793de5 
+Start importing Assets/_Project/Art/Models/Props/Nature/Rock_Moss_1.fbx using Guid(931cd882f724a5f4da8f6c0cdcd4e16b) (FBXImporter) -> (Import Result ID: 'f1d0a3814f07abb1ac08c3a972306647') in 0.0190476 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=372de1f3d799d0bffa57e8c221637e1b DependenciesID=08ff88dda168420886c0f335487f6d58 StaticDependenciesID=950f9c0388e9b09c4ac3c8baa6facad2 
+Start importing Assets/_Project/Art/Models/Props/Nature/CommonTree_Dead_1.fbx using Guid(e32723b57c568874aabecc4541a71891) (FBXImporter) -> (Import Result ID: '2409259d6c37d486b6b052e727e0f327') in 0.0202004 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=b57966147e25f34a8f2ddcfe337e0c29 DependenciesID=5f926694a41def9705559ecc8316bd9d StaticDependenciesID=977ad5e73250849716c5995f4d14f12c 
+Start importing Assets/_Project/Art/Models/Props/W03/Rock_4.fbx using Guid(2417972eb4ca2874bba3184390ec2a47) (FBXImporter) -> (Import Result ID: 'af83f983f7e8057504b7c34ecf0d1cf8') in 0.0177243 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=13ac591efabfafef41ce10725be1f335 DependenciesID=69403a79bdb6f2902d26c53453fd9543 StaticDependenciesID=8ff64aef4e2e4397dadda7ba391e8c85 
+Start importing Assets/_Project/Art/Models/Props/W02/building_B.fbx using Guid(74c3c716391bbd448a1d6dae4f6e32c8) (FBXImporter) -> (Import Result ID: 'abe6affa9cc7da730d6ab7423fd99f62') in 0.0218585 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=5a8bf517b7bfd67ef95d888be5df205c DependenciesID=88f2fe00f48536435d620a379562cd4c StaticDependenciesID=775c6c792f736cacf44a1ccb6b8fb78a 
+Start importing Assets/_Project/Art/Models/Props/W01/BushBerries_1.fbx using Guid(7496c3254127d3443b05a67d8270a90f) (FBXImporter) -> (Import Result ID: 'fc401f78619aa84045d5c6a1e97e68e5') in 0.0188956 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=a53c11f84fe737d1713644195b3bab0a DependenciesID=d9cfe2dbe572e312dadf05eedd509d60 StaticDependenciesID=4c3fbac6411ebc7bb0e9a8d4c36190bb 
+Start importing Assets/_Project/Art/Models/Props/Nature/Flowers.fbx using Guid(d46e572727fc316498867782907d3dd8) (FBXImporter) -> (Import Result ID: '833054ae2d373e55f54d7148eb786849') in 0.0177082 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=685fe44ac21f10b5841b81ffd334543c DependenciesID=80dea1b514aaa1e34c00c65cfd1faa55 StaticDependenciesID=e806e91b34465fa34037275a678d61d9 
+Start importing Assets/_Project/Art/Models/Props/Nature/BirchTree_1.fbx using Guid(156af47d77f51174b893133084487684) (FBXImporter) -> (Import Result ID: '462bea318257a266669ddf9c2cfbe254') in 0.019968 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=1c8fd30db2259ecd0d740d419dc9d642 DependenciesID=fa5c6ea352bb35d5077be54211483a14 StaticDependenciesID=8fe8758c04b69c2708377a2832561903 
+Start importing Assets/_Project/Art/Models/Props/W03/Cactus_3.fbx using Guid(7529aa211c3c09d40bf8acf8384f5ade) (FBXImporter) -> (Import Result ID: '54fb0db4251670fadb01048fea7bae9e') in 0.0175161 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=8177fa6762e90115aa2b38d1ddb560a5 DependenciesID=e4f73c142b2c9b91bab06ae5212f5973 StaticDependenciesID=957d6d4c12f5522da62f37e880ac3e83 
+Start importing Assets/_Project/Art/Models/Props/Nature/Rock_1.fbx using Guid(a5485332136e979469e61e851829ec2c) (FBXImporter) -> (Import Result ID: 'b4fdad2cc259530c59f9629e10bb10a3') in 0.0187285 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=617cb47dc8cedde34ab3748f620825e2 DependenciesID=5a697565e036648efea06b83b54c6238 StaticDependenciesID=573b7dd852b1b85e65368a9129d9b3d7 
+Start importing Assets/_Project/Art/Models/Props/Nature/Rock_Moss_2.fbx using Guid(e526c48c40a85c04a8c369f222af4b28) (FBXImporter) -> (Import Result ID: 'e851b33130b833419a333c20c8f3f03a') in 0.0214748 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=270eb955bb462b52f9ea9c59571d567f DependenciesID=949022f7dac1f5041adb029a66aae039 StaticDependenciesID=fddef448ded98537d9981d3252127465 
+Start importing Assets/_Project/Art/Models/Props/Nature/Grass.fbx using Guid(f5a27f555df44244da8535c430a2fde7) (FBXImporter) -> (Import Result ID: 'd6b7e7cb6ac193d00ea1abdccfb718b9') in 0.0181495 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=7ee4464353195628f931f94af73f5897 DependenciesID=7f9af48e5970345506ade45afc442b4e StaticDependenciesID=f81e1ff8d289f860c95487d41eca2df5 
+Start importing Assets/_Project/Art/Models/Props/W03/box_A.fbx using Guid(f5745b3c10b419b478ee474c641bc5c6) (FBXImporter) -> (Import Result ID: '2cd7bbaf548a4d818fcd6908b94b87c6') in 0.0257547 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=372898da78619d2aa81f94ae05f686e9 DependenciesID=88ae0abd7d1074197939aac2ebe0e749 StaticDependenciesID=56581468ce697ea4140861d204c466a7 
+Start importing Assets/_Project/Art/Models/Props/City/building_D.fbx using Guid(0652a3aa63ce0034a9f5d70b6e496bf1) (FBXImporter) -> (Import Result ID: '75ccddc736194eacb0705b5c63be919d') in 0.0213888 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=5b6d0c3eaad9299a260bc2df656c234e DependenciesID=d8362cddb89368165732f9f82a92b6c3 StaticDependenciesID=ca033aef08d761f700aff3dba34ebbb7 
+Start importing Assets/_Project/Art/Models/Props/W01/Rock_Moss_1.fbx using Guid(865d04a967e7cbb44b4de5f5f52438c2) (FBXImporter) -> (Import Result ID: 'af941919a7538d04681c2c65929d965f') in 0.0198325 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0bf57c2f7e77942297f7b48098b76728 DependenciesID=0ef1ea51a0a6168a886e9a29cda1dbe1 StaticDependenciesID=4b0caec2137f84778c1aaa14c20b0d7a 
+Start importing Assets/_Project/Art/Models/Props/City/car_taxi.fbx using Guid(c696130a8b45353429ef8e27f97bf98c) (FBXImporter) -> (Import Result ID: 'b4f5c0b5092b4500b79d761879da4886') in 0.0253439 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=a97d8c041eca75d0fece9eff0928ed45 DependenciesID=de231785c7aa56cd21936acafa0ebd16 StaticDependenciesID=a1b2e92ab24ad3e719738f65c8aea5c9 
+Start importing Assets/_Project/Art/Models/Props/City/car_sedan.fbx using Guid(e6d4b73500493d64999950c6efe8d2fa) (FBXImporter) -> (Import Result ID: '80fa18e5ca56a968ec0fbe003e182206') in 0.0218562 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=f754e63a723bb5dec7400987c7ae9e37 DependenciesID=e61f8e83d013b24890e47a36d0a4ba05 StaticDependenciesID=37894c74c9bf01a355b6f0a0464acd79 
+Start importing Assets/_Project/Art/Models/Props/Nature/PalmTree_2.fbx using Guid(f679de118311d5541af0f07d0f8a54be) (FBXImporter) -> (Import Result ID: 'fa6153fe855a183c924a0b8302759b45') in 0.01858 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=64b6c9976a0ee00a55160c2d1751c1b2 DependenciesID=884fb845e9419b13f4ce3614d48d51b8 StaticDependenciesID=9d2b226354e22354caaf5e234541f8e0 
+Start importing Assets/_Project/Art/Models/Props/W01/BirchTree_1.fbx using Guid(079daa50efd9891408a34d70c4e2ae71) (FBXImporter) -> (Import Result ID: 'b4ed8188d0f9022f7e469c104277599a') in 0.0207843 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=2d8c33ee13cfcf0fb7c195e6f3e855b1 DependenciesID=b87489955d4b97a99af858b24425906f StaticDependenciesID=e6299e49f06a990892fd988e95cb40b8 
+Start importing Assets/_Project/Art/Models/Props/W02/building_C.fbx using Guid(1778fdac6877f6349900d742b6e96ad7) (FBXImporter) -> (Import Result ID: '835138d418d585df5a6cc4662864fcbb') in 0.0229366 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0c83b498128fe4adc59048954319c821 DependenciesID=b2dc244885220891bf84044e6e3b40e9 StaticDependenciesID=d1d72648ab6ce905a39a7da38096cf76 
+Start importing Assets/_Project/Art/Models/Props/W01/CommonTree_2.fbx using Guid(2717a1e082b544c4298a1916617359f2) (FBXImporter) -> (Import Result ID: '4f58a48b02d9739af2aa1b1bd49f90cb') in 0.01974 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=33d62e9c51e665eb2bbf6d534e003234 DependenciesID=c2a6b3c9bde8d8c535275b31ef5aaa64 StaticDependenciesID=25c9fcfc2e7aacd194ee7b62ed7c35ea 
+Start importing Assets/_Project/Art/Models/Props/W01/CommonTree_1.fbx using Guid(47d00a327bde1e34e9231b43aa057470) (FBXImporter) -> (Import Result ID: '209873e309eca2aef16ae3ef3a92d9e5') in 0.0201453 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=888937720bb4b03e8a16b0dc47571e69 DependenciesID=570855901feb77d6f4d619f31a62572c StaticDependenciesID=f93bed7e39dad1a0a127fdc3895a86c3 
+Start importing Assets/_Project/Art/Models/Props/Streets/TrafficLight.fbx using Guid(082d6d7cbdc461f46afa5bd6b9a00c81) (FBXImporter) -> (Import Result ID: '5c10eb2258b5e2204d5c1afea8909bac') in 0.0186168 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=df7329b1495868fdf03f3bb0357b67b2 DependenciesID=a534be19560863c6d5426907ad99c548 StaticDependenciesID=1654778c93e11ed74e2e45ac3cd81e8b 
+Start importing Assets/_Project/Art/Models/Props/Nature/WoodLog.fbx using Guid(1841d3e573652db43ad605e02c968f4a) (FBXImporter) -> (Import Result ID: 'a92f93fa42f249905cd749935f4cf797') in 0.0221387 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=c7d0ee617ee7fc9c46ad3c1ea08764ac DependenciesID=1baf135968a45744158bc1e2339fc226 StaticDependenciesID=86affd8328aaf08d640458c41ef4332f 
+Start importing Assets/_Project/Art/Models/Props/Nature/CommonTree_Dead_2.fbx using Guid(280976f1326d2c54ea260376105745f6) (FBXImporter) -> (Import Result ID: 'fa10f9c01fa75a660997b608b783c59f') in 0.0193641 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=f99f96688bdea5f41ffa7f4df7ee0827 DependenciesID=f9f644923d537c19533ba655327f96f6 StaticDependenciesID=6ccff11271ca1d91c1592ca5bda12958 
+Start importing Assets/_Project/Art/Models/Props/W03/CactusFlowers_2.fbx using Guid(78a2bceb89fa1114d8fb1eaab3099e17) (FBXImporter) -> (Import Result ID: '7a36b6c6632dd5cd553543aaf6295d0b') in 0.0191308 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0d673873894ae435c7eb0fe73dabbe74 DependenciesID=7d6ae4d4d50fc00b472d8397a3e8ce2d StaticDependenciesID=1b2c7f8dce8c8c4d7dc86bcaa7ac6741 
+Start importing Assets/_Project/Art/Models/Props/W03/PalmTree_1.fbx using Guid(88845b5d0c0ae6047a1c9b69c983b140) (FBXImporter) -> (Import Result ID: '6272569164c527a0c8c829708869f937') in 0.0202585 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=99e55e8c7b52c6e0c3b88cb2b790a312 DependenciesID=4bae9b9371fb2f4a6a95cb4f5a0564a8 StaticDependenciesID=7dcae3fddff6e970094b1b055eafa9d0 
+Start importing Assets/_Project/Art/Models/Props/W01/Bush_1.fbx using Guid(982cc1706dfb75a429b4ed5538a9db2f) (FBXImporter) -> (Import Result ID: '431609f3de672c571a51eadcf8091b78') in 0.0196558 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=1b4e1f402f719c6c55fecb342e59aa28 DependenciesID=d07595483850bc166d106cdcf2d22374 StaticDependenciesID=27ba1aec6aeaab74ccad10118ce14e9d 
+Start importing Assets/_Project/Art/Models/Props/W03/Rock_5.fbx using Guid(c8fad972cb2bfcb46baee7fe4a33dd68) (FBXImporter) -> (Import Result ID: '898622458b03d23be9be46038700d90e') in 0.0176875 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=c022e261251e35dfb6974c7983ae0021 DependenciesID=6279487d9109ca53dff9e0ef4d69cc5f StaticDependenciesID=ef047f7a6c0ecb7e5abf1b25ac4299b0 
+Start importing Assets/_Project/Art/Models/Props/Nature/Cactus_2.fbx using Guid(695b9e3678270d74fa25e15197474386) (FBXImporter) -> (Import Result ID: '2097caf1c1a4a36d69ef7b7e0e67fc94') in 0.0187455 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=116e03c2dfbd149aa5a0927696075be6 DependenciesID=e7b7adac3c2b2543bccdf8bbe73ed178 StaticDependenciesID=d4936ded49c46f0bd5a50d11f17e7c54 
+Start importing Assets/_Project/Art/Models/Props/Streets/Street_Curve.fbx using Guid(697db009d86327f4782c9a37c62eee45) (FBXImporter) -> (Import Result ID: '21111249f3b0ab3dcc43b99e9f6422bc') in 0.0195842 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=c94f1ca9d41609f97b40c8379ef633df DependenciesID=16ebbc7e51c24e51b13071118dcaa7fb StaticDependenciesID=d5738a8efdacec9a78e29e9d8b741f27 
+Start importing Assets/_Project/Art/Models/Props/City/car_police.fbx using Guid(c9e45e90db5d81344a5f1ee4071ac67c) (FBXImporter) -> (Import Result ID: 'fd8daba785d55071ecad1ba0f35ab802') in 0.0207416 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=75bea7dcd1fa82bfd57347ce99bba9fd DependenciesID=2d9b8e58cc25a87c48ef8fa39e1733d9 StaticDependenciesID=8aa047444ec391da4f753ca8515f9377 
+Start importing Assets/_Project/Art/Models/Props/W01/Flowers.fbx using Guid(e95e397f04b324f40b660afe1778b56a) (FBXImporter) -> (Import Result ID: '24258386d22e54fa7c0cc14ff9ecbfdc') in 0.0188848 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ade34d4127e3ad2e387432c9c1c88fcf DependenciesID=33f1062e71ba17e75fb2827cd949868f StaticDependenciesID=10127682c3a42931195fabff68e56d99 
+Start importing Assets/_Project/Art/Models/Props/W02/building_D.fbx using Guid(6a3a9e3344da54b4b8f78b5dd04cc93a) (FBXImporter) -> (Import Result ID: '223b62ee98e4e36c4b00bf944954b5ae') in 0.022145 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=10bc4a030b2a500f77336006d8a97e73 DependenciesID=98df82f7bcb2594f70b581aed22492ff StaticDependenciesID=a42a4277b68ff8b9042562662feb930a 
+Start importing Assets/_Project/Art/Models/Props/Nature/TreeStump.fbx using Guid(aa34f205749200d429f53f2e13f1b38d) (FBXImporter) -> (Import Result ID: 'bdf5c9571283b8944390e8adc14ddf45') in 0.0217524 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=50efe98ffc1a5ca25e833f202afc163c DependenciesID=882a6ea3d02349d9c6c2dde5105db7ba StaticDependenciesID=c5a6e30663cbbe807f53372f2d9ee79a 
+Start importing Assets/_Project/Art/Models/Props/W02/streetlight.fbx using Guid(ca30d64863d37a848b057c8c5d5e9d1a) (FBXImporter) -> (Import Result ID: '4d3f4b5e83ee32e4bb6b8fedf32cf02a') in 0.0205 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ee833a6c45799c67958d428cc7585629 DependenciesID=5027140da29853428c6250e3a29234f9 StaticDependenciesID=2ee47a3bf51e45c1f675687c28f81690 
+Start importing Assets/_Project/Art/Models/Props/W03/dumpster.fbx using Guid(1b7163e084e7f5b42ad5981c5303c793) (FBXImporter) -> (Import Result ID: '1a16780d228b2c6ed3f3e66a2d9f0070') in 0.0201036 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ad0c7d44aba69c49fe1a5f3ee92ddb3f DependenciesID=ba15e541d30256eb0a71be7be92d8d80 StaticDependenciesID=524347fa59274dc71a278f51a2b49ce1 
+Start importing Assets/_Project/Art/Models/Props/Nature/BirchTree_2.fbx using Guid(2b332f082ede2c744960517a0f654226) (FBXImporter) -> (Import Result ID: '7645370ae5b7863055f6e86ece8be372') in 0.0206688 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=ea383fa220372d1a31d5f16e1f4c63ac DependenciesID=9536b8f82374e8624da6dbed242f7ded StaticDependenciesID=299e761972bb34b5762626be873bfe53 
+Start importing Assets/_Project/Art/Models/Props/W01/Rock_1.fbx using Guid(3b7316ec32912894a843414eb857ff90) (FBXImporter) -> (Import Result ID: '4768d695339103a0cca9d6d3beeda87e') in 0.0176554 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=fd5af5d16e835c40b9d22e2e6a0c0ec9 DependenciesID=eb3d96e89bcc86f17754cc16360b3092 StaticDependenciesID=213330ec3b48ac4f03103f13e811b364 
+Start importing Assets/_Project/Art/Models/Props/W02/car_taxi.fbx using Guid(db25523f92aad6f43bafd6cd2305a3f2) (FBXImporter) -> (Import Result ID: 'a645e3fcb5950db0b23597e6e3481992') in 0.0233062 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=2d3e752b52a7c6d40d2d531368553de7 DependenciesID=d052db71790a4b22512d442611c6e654 StaticDependenciesID=de924ffae43918b89ee5b6e4019102cf 
+Start importing Assets/_Project/Art/Models/Props/City/box_B.fbx using Guid(fb62e82d97c0d5647ab8d52c789133c8) (FBXImporter) -> (Import Result ID: '59ef372d05d742bedefa044844a87865') in 0.0163316 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=3ed791d1d122fd0eb80ae9dcac71f396 DependenciesID=3371c7a5ac3fc7ab80f70ae1718fab57 StaticDependenciesID=b020d0bc43e7a747817f8bf3cbe52448 
+Start importing Assets/_Project/Art/Models/Props/W03/box_B.fbx using Guid(2c59d78163ac3044db094e826a92e5fb) (FBXImporter) -> (Import Result ID: 'd164280c7dda3c9f486decef5555c625') in 0.0197477 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=3f7232056582d10b07fd2bed3f486fb0 DependenciesID=419e60de29c21157fcc2d8b936224090 StaticDependenciesID=7a270c758bc393cbc2abd1e279d30964 
+Start importing Assets/_Project/Art/Models/Props/City/dumpster.fbx using Guid(3cbc254391dfe654fba02ea15ac05e1a) (FBXImporter) -> (Import Result ID: '54b9dd5a30021c24330bf779d66e4884') in 0.017885 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=aed581fba02ef73fe11980d5d9f6917a DependenciesID=002672061a5ae798b5b2a7886e3c7e84 StaticDependenciesID=0706fc689ce950ccc89740548bdc17d7 
+Start importing Assets/_Project/Art/Models/Props/City/box_A.fbx using Guid(dc25b77926a9d584797d47d5796a940b) (FBXImporter) -> (Import Result ID: 'e440c242ed834c5531798820aca2c7ce') in 0.0169279 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=0d72a5552f8ed25d8b3cada3e5f7228a DependenciesID=d2f9900dfae5200a3012caa7007c521d StaticDependenciesID=c8cbc96b7d8892ed1aa2274dc9e53a58 
+Start importing Assets/_Project/Art/Models/Props/City/building_A.fbx using Guid(ecc463b88668bbd4fac9b48e5be4ef7a) (FBXImporter) -> (Import Result ID: 'e27e3fdd47bf4c4e62bb7db66391f6e2') in 0.0181739 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=8175dc42f76c1faf725531e8301824c6 DependenciesID=4816e963b68a481db8fffef792a76f06 StaticDependenciesID=71a5e85af45a3a3965be23aa73dc2760 
+Start importing Assets/_Project/Art/Models/Props/Nature/CactusFlower_1.fbx using Guid(ec0cc984d74b6da40984065f26e0815a) (FBXImporter) -> (Import Result ID: '5b4c1005022892d3b875e4c79648ff35') in 0.0184591 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=e0d8dc9f751208590c4889211c160ccd DependenciesID=6af43a111e51d42154eeca506e669dfd StaticDependenciesID=2dccdf07e16772b5d78b730f3689b014 
+Start importing Assets/_Project/Art/Models/Props/Nature/Rock_3.fbx using Guid(0d4142016dffd614495fd58423b7cbbf) (FBXImporter) -> (Import Result ID: '00de383800228cbb1afea02176076281') in 0.0169529 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=863330503db871e2a6fa41f4e8573e7b DependenciesID=bf12dd038fdf65449825453b67eb8d6a StaticDependenciesID=1248854c1bf03ea42081f71cd72a783e 
+Start importing Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/Mesh/SamplesFloorSpotlight.fbx using Guid(1dbf28c1bb322474d981b2dc555e28b0) (FBXImporter) -> (Import Result ID: 'bbe14536ebd2c6d072ddc2f5f4bf6ba3') in 0.0220622 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=18dbbe6fbfdb3c041f1d6c429c874cf8 DependenciesID=05841cea22279dd02cc96a52173c92b0 StaticDependenciesID=acf3b4d4e41287957d9eca0076fbe5c7 
+Start importing Assets/_Project/Art/Models/Props/Nature/BushBerries_1.fbx using Guid(2d36fc2e3b57b9c4abbb7db8e9571594) (FBXImporter) -> (Import Result ID: '1aad791178645299807d5785c940c2c0') in 0.0174706 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=3ccf5c8d2901447f1fa4597f77f3e71e DependenciesID=3f62418a3a39f038a75ff660023087b2 StaticDependenciesID=88f0569cd74109db3873f44cb013333c 
+Start importing Assets/_Project/Art/Models/Props/Streets/Streetlight_Single.fbx using Guid(3daf62587d1d49a4586efaf8b861d94b) (FBXImporter) -> (Import Result ID: '0740b8f70cdfe788cd5fba702ca7ce46') in 0.0204592 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=404c1fd68d266804ffa33c7a52077887 DependenciesID=fdf8b16b91162d514aa75622cc7e1fd0 StaticDependenciesID=569ac20509bcc5fecb6d2f71ff5e6a30 
+Start importing Assets/_Project/Art/Models/Props/Nature/CommonTree_1.fbx using Guid(6d733e0d06495454889a1623eb64e7de) (FBXImporter) -> (Import Result ID: '901fefa35cd0cba168ce192a2b7a1830') in 0.0206815 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=40152117b3a4246ac949032af0083a56 DependenciesID=56366854861ac0b9f61abcef9576cd47 StaticDependenciesID=11400a4fb1153e3c9a8602964a470fc0 
+Start importing Assets/_Project/Art/Models/Props/W03/Cactus_2.fbx using Guid(7de16334359b413479483d80a238a659) (FBXImporter) -> (Import Result ID: 'd09ec27d8abea00273f464c233bc7bc9') in 0.0175462 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=e894b8e9ebbec5a742eea90adf8da584 DependenciesID=8632dc8c3292be511830247161464c45 StaticDependenciesID=df2c73a516d2f4c477af1f153469bbab 
+Start importing Assets/_Project/Art/Models/Props/Nature/Bush_2.fbx using Guid(cd3e1a7d707c5ca42894fd62b189bdeb) (FBXImporter) -> (Import Result ID: 'ab11a7f9d94b87f395c7c72e40fcd906') in 0.0191549 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=913b889cc9c302ae98cad11236d9e2fe DependenciesID=164b53d6e8fd0424ba7f3bb3472de5ce StaticDependenciesID=f882fafd7c1a722f5dea7bd9d618741d 
+Start importing Assets/_Project/Art/Models/Props/Nature/CommonTree_2.fbx using Guid(dd07ed7b13d1b4449b2035a450fbd369) (FBXImporter) -> (Import Result ID: 'cfeda438580423f324b70613ed87f4a5') in 0.0216428 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=b5b0a675c173cfc0e2da05654990d1d8 DependenciesID=3a6ccd199404c5952d50001c5d7e386c StaticDependenciesID=47b64c19ba04c9cc7005d36de2278ebf 
+Start importing Assets/_Project/Art/Models/Props/W02/car_police.fbx using Guid(be84c6f6e09834244b83e25019f375ea) (FBXImporter) -> (Import Result ID: '0b2190915cca888817a62360be9d2fc0') in 0.0238438 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=11694aa70dafb545e18b8dbcbf103a59 DependenciesID=332342da9ed6beaa70d3cef3879921eb StaticDependenciesID=2662ad87c3be9921cd6b4834e2398a81 
+Start importing Assets/_Project/Art/Models/Props/Streets/Streetlight_Double.fbx using Guid(3fdd4b46318acdb48a8acef69000f5bb) (FBXImporter) -> (Import Result ID: '3f9b86a9ec8b242a5b11bcf4f7d183d8') in 0.020296 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=668cb80065b1179b1b8535e00eb5109c DependenciesID=38324d089e9e4a91b4770f028334e209 StaticDependenciesID=6c833f4f96c6c552a236bef3bb23a34b 
+Start importing Assets/_Project/Art/Models/Props/W03/Cactus_1.fbx using Guid(5ff81955b1fed5e4c82a596298d4f2b1) (FBXImporter) -> (Import Result ID: '790cb7493343f4413479242743a24a3f') in 0.0229934 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=35aef7a1bf81d64ca24944dfd78323ef DependenciesID=e4c11efa05d9eeafc3c758d70f710d62 StaticDependenciesID=914ac9502a16efdc8f6842afb0863c5f 
+Start importing Assets/_Project/Art/Models/Props/W02/car_sedan.fbx using Guid(9f72d9a3b6ed13b418113f869ab63ecb) (FBXImporter) -> (Import Result ID: 'a4463c36a074aade747c08a4c6f5c70d') in 0.0270898 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=6fe67b866b335b32bedd9375958e9ba2 DependenciesID=c622a1d9379c2ff21967e60a5f4001a4 StaticDependenciesID=21047fc317d2fac1df1adb685b5929b9 
+Start importing Assets/_Project/Art/Models/Props/Streets/Street_3Way.fbx using Guid(af34e877b12a8af47b95bf7ffdf5d08c) (FBXImporter) -> (Import Result ID: '9217126b429ae58e6039c8bb61eb33e9') in 0.0196518 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=581246836fd8d14b5f7b8ed578e90a0d DependenciesID=ca55f52535af0e71abbc950a1d42b78a StaticDependenciesID=60ef2e16169af7d11dee802a806458fd 
+Start importing Assets/_Project/Art/Models/Props/Nature/Cactus_1.fbx using Guid(df27f3631f40e8141bbbe07feb4c3ea8) (FBXImporter) -> (Import Result ID: 'caa3fcdc0ca66a36cee1f65f8a977908') in 0.019014 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=eccb5f4a86e5335a743e0289adde7600 DependenciesID=babaed892f2aa4078ea70a20007b81c2 StaticDependenciesID=5d518a998f654f08e0e8fe4c412441a3 
+Start importing Assets/_Project/Art/Models/Props/City/firehydrant.fbx using Guid(ff38aeaa617eaa94997cd8330b62d237) (FBXImporter) -> (Import Result ID: '1773acc6b353b8df1e3153d7456d546c') in 0.0187501 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=935d372b82af2eebf60d24f2d92d6e54 DependenciesID=ca3e833604abd3dbc786cba89041348a StaticDependenciesID=67fe4e268895ef25490483f4b2503d8e 
+Start importing Assets/_Project/Art/UI/Fonts/KenneyFuture SDF.asset using Guid(c6dd4b92f8199ce48af4fbcc50f9d6de) (NativeFormatImporter) -> (Import Result ID: 'e2bb5819a66d9b3acff5aa208c7e39f1') in 0.0185368 seconds [static dependencies only]. Details - ImportResultOutputID=2a8fe764744be20ef9b1efada36bb927 DependenciesID=9cfa111518391e4cccb1f11b99774b56 StaticDependenciesID=17905670414f406145c71ba094805fb1 
+Start importing Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset using Guid(2e498d1c8094910479dc3e1b768306a4) (NativeFormatImporter) -> (Import Result ID: 'd3a227d21fc4f04b82b7c73b571641a9') in 0.0027399 seconds [static dependencies only]. Details - ImportResultOutputID=e41b1f0344bbdb50094a59e4b77576a4 DependenciesID=b9b643b9b119c221595e6043c100168c StaticDependenciesID=726e6a0972ec794912e65c3c3429c40f 
+Start importing Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset using Guid(8f586378b4e144a9851e7b34d9b748ee) (NativeFormatImporter) -> (Import Result ID: 'fd92effc99b62c8c50a259b25f91ae92') in 0.0027291 seconds [static dependencies only]. Details - ImportResultOutputID=fa1185a8918a79eaa87b492efbb07c09 DependenciesID=0030ba4cd02d219d109bc6e2f8001758 StaticDependenciesID=876feafa23c6006d395b29754c0fd7ea 
+(Values over 0.050ms)
+Asset Pipeline Refresh (id=5762ae6fdf795744d917086af9bedf4d): Total: 10.534 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+	Summary:
+		Imports: total=278 (actual=241, local cache=37, cache server=0)
+		Asset DB Process Time: managed=94 ms, native=9691 ms
+		Asset DB Callback time: managed=196 ms, native=551 ms
+		Scripting: domain reloads=0, domain reload time=0 ms, compile time=0 ms, other=0 ms
+		Project Asset Count: scripts=866, non-scripts=2562
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 299
+	ApplyChangesToAssetFolders: 0.179ms
+	Scan: 45.507ms
+	CategorizeScriptCompilationAssets: 0.381ms
+	ProcessAssetsWithTransientArtifactChanges: 0.077ms
+	CategorizeAssets: 22.088ms
+	ImportOutOfDateAssets: 9702.115ms (0.258ms without children)
+		ImportManagerImport: 9699.861ms (162.209ms without children)
+			UpdateCategorizedAssets: 7.185ms
+		UnloadImportedAssets: 1.221ms
+		ReloadImportedAssets: 7.625ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.403ms
+		OnDemandSchedulerStart: 0.345ms
+	PostProcessAllAssets: 746.158ms
+		ShaderAssetModifiedCallback 489.306ms
+		ComputeShaderImportPostprocess 0.743ms
+		RaytracingShaderImportPostprocess 0.651ms
+		PostProcessCallbackCreateDeferredMaterials 0.540ms
+		SpeedTreeImporter.PostprocessAllAssets 0.287ms
+		AssemblyValidation.PostprocessAllAssets 0.249ms
+		BlockShaderImporter.PostprocessAllAssets 0.237ms
+		LocalizationDatabase.AssetDatabasePostprocessCallback 0.208ms
+		MonoPostProcessAllAssets: 195.572ms
+			AssetPostprocessor.OnPostprocessAllAssets 40.055ms
+			MaterialPostprocessor.OnPostprocessAllAssets 30.985ms
+			TMPro_TexturePostProcessor.OnPostprocessAllAssets 27.672ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 15.486ms
+			ShaderGraphAssetPostProcessor.OnPostprocessAllAssets 14.987ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 6.551ms
+			PostProcessor.OnPostprocessAllAssets 2.232ms
+			AssetChangedListener.OnPostprocessAllAssets 2.085ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 1.773ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 1.552ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.669ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.498ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.301ms
+			AssetEvents.OnPostprocessAllAssets 0.232ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.173ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.159ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.158ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 0.132ms
+			SyncVS.PostprocessSyncProject 0.128ms
+			AudioContainerPostProcessor.OnPostprocessAllAssets 0.077ms
+	PostAssetChangesProfiler: 1.057ms
+	GatherAllCurrentPrimaryImportResultRevisions: 0.318ms
+	UnloadStreamsBegin: 0.110ms
+	PersistCurrentRevisions: 0.104ms
+	UnloadStreamsEnd: 0.118ms
+	Untracked: 7.084ms
+
+[UnityConnectServicesConfig] config is NOT valid, switching to default
+Created GICache directory at C:/Users/Felipe/AppData/LocalLow/Unity/Caches/GiCache. Took: 0.065s, timestamps: [8.714 - 8.779]
+Unloading 345 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 504 unused Assets / (15.0 MB). Loaded Objects now: 4228.
+Memory consumption went from 243.9 MB to 228.9 MB.
+Total: 23.903700 ms (FindLiveObjects: 0.204700 ms CreateObjectMapping: 0.116900 ms MarkObjects: 17.384200 ms  DeleteObjects: 6.197000 ms)
+
+Executing IPrebuildSetup for: Unity.PerformanceTesting.Editor.TestRunBuilder.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.TestRun.Tasks.BuildActionTaskBase`1/<ExecuteMethods>d__8<UnityEngine.TestTools.IPrebuildSetup>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/Tasks/BuildActionTaskBase.cs:48)
+UnityEditor.TestTools.TestRunner.TestRun.Tasks.BuildActionTaskBase`1/<Execute>d__7<UnityEngine.TestTools.IPrebuildSetup>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/Tasks/BuildActionTaskBase.cs:34)
+UnityEditor.TestTools.TestRunner.TestRun.TestJobRunner:ExecuteStep () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/TestJobRunner.cs:173)
+UnityEditor.TestTools.TestRunner.TestRun.TestJobRunner:ExecuteCallback () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/TestJobRunner.cs:108)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/Tasks/BuildActionTaskBase.cs Line: 48)
+
+Saving results to: C:/Users/Felipe/AppData/LocalLow/DefaultCompany/MutantArmyRun\TestResults.xml
+Saving results to: C:\Users\Felipe\Downloads\jogo test\t-edit.xml
+Executing IPostBuildCleanup for: Unity.PerformanceTesting.Editor.TestRunBuilder.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.TestRun.Tasks.BuildActionTaskBase`1/<ExecuteMethods>d__8<UnityEngine.TestTools.IPostBuildCleanup>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/Tasks/BuildActionTaskBase.cs:48)
+UnityEditor.TestTools.TestRunner.TestRun.Tasks.BuildActionTaskBase`1/<Execute>d__7<UnityEngine.TestTools.IPostBuildCleanup>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/Tasks/BuildActionTaskBase.cs:34)
+UnityEditor.TestTools.TestRunner.TestRun.TestJobRunner:ExecuteStep () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/TestJobRunner.cs:173)
+UnityEditor.TestTools.TestRunner.TestRun.TestJobRunner:ExecuteCallback () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/TestJobRunner.cs:108)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/TestRun/Tasks/BuildActionTaskBase.cs Line: 48)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 0 unused Assets / (0 B). Loaded Objects now: 4228.
+Memory consumption went from 194.9 MB to 194.9 MB.
+Total: 15.376300 ms (FindLiveObjects: 0.175500 ms CreateObjectMapping: 0.083700 ms MarkObjects: 15.110200 ms  DeleteObjects: 0.006200 ms)
+
+DisplayProgressbar: Undo
+Test run completed. Exiting with code 0 (Ok). Run completed.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:ExitApplication (UnityEditor.TestTools.TestRunner.CommandLineTest.Executer/ReturnCodes,string) (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/CommandLineTest/Executer.cs:81)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:ExitIfRunIsCompleted () (at ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/CommandLineTest/Executer.cs:74)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEditor.TestRunner/CommandLineTest/Executer.cs Line: 81)
+
+Killing ADB server in 2,0902399 seconds.
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-Felipe-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-Felipe channel disconnected successfully.
+AcceleratorClientConnectionCallback - disconnected - :0
+Shut down.
+Cleanup mono
+CodeReloadManager destroyed
+abort_threads: Failed aborting id: 0000000000005EE8, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 0000000000007844, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 0000000000005EE8, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 0000000000007844, mono_thread_manage will ignore it
+
+debugger-agent: Unable to listen on 3508
+Checking for leaked weakptr:
+  Found no leaked weakptrs.
+[Package Manager] Server process was shutdown
+##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1781260646316,"processId":38288,"allocatedMemory":17630410,"memoryLabels":[{"Default":183235},{"Permanent":15276},{"NewDelete":67131},{"Thread":4230344},{"Manager":34061},{"VertexData":8},{"Geometry":816},{"Texture":24},{"Shader":848592},{"Material":24},{"GfxDevice":55320},{"Animation":392},{"Audio":3008},{"Font":2235457},{"FreeType":66455},{"FontEngine":736},{"Physics":2090},{"Physics2D":16},{"Serialization":1136},{"Input":9880},{"JobScheduler":33024},{"TextLib":216},{"Mono":32},{"MonoCode":64},{"ScriptingNativeRuntime":155052},{"BaseObject":1620560},{"Resource":1184},{"Renderer":3008},{"Transform":4685},{"File":1088},{"WebCam":616},{"Culling":32},{"Terrain":11394},{"Wind":24},{"STL":40},{"String":12966},{"StaticString":6718},{"Utility":2673318},{"Curl":2559},{"PoolAlloc":2168},{"AI":80},{"TypeTree":20445},{"ScriptManager":448},{"RuntimeInitializeOnLoadManager":64},{"SpriteAtlas":120},{"GI":7792},{"Director":8320},{"CloudService":288},{"WebRequest":808},{"VR":48050},{"SceneManager":504},{"Video":64},{"LazyScriptCache":32},{"Camera":17},{"Secure":2377},{"SerializationCache":1576},{"APIUpdating":10320},{"Subsystems":336},{"VirtualTexturing":57888},{"StaticSafetyDebugInfo":278528},{"Analytics":344},{"Hierarchy":608},{"CoreStats":13032},{"Identifiers":12960},{"Gui":128},{"EditorUtility":119796},{"VersionControl":4},{"Undo":931},{"AssetDatabase":4707407},{"EditorGi":328},{"UnityConnect":37777},{"Upm":1912},{"UpmDiagnostics":8},{"AssetCompliance":64},{"DrivenProperties":72},{"LocalIPC":212},{"ProfilerEditor":9746},{"CoreBusinessMetrics":2627},{"Windowing":456},{"Licensing":1232},{"AssetReference":32},{"IPCStream":32}]}

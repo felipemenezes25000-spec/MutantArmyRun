@@ -21,6 +21,9 @@ namespace MutantArmy.UI
         [SerializeField] private TMP_Text _weaknessText;
         [SerializeField] private TMP_Text _hintText;
         [SerializeField] private Image _portrait;
+        [SerializeField] private Image _elementIcon;    // orbe tintado pela cor do elemento do boss
+        [SerializeField] private Image _weaknessIcon;   // orbe tintado pela cor da FRAQUEZA (reforça o texto)
+        [SerializeField] private Image _timerFill;      // anel radial: esvazia junto com o auto-dismiss
         [SerializeField] private Button _skipButton;    // botão fullscreen: qualquer toque pula
 
         private Coroutine _autoHide;
@@ -69,6 +72,18 @@ namespace MutantArmy.UI
                 _portrait.sprite = boss.scoutCardArt;
                 _portrait.enabled = boss.scoutCardArt != null;
             }
+            if (_elementIcon != null)
+            {
+                _elementIcon.color = ElementColorPt(boss.element);
+                _elementIcon.enabled = _elementIcon.sprite != null;
+            }
+            if (_weaknessIcon != null)
+            {
+                bool hasWeakness = boss.weaknesses != null && boss.weaknesses.Length > 0;
+                if (hasWeakness) _weaknessIcon.color = ElementColorPt(boss.weaknesses[0]);
+                _weaknessIcon.enabled = hasWeakness && _weaknessIcon.sprite != null;
+            }
+            if (_timerFill != null) _timerFill.fillAmount = 1f;
         }
 
         public static string ElementNamePt(ElementType element)
@@ -87,6 +102,26 @@ namespace MutantArmy.UI
             }
         }
 
+        /// <summary>
+        /// Cor canônica por elemento (doc 09 P7: a COR reforça, o NOME informa — nunca
+        /// só cor). Tons vivos para tintar orbes/ícones sobre o cartão escuro.
+        /// </summary>
+        public static Color ElementColorPt(ElementType element)
+        {
+            switch (element)
+            {
+                case ElementType.Fire: return new Color(1.00f, 0.45f, 0.15f);
+                case ElementType.Ice: return new Color(0.45f, 0.85f, 1.00f);
+                case ElementType.Lightning: return new Color(1.00f, 0.92f, 0.25f);
+                case ElementType.Poison: return new Color(0.55f, 0.90f, 0.25f);
+                case ElementType.Light: return new Color(1.00f, 0.97f, 0.75f);
+                case ElementType.Shadow: return new Color(0.58f, 0.40f, 0.88f);
+                case ElementType.Metal: return new Color(0.75f, 0.78f, 0.85f);
+                case ElementType.Alien: return new Color(0.40f, 1.00f, 0.65f);
+                default: return new Color(0.70f, 0.70f, 0.75f);
+            }
+        }
+
         private IEnumerator AutoHideRoutine(float seconds)
         {
             // unscaled: o cartão fecha no tempo certo mesmo se o jogo congelar timeScale.
@@ -94,6 +129,9 @@ namespace MutantArmy.UI
             while (t < seconds)
             {
                 t += Time.unscaledDeltaTime;
+                // Timer circular esvaziando: comunica o auto-dismiss sem texto (doc 09 §5.1).
+                if (_timerFill != null && seconds > 0f)
+                    _timerFill.fillAmount = Mathf.Clamp01(1f - t / seconds);
                 yield return null;
             }
             Finish();

@@ -21,6 +21,8 @@ namespace MutantArmy.Core
         public Mesh mesh;
         public Material material;              // material com VAT (doc 12 §6)
         public Texture2D vatTexture;           // animação assada (idle/run/attack)
+        public GameObject viewPrefab;          // view pooled (SkinnedMeshRenderer+Animator) — Supply cap 60;
+                                               // nulo → fallback instanced via mesh/material acima (VAT pós-MVP)
         public Sprite cardIcon;
         public AnimationCurve levelHpCurve, levelDpsCurve;        // escala nv 1–10
     }

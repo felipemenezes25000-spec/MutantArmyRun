@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01c82c59f01d9824a84f4dfb43b3a653, type: 3}
+  m_Name: AudioCatalog
+  m_EditorClassIdentifier: MutantArmy.Services::MutantArmy.Services.AudioCatalogSO
+  gatePositive: {fileID: 8300000, guid: 8393e0fd44403c74cba94070b3691d33, type: 3}
+  gateNegative: {fileID: 8300000, guid: e0504e2628a2559438fe755e0a1856e8, type: 3}
+  coin: {fileID: 8300000, guid: 6107e2f52194d9446be34090ce10b6db, type: 3}
+  pop: {fileID: 8300000, guid: db8169677a80ea1418182bab6eed823d, type: 3}
+  bossHit: {fileID: 8300000, guid: 87a9dc0aad2c19149b963a6ed8041723, type: 3}
+  bossRoar: {fileID: 8300000, guid: f73081df16f57c846ae12ba1f7a887d7, type: 3}
+  uiClick: {fileID: 8300000, guid: 9160b45fd98bee14980cb69135fffc46, type: 3}
+  uiConfirm: {fileID: 8300000, guid: 11ad9c3d89943a54a8fd2bbb0a8ef483, type: 3}
+  victoryJingle: {fileID: 8300000, guid: 3d957fa62f1c5914ca8b80b1644fa6e3, type: 3}
+  defeatJingle: {fileID: 8300000, guid: 250282a506c3b584480937e792edc0c5, type: 3}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MutantArmy.Core;
 using MutantArmy.Domain;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MutantArmy.Gameplay
 {
@@ -30,6 +31,27 @@ namespace MutantArmy.Gameplay
         private int _nextWaveEvent;   // ponteiro: nunca varre a lista (doc 12 §4.5)
         private ArenaWave[] _domainWaves = Array.Empty<ArenaWave>();
 
+        // ---- View do boss: BossConfigSO.prefab pooled; cápsula fallback se nulo ----
+        [SerializeField] private float _viewAheadMeters = 12f;   // boss nasce à frente do exército, centro da pista
+
+        // contrato do parâmetro int "State" do AnimatorController de boss (UnitVisualFactory)
+        private static readonly int ViewStateParamHash = Animator.StringToHash("State");
+        private const int ViewStateIdle = 0;
+        private const int ViewStateAttack = 1;
+
+        private readonly Dictionary<GameObject, ObjectPool<GameObject>> _viewPools =
+            new Dictionary<GameObject, ObjectPool<GameObject>>();     // pool POR PREFAB (doc 12 §6.4)
+        private readonly Dictionary<GameObject, GameObject> _viewTemplateByInstance =
+            new Dictionary<GameObject, GameObject>();
+        private GameObject _view;
+        private Animator _viewAnimator;
+        private int _viewAnimState = -1;
+        private Vector3 _viewTargetScale = Vector3.one;
+        private float _entranceSeconds;
+        private readonly Countdown _entrance = new Countdown();      // Domain: entrada ≤ 2 s (CANON §6)
+        private bool _entranceActive;
+        private GameObject _fallbackTemplate;                        // cápsula construída 1× sob demanda
+
         // Inimigos da arena como AGREGADOS (combate agregado, doc 12 §4.4): grupo = dado,
         // sem GameObject por inimigo. O CombatSystem consome estes agregados por tick.
         private sealed class ArenaEnemyGroup
@@ -52,6 +74,8 @@ namespace MutantArmy.Gameplay
                 // -= antes de += para Init repetido não duplicar a inscrição.
                 GameManager.Instance.StateEntered -= HandleStateEntered;
                 GameManager.Instance.StateEntered += HandleStateEntered;
+                GameManager.Instance.StateExited -= HandleStateExited;
+                GameManager.Instance.StateExited += HandleStateExited;
             }
         }
 
@@ -62,10 +86,20 @@ namespace MutantArmy.Gameplay
             if (level != null) BeginFight(level.boss, level.bossHpMultiplier);
         }
 
+        // Vitória, derrota e saída para o menu passam TODAS por ExitState(BossFight)
+        // (inclusive o caminho do revive recusado: Pop + ChangeState) — único ponto de release.
+        private void HandleStateExited(GameState s)
+        {
+            if (s == GameState.BossFight) ReleaseView();
+        }
+
         private void OnDestroy()
         {
             if (GameManager.Instance != null)
+            {
                 GameManager.Instance.StateEntered -= HandleStateEntered;
+                GameManager.Instance.StateExited -= HandleStateExited;
+            }
         }
 
         public void BeginFight(BossConfigSO config)
@@ -86,6 +120,8 @@ namespace MutantArmy.Gameplay
 
             if (CrowdManager.Instance != null)
                 CrowdManager.Instance.EnterArenaFormation();   // handoff sim→cinemática (decisão 3)
+
+            SpawnView(config);   // prefab do SO (pooled) ou cápsula fallback, escala 0→alvo
 
             // entrada ≤ 2 s (CANON §6): a luta "começa" depois da animação de entrada
             _specialCooldown.Set(config.specialBaseCooldown + config.entranceSeconds);
@@ -120,6 +156,7 @@ namespace MutantArmy.Gameplay
             float dt = Time.deltaTime;
             Current.FightTime += dt;
             Current.TickStatus(dt);
+            TickEntrance(dt);   // cosmético: escala 0→alvo com ease-out (CANON §6: ≤ 2 s)
 
             // Waves da arena: lista ORDENADA + ponteiro do Domain (decisão 1) — dt gigante
             // dispara todas em ordem, dt pequeno nunca duplica
@@ -134,6 +171,7 @@ namespace MutantArmy.Gameplay
             {
                 _telegraphing = true;
                 _telegraph.Set(Current.Config.telegraphSeconds);   // janela de leitura, padrão 1,0 s
+                ApplyViewAnim(ViewStateAttack);                    // windup: o corpo telegrapha junto do decal
                 if (VFXManager.Instance != null)
                     VFXManager.Instance.ShowTelegraph(Current.Config.specialAttackArea,
                                                       Current.Config.telegraphSeconds);
@@ -150,6 +188,7 @@ namespace MutantArmy.Gameplay
         private void FireSpecial()
         {
             _telegraphing = false;
+            ApplyViewAnim(ViewStateIdle);   // golpe disparado: corpo volta ao idle até o próximo windup
             if (Current == null) return;
             if (CrowdManager.Instance != null)
                 CrowdManager.Instance.DamageArea(Current.Config.specialAttackArea,
@@ -189,8 +228,134 @@ namespace MutantArmy.Gameplay
             if (VFXManager.Instance != null) VFXManager.Instance.SlowMotion(0.3f, 0.8f);
 
             // recompensa do boss é responsabilidade da Meta, que reage a OnLevelFinished
-            // (disparado pelo GameManager no ResolveEnd) — fronteira de asmdef (doc 12 §2.3)
+            // (disparado pelo GameManager no ResolveEnd) — fronteira de asmdef (doc 12 §2.3);
+            // a view é devolvida ao pool no ExitState(BossFight) que esta transição dispara
             if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameState.Victory);
+        }
+
+        // ------------------------------------------------------------------
+        // View do boss: BossConfigSO.prefab quando existir (instância POOLED na arena,
+        // entrada escala 0→alvo com ease-out); cápsula fallback quando nulo.
+        // Cosmético puro: HP/fase/dano vivem no BossRuntime — nada aqui altera a luta.
+        // ------------------------------------------------------------------
+
+        private void SpawnView(BossConfigSO config)
+        {
+            ReleaseView();   // defensivo: re-entrada sem ExitState não vaza instância
+
+            GameObject template = config.prefab != null ? config.prefab : GetFallbackTemplate();
+            if (template == null) return;
+
+            _view = GetViewPool(template).Get();
+            _viewTemplateByInstance[_view] = template;
+
+            // arena: centro da pista (x=0), alguns metros à frente de onde o exército chegou
+            Vector3 pos = CrowdAnchor.Position;
+            pos.x = 0f;
+            pos.y = 0f;
+            pos.z += _viewAheadMeters;
+            // boss encara o exército, que chega vindo de −Z
+            _view.transform.SetPositionAndRotation(pos, Quaternion.LookRotation(Vector3.back));
+
+            // entrada canônica (CANON §6, ≤ 2 s): escala 0 → escala do prefab com ease-out
+            _viewTargetScale = template.transform.localScale;
+            _view.transform.localScale = Vector3.zero;
+            _entranceSeconds = Mathf.Max(0.05f, config.entranceSeconds);
+            _entrance.Set(_entranceSeconds);
+            _entranceActive = true;
+
+            _viewAnimator = _view.GetComponentInChildren<Animator>(true);
+            if (_viewAnimator != null && !HasIntParam(_viewAnimator, ViewStateParamHash))
+                _viewAnimator = null;   // cápsula greybox/fallback não tem o parâmetro — vira no-op
+            _viewAnimState = -1;
+            ApplyViewAnim(ViewStateIdle);
+        }
+
+        private void TickEntrance(float dt)
+        {
+            if (!_entranceActive || _view == null) return;
+            _entrance.Tick(dt);
+            float t = 1f - Mathf.Clamp01(_entrance.Remaining / _entranceSeconds);
+            float eased = 1f - Mathf.Pow(1f - t, 3f);   // ease-out cúbico: chega "pesado", sem pop
+            _view.transform.localScale = _viewTargetScale * eased;
+            if (_entrance.Done)
+            {
+                _entranceActive = false;
+                _view.transform.localScale = _viewTargetScale;
+            }
+        }
+
+        private void ReleaseView()
+        {
+            _entranceActive = false;
+            _viewAnimator = null;
+            _viewAnimState = -1;
+            if (_view == null) return;
+
+            if (_viewTemplateByInstance.TryGetValue(_view, out GameObject template) && template != null
+                && _viewPools.TryGetValue(template, out ObjectPool<GameObject> pool))
+            {
+                _viewTemplateByInstance.Remove(_view);
+                pool.Release(_view);   // Release, nunca Destroy (doc 12 §6.4)
+            }
+            else
+            {
+                _viewTemplateByInstance.Remove(_view);
+                _view.SetActive(false);
+            }
+            _view = null;
+        }
+
+        private void ApplyViewAnim(int state)
+        {
+            if (_viewAnimator == null || _viewAnimState == state) return;
+            _viewAnimState = state;
+            _viewAnimator.SetInteger(ViewStateParamHash, state);
+        }
+
+        private ObjectPool<GameObject> GetViewPool(GameObject template)
+        {
+            if (_viewPools.TryGetValue(template, out ObjectPool<GameObject> pool)) return pool;
+            pool = new ObjectPool<GameObject>(
+                () =>
+                {
+                    GameObject go = Instantiate(template, transform);
+                    go.SetActive(false);
+                    return go;
+                },
+                go => go.SetActive(true),
+                go => go.SetActive(false),
+                go => { if (go != null) Destroy(go); },
+                collectionCheck: false, defaultCapacity: 1, maxSize: 2);
+            _viewPools[template] = pool;
+            return pool;
+        }
+
+        // Cápsula greybox (~8 m) construída 1× sob demanda — mantém a leitura do boss
+        // mesmo com BossConfigSO.prefab nulo (mesma silhueta do Boss_Greybox do factory).
+        private GameObject GetFallbackTemplate()
+        {
+            if (_fallbackTemplate != null) return _fallbackTemplate;
+            var root = new GameObject("Boss_FallbackCapsule");
+            root.transform.SetParent(transform, false);
+            root.SetActive(false);
+            GameObject body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            Collider collider = body.GetComponent<Collider>();
+            if (collider != null) Destroy(collider);   // view pura: sem física na arena
+            body.name = "Body";
+            body.transform.SetParent(root.transform, false);
+            body.transform.localPosition = new Vector3(0f, 4f, 0f);
+            body.transform.localScale = new Vector3(4f, 4f, 4f);
+            _fallbackTemplate = root;
+            return root;
+        }
+
+        private static bool HasIntParam(Animator animator, int hash)
+        {
+            AnimatorControllerParameter[] ps = animator.parameters;   // aloca: 1× por spawn, nunca por frame
+            for (int i = 0; i < ps.Length; i++)
+                if (ps[i].nameHash == hash && ps[i].type == AnimatorControllerParameterType.Int) return true;
+            return false;
         }
 
         private void SpawnWave(ArenaWaveEvent w)

@@ -15,11 +15,15 @@ namespace MutantArmy.Gameplay
         [SerializeField] private TMP_Text _label;
         [SerializeField] private Collider _trigger;
         [SerializeField] private MeshRenderer _frameRenderer;
+        // Moldura/arco emissivo do portal (WorldVisualFactory) — tintado pelo portalColor
+        // do config via MPB, igual ao painel. Opcional: vazio no greybox puro.
+        [SerializeField] private Renderer[] _frameTrimRenderers;
 
         private GatePairView _pair;
         private MaterialPropertyBlock _mpb;
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");   // URP Lit
         private static readonly int ColorId = Shader.PropertyToID("_Color");           // fallback
+        private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
         public GateConfigSO Config => _config;
 
@@ -71,6 +75,22 @@ namespace MutantArmy.Gameplay
                 _mpb.SetColor(BaseColorId, _config.portalColor);
                 _mpb.SetColor(ColorId, _config.portalColor);
                 _frameRenderer.SetPropertyBlock(_mpb);   // MPB: sem instanciar material em runtime
+            }
+
+            if (_frameTrimRenderers != null && _frameTrimRenderers.Length > 0)
+            {
+                if (_mpb == null) _mpb = new MaterialPropertyBlock();
+                // Emissão acima de 1: clampa no buffer LDR mas cruza o threshold do Bloom —
+                // a moldura "acende" na cor do portal (azul=positivo, laranja=negativo,
+                // dourado=risco; cores vêm do GateConfigSO — portais honestos, CANON §3.4).
+                _mpb.SetColor(BaseColorId, _config.portalColor);
+                _mpb.SetColor(ColorId, _config.portalColor);
+                _mpb.SetColor(EmissionColorId, _config.portalColor * 2f);
+                for (int i = 0; i < _frameTrimRenderers.Length; i++)
+                {
+                    if (_frameTrimRenderers[i] != null)
+                        _frameTrimRenderers[i].SetPropertyBlock(_mpb);
+                }
             }
         }
 

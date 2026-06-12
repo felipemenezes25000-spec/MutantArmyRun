@@ -26,6 +26,7 @@ MonoBehaviour:
   mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 92c4d58228849694d805cb94e8d30322, type: 2}
   vatTexture: {fileID: 0}
+  viewPrefab: {fileID: 6877565702950780519, guid: 99bad13879d00d3458805229ff13b888, type: 3}
   cardIcon: {fileID: 0}
   levelHpCurve:
     serializedVersion: 2

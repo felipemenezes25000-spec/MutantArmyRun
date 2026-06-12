@@ -386,7 +386,9 @@ namespace MutantArmy.Gameplay
             }
 
             if (_count > 0) Centroid = sum / _count;   // cache: mantém último valor se zerar
-            CrowdRenderer.Submit(_positions, _typeIds, _flags, _count);
+            // velocidades (rotação da view) + timers de dying (anim de queda) vão juntos:
+            // o caminho pooled do CrowdRenderer precisa deles; o instanced ignora
+            CrowdRenderer.Submit(_positions, _velocities, _typeIds, _flags, _dyingTimer, _dyingSeconds, _count);
         }
 
         // Separação com falloff linear Clamp01(1 − d/raio); vizinhos via grid uniforme em XZ.

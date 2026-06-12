@@ -23,18 +23,27 @@ namespace MutantArmy.Editor
     /// (MainMenuController); HUD/ResultScreen/GameUIController na cena Game com todos os
     /// campos serializados ligados aos assets do MvpContentFactory. Idempotente: rodar
     /// de novo recria as cenas e re-liga tudo.
+    /// A UI usa o SKIN premium do UiSkinFactory (sprites Kenney 9-slice + fonte TMP com
+    /// outline + gradiente gerado, doc 01 §6): se um asset do skin faltar, cada elemento
+    /// degrada individualmente para o builtin — nunca erro, nunca cena quebrada.
     /// </summary>
     public static class ProjectSetup
     {
         private const string ScenesFolder = "Assets/_Project/Scenes";
         private const string SoRoot = "Assets/_Project/ScriptableObjects";
 
-        // Cores canônicas de UI (doc 09): ciano positivo, âmbar de aviso, cinza neutro.
+        // Cores canônicas de UI (doc 09 + doc 01 §6.5): ciano positivo, âmbar de aviso,
+        // verde = ganho, vermelho = perda, dourado = moedas/CTA premium.
         private static readonly Color Cyan = new Color(0.20f, 0.75f, 1.00f);
         private static readonly Color Amber = new Color(1.00f, 0.75f, 0.15f);
         private static readonly Color PanelDark = new Color(0.06f, 0.08f, 0.12f, 0.96f);
         private static readonly Color ButtonGrey = new Color(0.35f, 0.38f, 0.45f);
         private static readonly Color Green = new Color(0.25f, 0.80f, 0.35f);
+        private static readonly Color Gold = new Color(1.00f, 0.86f, 0.40f);
+        private static readonly Color GoldDeep = new Color(1.00f, 0.58f, 0.12f);
+        private static readonly Color CardNavy = new Color(0.10f, 0.12f, 0.20f, 0.97f);
+        private static readonly Color ChipBg = new Color(0.06f, 0.08f, 0.14f, 0.72f);
+        private static readonly Color TextSoft = new Color(0.80f, 0.85f, 0.90f);
 
         [MenuItem("MAR Tools/Setup Project")]
         public static void SetupProject()
@@ -47,6 +56,7 @@ namespace MutantArmy.Editor
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
             EnsureTmpEssentials();      // TMP Settings + fonte default — sem isso TMP_Text nasce sem fonte
+            UiSkinFactory.BuildAll();   // skin premium (sprites Kenney + fonte + gradiente) ANTES das cenas
             EnsureFolder(ScenesFolder);
             EnsureGameSettingsAsset();  // catálogo de fases em Resources (doc 12 §2.1) p/ o botão Jogar
 
@@ -62,7 +72,7 @@ namespace MutantArmy.Editor
             };
 
             AssetDatabase.SaveAssets();
-            Debug.Log("MAR Tools: cenas Boot/Main/Game criadas, UI ligada e Build Settings atualizado.");
+            Debug.Log("MAR Tools: cenas Boot/Main/Game criadas, UI premium ligada e Build Settings atualizado.");
         }
 
         // ------------------------------------------------------------------ Boot
@@ -141,15 +151,26 @@ namespace MutantArmy.Editor
                 remoteConfig, analytics, ads, iap, economy, upgrade, unit, reward, audio, ui
             });
 
-            // Splash: orçamento de boot de 2,5 s sem visual além disto (doc 12 §2.2).
+            // Splash: orçamento de boot de 2,5 s — gradiente do skin + logo (doc 12 §2.2).
             GameObject splash = CreateCanvas("SplashCanvas", null);
             var bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
             var bgRect = (RectTransform)bg.transform;
             bgRect.SetParent(splash.transform, false);
             StretchFull(bgRect);
-            bg.GetComponent<Image>().color = Color.black;
-            CreateTmpLabel(splash.transform, "Title", "MUTANT ARMY RUN", 64f,
-                           TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(900f, 200f));
+            var bgImage = bg.GetComponent<Image>();
+            Sprite splashGradient = UiSkin.MenuGradient;
+            if (splashGradient != null)
+            {
+                bgImage.sprite = splashGradient;
+                bgImage.color = Color.white;
+            }
+            else
+            {
+                bgImage.color = Color.black;
+            }
+            TMP_Text splashTitle = CreateTmpLabel(splash.transform, "Title", "MUTANT ARMY\nRUN", 84f,
+                           TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(900f, 360f));
+            ApplyTitleStyle(splashTitle, 0f);
 
             string path = ScenesFolder + "/Boot.unity";
             EditorSceneManager.SaveScene(scene, path);
@@ -169,23 +190,55 @@ namespace MutantArmy.Editor
             GameObject canvas = CreateCanvas("MainCanvas", null);
             var menu = canvas.AddComponent<MainMenuController>();
 
-            CreateTmpLabel(canvas.transform, "Title", "MUTANT ARMY RUN", 84f,
-                           TextAlignmentOptions.Center, Anchors.TopCenter, new Vector2(0f, -260f), new Vector2(960f, 220f));
+            // Fundo: gradiente vertical vibrante gerado em código (doc 01 §6.2) +
+            // dois glows suaves de profundidade. Tudo raycast-off.
+            Sprite gradient = UiSkin.MenuGradient;
+            var bgGo = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            var bgRect = (RectTransform)bgGo.transform;
+            bgRect.SetParent(canvas.transform, false);
+            StretchFull(bgRect);
+            var bgImg = bgGo.GetComponent<Image>();
+            bgImg.raycastTarget = false;
+            if (gradient != null) { bgImg.sprite = gradient; bgImg.color = Color.white; }
+            else bgImg.color = new Color(0.23f, 0.14f, 0.45f);
 
-            // Topo: moedas (esquerda) e gemas (direita) — preenchidos pelo controller via save/eventos.
-            TMP_Text coins = CreateTmpLabel(canvas.transform, "CoinsText", "0", 44f,
-                           TextAlignmentOptions.Left, Anchors.TopLeft, new Vector2(60f, -70f), new Vector2(360f, 70f), Amber);
-            TMP_Text gems = CreateTmpLabel(canvas.transform, "GemsText", "0", 44f,
-                           TextAlignmentOptions.Right, Anchors.TopRight, new Vector2(-60f, -70f), new Vector2(360f, 70f),
-                           new Color(0.55f, 0.85f, 1f));
+            Sprite glow = UiSkin.GlowSoft;
+            if (glow != null)
+            {
+                CreateImage(canvas.transform, "GlowTop", glow, new Color(1f, 1f, 1f, 0.10f),
+                            Anchors.TopCenter, new Vector2(-320f, -260f), new Vector2(900f, 900f), Image.Type.Simple);
+                CreateImage(canvas.transform, "GlowBottom", glow, new Color(1f, 0.55f, 0.85f, 0.08f),
+                            Anchors.BottomCenter, new Vector2(380f, 220f), new Vector2(1100f, 1100f), Image.Type.Simple);
+            }
 
-            TMP_Text levelText = CreateTmpLabel(canvas.transform, "LevelText", "FASE 1", 52f,
-                           TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 180f), new Vector2(600f, 90f));
+            // Topo: painéis de moeda (esq.) e gema (dir.) com ícones — preenchidos pelo controller.
+            TMP_Text coins = CreateWalletChip(canvas.transform, "CoinsChip", UiSkin.IconCoin, Color.white,
+                            Anchors.TopLeft, new Vector2(205f, -90f), new Vector2(330f, 84f), Amber);
+            TMP_Text gems = CreateWalletChip(canvas.transform, "GemsChip", UiSkin.IconGem, new Color(0.55f, 0.85f, 1f),
+                            Anchors.TopRight, new Vector2(-205f, -90f), new Vector2(330f, 84f), new Color(0.55f, 0.85f, 1f));
 
-            // Botão JOGAR — grande, central (uGUI Button + TMP).
+            // Logo tipográfico: grande, outline (material da fonte), gradiente dourado e
+            // leve rotação — identidade sem depender de arte bitmap.
+            TMP_Text title = CreateTmpLabel(canvas.transform, "Title", "MUTANT ARMY\nRUN", 108f,
+                           TextAlignmentOptions.Center, Anchors.TopCenter, new Vector2(0f, -420f), new Vector2(980f, 380f));
+            ApplyTitleStyle(title, -4f);
+
+            // Badge da fase atual.
+            Image levelBadge = CreateImage(canvas.transform, "LevelBadge",
+                            UiSkin.BadgeFlat, UiSkin.BadgeFlat != null ? new Color(0.08f, 0.10f, 0.20f, 0.78f) : PanelDark,
+                            Anchors.Middle, new Vector2(0f, 130f), new Vector2(380f, 96f));
+            TMP_Text levelText = CreateTmpLabel(levelBadge.transform, "LevelText", "FASE 1", 50f,
+                           TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(380f, 96f));
+
+            // Botão JOGAR — gigante, dourado, na thumb zone (terço inferior, doc 09 §6),
+            // com pulso sutil em loop e ScalePop no press (UIButtonPop via CreateButton).
             TMP_Text playLabel;
-            Button play = CreateButton(canvas.transform, "PlayButton", "JOGAR", 64f, Cyan,
-                                       Anchors.Middle, new Vector2(0f, -40f), new Vector2(540f, 170f), out playLabel);
+            Button play = CreateButton(canvas.transform, "PlayButton", "JOGAR", 80f,
+                                       UiSkin.ButtonGold, Amber,
+                                       Anchors.Middle, new Vector2(0f, -330f), new Vector2(660f, 190f), out playLabel);
+            play.gameObject.AddComponent<UIPulse>();
+            if (AddIcon(play.transform, "PlayIcon", UiSkin.IconPlay, new Vector2(-220f, 0f), 64f) != null)
+                ((RectTransform)playLabel.transform).anchoredPosition = new Vector2(28f, 0f);
 
             WireSerializedField(menu, "_playButton", play);
             WireSerializedField(menu, "_playLabel", playLabel);
@@ -292,25 +345,39 @@ namespace MutantArmy.Editor
 
         private static void BuildHudElements(HudController controller, RectTransform root)
         {
-            // Barra de progresso da pista (topo, fina) — OnRunProgress.
+            // Barra de progresso da pista (zona segura do topo, doc 01 §6.4) com o ícone
+            // do boss na ponta — o jogador vê o quão perto está da arena.
             Image progressFill = CreateBar(root, "ProgressBar", Anchors.TopCenter,
-                new Vector2(0f, -50f), new Vector2(760f, 22f), Green);
+                new Vector2(0f, -60f), new Vector2(720f, 36f), Green);
+            Transform progressBg = progressFill.transform.parent;
+            Sprite glow = UiSkin.GlowSoft;
+            if (glow != null)
+            {
+                Image marker = CreateImage(progressBg, "BossMarker", glow, new Color(1f, 0.28f, 0.20f, 0.95f),
+                    Anchors.MiddleRight, new Vector2(16f, 0f), new Vector2(96f, 96f), Image.Type.Simple);
+                AddIcon(marker.transform, "Exclamation", UiSkin.IconExclamation, Vector2.zero, 44f);
+            }
 
-            // Contador de tropas: o número mais importante da tela (doc 09 §4.2).
-            TMP_Text unitCount = CreateTmpLabel(root, "UnitCountText", "1", 96f,
-                TextAlignmentOptions.Center, Anchors.TopCenter, new Vector2(0f, -150f), new Vector2(420f, 130f));
+            // Contador de tropas em BADGE grande central-superior: o número mais
+            // importante da tela (doc 09 §4.2); pop ao mudar vem do HudController.
+            Image armyBadge = CreateImage(root, "ArmyBadge",
+                UiSkin.BadgeRound, UiSkin.BadgeRound != null ? Color.white : new Color(0.13f, 0.30f, 0.60f, 0.90f),
+                Anchors.TopCenter, new Vector2(0f, -175f), new Vector2(330f, 150f));
+            TMP_Text unitCount = CreateTmpLabel(armyBadge.transform, "UnitCountText", "1", 96f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 2f), new Vector2(330f, 150f));
 
             // Barra de Supply "52/60" com fill e texto sobreposto.
             Image supplyFill = CreateBar(root, "SupplyBar", Anchors.TopCenter,
-                new Vector2(0f, -250f), new Vector2(520f, 34f), Cyan);
+                new Vector2(0f, -290f), new Vector2(520f, 40f), Cyan);
             TMP_Text supplyText = CreateTmpLabel(supplyFill.transform.parent, "SupplyText", "0/60", 28f,
-                TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(520f, 34f));
+                TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(520f, 40f));
 
-            // Carteira persistente (topo-esquerda) + delta da corrida (visual DISTINTO).
-            TMP_Text coins = CreateTmpLabel(root, "CoinsText", "0", 40f,
-                TextAlignmentOptions.Left, Anchors.TopLeft, new Vector2(50f, -60f), new Vector2(320f, 60f), Amber);
-            TMP_Text runCoins = CreateTmpLabel(root, "RunCoinsText", "+0", 34f,
-                TextAlignmentOptions.Left, Anchors.TopLeft, new Vector2(50f, -120f), new Vector2(320f, 50f),
+            // Carteira persistente (topo-esquerda, chip com ícone) + delta da corrida
+            // (visual DISTINTO — doc 12 §4.13).
+            TMP_Text coins = CreateWalletChip(root, "CoinsChip", UiSkin.IconCoin, Color.white,
+                Anchors.TopLeft, new Vector2(185f, -70f), new Vector2(300f, 76f), Amber);
+            TMP_Text runCoins = CreateTmpLabel(root, "RunCoinsText", "+0", 36f,
+                TextAlignmentOptions.Left, Anchors.TopLeft, new Vector2(195f, -140f), new Vector2(320f, 50f),
                 new Color(1f, 0.95f, 0.55f));
 
             // 3 slots de mutação (CANON §3.3) na lateral esquerda.
@@ -333,44 +400,80 @@ namespace MutantArmy.Editor
 
         private static ResultScreen BuildResultScreen(RectTransform parent)
         {
-            GameObject panel = CreatePanel(parent, "ResultScreen", PanelDark);
+            GameObject panel = CreatePanel(parent, "ResultScreen", new Color(0f, 0f, 0f, 0.85f));
             panel.AddComponent<CanvasGroup>();              // UIScreen exige CanvasGroup
             var screen = panel.AddComponent<ResultScreen>();
 
-            TMP_Text title = CreateTmpLabel(panel.transform, "Title", "VITÓRIA!", 76f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 440f), new Vector2(800f, 120f));
+            // Cartão central escuro sobre o dim — tudo do resultado vive nele.
+            Image card = CreateImage(panel.transform, "Card",
+                UiSkin.BadgeFlat, UiSkin.BadgeFlat != null ? CardNavy : PanelDark,
+                Anchors.Middle, new Vector2(0f, -10f), new Vector2(920f, 1320f));
 
-            // Selo PERFECT (doc 09 §4.4) — GameObject ligado ao campo _perfectBadge.
-            TMP_Text perfect = CreateTmpLabel(panel.transform, "PerfectBadge", "PERFECT!", 44f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 340f), new Vector2(500f, 70f), Amber);
-            perfect.gameObject.SetActive(false);
+            // Header colorido: o ResultScreen pinta verde/vermelho no Bind (doc 01 §6.5).
+            Image headerBg = CreateImage(card.transform, "Header",
+                UiSkin.BadgeFlat, new Color(0.22f, 0.72f, 0.35f),
+                Anchors.Middle, new Vector2(0f, 580f), new Vector2(880f, 150f));
+            TMP_Text title = CreateTmpLabel(headerBg.transform, "Title", "VITÓRIA!", 76f,
+                TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(880f, 150f));
 
-            // O número principal é o DELTA, nunca o total da carteira (doc 12 §4.13).
-            TMP_Text coinsDelta = CreateTmpLabel(panel.transform, "CoinsDelta", "+0", 100f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 210f), new Vector2(700f, 140f), Amber);
-            TMP_Text xpDelta = CreateTmpLabel(panel.transform, "XpDelta", "+0 XP", 44f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 100f), new Vector2(600f, 70f));
-            TMP_Text survivors = CreateTmpLabel(panel.transform, "Survivors", "Sobreviventes: 0", 36f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 20f), new Vector2(700f, 60f));
-            TMP_Text damage = CreateTmpLabel(panel.transform, "Damage", "Dano causado: 0", 36f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, -40f), new Vector2(700f, 60f));
+            // Espaço reservado do confete (o agente de juice ancora o burst aqui).
+            var confetti = new GameObject("ConfettiAnchor", typeof(RectTransform));
+            var confettiRect = (RectTransform)confetti.transform;
+            confettiRect.SetParent(card.transform, false);
+            PlaceRect(confettiRect, Anchors.Middle, new Vector2(0f, 350f), new Vector2(800f, 400f));
 
+            // Selo PERFECT (doc 09 §4.4) — container com estrela + texto, ligado ao
+            // campo _perfectBadge (GameObject).
+            var perfectGo = new GameObject("PerfectBadge", typeof(RectTransform));
+            var perfectRect = (RectTransform)perfectGo.transform;
+            perfectRect.SetParent(card.transform, false);
+            PlaceRect(perfectRect, Anchors.Middle, new Vector2(0f, 455f), new Vector2(520f, 80f));
+            AddIcon(perfectRect, "Star", UiSkin.IconStar, new Vector2(-190f, 0f), 60f);
+            CreateTmpLabel(perfectRect, "Label", "PERFECT!", 46f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(20f, 0f), new Vector2(420f, 76f), Amber);
+            perfectGo.SetActive(false);
+
+            // O número principal é o DELTA, nunca o total da carteira (doc 12 §4.13) —
+            // ENORME, dourado, com a moeda do lado.
+            bool hasCoinIcon = AddIcon(card.transform, "CoinIcon", UiSkin.IconCoin, new Vector2(-230f, 320f), 96f) != null;
+            TMP_Text coinsDelta = CreateTmpLabel(card.transform, "CoinsDelta", "+0", 112f,
+                TextAlignmentOptions.Center, Anchors.Middle,
+                new Vector2(hasCoinIcon ? 40f : 0f, 320f), new Vector2(560f, 150f), Amber);
+
+            TMP_Text xpDelta = CreateTmpLabel(card.transform, "XpDelta", "+0 XP", 46f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 195f), new Vector2(600f, 70f));
+            TMP_Text survivors = CreateTmpLabel(card.transform, "Survivors", "Sobreviventes: 0", 36f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 110f), new Vector2(700f, 60f), TextSoft);
+            TMP_Text damage = CreateTmpLabel(card.transform, "Damage", "Dano causado: 0", 36f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 50f), new Vector2(700f, 60f), TextSoft);
+
+            // DOBRAR (verde, com ícone de vídeo do rewarded — CANON §11).
             TMP_Text doubleLabel;
-            Button doubleButton = CreateButton(panel.transform, "DoubleButton", "DOBRAR ×2", 44f, Green,
-                Anchors.Middle, new Vector2(0f, -180f), new Vector2(560f, 120f), out doubleLabel);
+            Button doubleButton = CreateButton(card.transform, "DoubleButton", "DOBRAR x2", 44f,
+                UiSkin.ButtonGreen, Green,
+                Anchors.Middle, new Vector2(0f, -105f), new Vector2(640f, 140f), out doubleLabel);
+            if (AddIcon(doubleButton.transform, "VideoIcon", UiSkin.IconVideo, new Vector2(-245f, 0f), 58f) != null)
+                ((RectTransform)doubleLabel.transform).anchoredPosition = new Vector2(30f, 0f);
 
-            Button nextButton = CreateButton(panel.transform, "NextButton", "PRÓXIMA FASE", 52f, Cyan,
-                Anchors.Middle, new Vector2(0f, -340f), new Vector2(560f, 140f), out _);
+            // PRÓXIMA FASE: o CTA principal — dourado, o maior do cartão.
+            Button nextButton = CreateButton(card.transform, "NextButton", "PRÓXIMA FASE", 56f,
+                UiSkin.ButtonGold, Amber,
+                Anchors.Middle, new Vector2(0f, -295f), new Vector2(660f, 170f), out _);
 
-            Button homeButton = CreateButton(panel.transform, "HomeButton", "MENU", 36f, ButtonGrey,
-                Anchors.Middle, new Vector2(0f, -480f), new Vector2(360f, 90f), out _);
+            TMP_Text homeLabel;
+            Button homeButton = CreateButton(card.transform, "HomeButton", "MENU", 38f,
+                UiSkin.ButtonGrey, ButtonGrey,
+                Anchors.Middle, new Vector2(0f, -490f), new Vector2(400f, 100f), out homeLabel);
+            if (AddIcon(homeButton.transform, "HomeIcon", UiSkin.IconHome, new Vector2(-140f, 0f), 44f) != null)
+                ((RectTransform)homeLabel.transform).anchoredPosition = new Vector2(22f, 0f);
 
+            WireSerializedField(screen, "_headerBg", headerBg);
             WireSerializedField(screen, "_titleText", title);
             WireSerializedField(screen, "_coinsDeltaText", coinsDelta);
             WireSerializedField(screen, "_xpDeltaText", xpDelta);
             WireSerializedField(screen, "_survivorsText", survivors);
             WireSerializedField(screen, "_damageText", damage);
-            WireSerializedField(screen, "_perfectBadge", perfect.gameObject);
+            WireSerializedField(screen, "_perfectBadge", perfectGo);
             WireSerializedField(screen, "_doubleButton", doubleButton);
             WireSerializedField(screen, "_doubleButtonLabel", doubleLabel);
             WireSerializedField(screen, "_nextButton", nextButton);
@@ -382,7 +485,7 @@ namespace MutantArmy.Editor
 
         private static BossScoutOverlay BuildBossScoutOverlay(RectTransform parent)
         {
-            GameObject panel = CreatePanel(parent, "BossScoutOverlay", new Color(0f, 0f, 0f, 0.88f));
+            GameObject panel = CreatePanel(parent, "BossScoutOverlay", new Color(0f, 0f, 0f, 0.85f));
             panel.AddComponent<CanvasGroup>();              // UIOverlay exige CanvasGroup
             var overlay = panel.AddComponent<BossScoutOverlay>();
 
@@ -396,21 +499,50 @@ namespace MutantArmy.Editor
             Button skipButton = skipGo.GetComponent<Button>();
             skipButton.transition = Selectable.Transition.None;
 
-            TMP_Text bossName = CreateTmpLabel(panel.transform, "BossName", "BOSS", 72f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 240f), new Vector2(900f, 110f));
-            TMP_Text element = CreateTmpLabel(panel.transform, "Element", "ELEMENTO: —", 44f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 110f), new Vector2(900f, 70f));
-            // Fraqueza com NOME do elemento, nunca só cor (doc 09 P7).
-            TMP_Text weakness = CreateTmpLabel(panel.transform, "Weakness", "FRACO CONTRA —", 56f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 0f), new Vector2(960f, 90f), Amber);
-            TMP_Text hint = CreateTmpLabel(panel.transform, "Hint", string.Empty, 36f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, -130f), new Vector2(900f, 70f),
-                new Color(0.8f, 0.85f, 0.9f));
+            // Cartão central com MOLDURA (panel fantasy do skin; doc 09 §5.1).
+            Image card = CreateImage(panel.transform, "Card",
+                UiSkin.PanelFrame, UiSkin.PanelFrame != null ? Color.white : PanelDark,
+                Anchors.Middle, new Vector2(0f, 40f), new Vector2(940f, 1180f));
+
+            CreateTmpLabel(card.transform, "Header", "BOSS À FRENTE!", 40f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 500f), new Vector2(820f, 60f), Gold);
+            TMP_Text bossName = CreateTmpLabel(card.transform, "BossName", "BOSS", 76f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 400f), new Vector2(820f, 110f));
+
+            // Retrato (scoutCardArt) — desabilitado até o Bind achar arte.
+            Image portrait = CreateImage(card.transform, "Portrait", null, Color.white,
+                Anchors.Middle, new Vector2(0f, 170f), new Vector2(360f, 360f), Image.Type.Simple);
+            portrait.enabled = false;
+
+            // Linha do elemento: orbe tintado pela cor do elemento (Bind) + nome.
+            Image elementIcon = AddIcon(card.transform, "ElementIcon", UiSkin.GlowSoft, new Vector2(-250f, -80f), 110f);
+            TMP_Text element = CreateTmpLabel(card.transform, "Element", "ELEMENTO: -", 44f,
+                TextAlignmentOptions.Left, Anchors.Middle, new Vector2(70f, -80f), new Vector2(560f, 80f));
+
+            // Fraqueza DESTACADA: faixa dourada com texto escuro + orbe da cor da
+            // fraqueza — nome do elemento, nunca só cor (doc 09 P7).
+            Image weaknessStrip = CreateImage(card.transform, "WeaknessStrip",
+                UiSkin.BadgeFlat, new Color(1f, 0.78f, 0.18f),
+                Anchors.Middle, new Vector2(0f, -225f), new Vector2(840f, 120f));
+            Image weaknessIcon = AddIcon(weaknessStrip.transform, "WeaknessIcon", UiSkin.GlowSoft, new Vector2(-340f, 0f), 80f);
+            TMP_Text weakness = CreateTmpLabel(weaknessStrip.transform, "Weakness", "FRACO CONTRA -", 50f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(30f, 0f), new Vector2(700f, 110f),
+                new Color(0.25f, 0.13f, 0.02f));
+
+            TMP_Text hint = CreateTmpLabel(card.transform, "Hint", string.Empty, 36f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, -365f), new Vector2(860f, 70f), TextSoft);
+
+            // Timer circular do auto-dismiss (~2 s) — esvazia via _timerFill.
+            Image timerFill = CreateRingTimer(card.transform, "Timer", new Vector2(0f, -490f), 120f, Amber);
 
             WireSerializedField(overlay, "_bossNameText", bossName);
             WireSerializedField(overlay, "_elementText", element);
             WireSerializedField(overlay, "_weaknessText", weakness);
             WireSerializedField(overlay, "_hintText", hint);
+            WireSerializedField(overlay, "_portrait", portrait);
+            WireSerializedField(overlay, "_elementIcon", elementIcon);
+            WireSerializedField(overlay, "_weaknessIcon", weaknessIcon);
+            WireSerializedField(overlay, "_timerFill", timerFill);
             WireSerializedField(overlay, "_skipButton", skipButton);
 
             DeactivateUiRoot(panel);
@@ -419,26 +551,47 @@ namespace MutantArmy.Editor
 
         private static ReviveOverlay BuildReviveOverlay(RectTransform parent)
         {
-            GameObject panel = CreatePanel(parent, "ReviveOverlay", new Color(0f, 0f, 0f, 0.88f));
+            // Dim avermelhado: urgência sem gore (doc 09 §5.5).
+            GameObject panel = CreatePanel(parent, "ReviveOverlay", new Color(0.20f, 0f, 0.02f, 0.90f));
             panel.AddComponent<CanvasGroup>();
             var overlay = panel.AddComponent<ReviveOverlay>();
 
-            TMP_Text title = CreateTmpLabel(panel.transform, "Title", "EXÉRCITO DERROTADO", 60f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 220f), new Vector2(960f, 100f));
-            CreateTmpLabel(panel.transform, "Subtitle", "Reviver com metade do exército?", 38f,
-                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 110f), new Vector2(900f, 70f),
-                new Color(0.8f, 0.85f, 0.9f));
+            Image card = CreateImage(panel.transform, "Card",
+                UiSkin.BadgeFlat, UiSkin.BadgeFlat != null ? new Color(0.20f, 0.08f, 0.11f, 0.97f) : PanelDark,
+                Anchors.Middle, Vector2.zero, new Vector2(880f, 1000f));
+
+            Image headerBg = CreateImage(card.transform, "Header",
+                UiSkin.BadgeFlat, new Color(0.85f, 0.25f, 0.28f),
+                Anchors.Middle, new Vector2(0f, 420f), new Vector2(840f, 140f));
+            TMP_Text title = CreateTmpLabel(headerBg.transform, "Title", "EXÉRCITO DERROTADO", 56f,
+                TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(840f, 140f));
+
+            CreateTmpLabel(card.transform, "Subtitle", "Reviver com metade do exército?", 38f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 300f), new Vector2(820f, 70f), TextSoft);
+
+            // Countdown URGENTE: anel esvaziando + segundos gigantes no centro.
+            Image timerFill = CreateRingTimer(card.transform, "CountdownRing", new Vector2(0f, 90f), 260f,
+                new Color(1f, 0.42f, 0.20f));
+            TMP_Text countdown = CreateTmpLabel(card.transform, "CountdownText", "5", 120f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 90f), new Vector2(260f, 260f), Gold);
 
             TMP_Text reviveLabel;
-            Button reviveButton = CreateButton(panel.transform, "ReviveButton", "REVIVER (ANÚNCIO)", 44f, Green,
-                Anchors.Middle, new Vector2(0f, -40f), new Vector2(620f, 130f), out reviveLabel);
-            Button declineButton = CreateButton(panel.transform, "DeclineButton", "DESISTIR", 38f, ButtonGrey,
-                Anchors.Middle, new Vector2(0f, -200f), new Vector2(420f, 100f), out _);
+            Button reviveButton = CreateButton(card.transform, "ReviveButton", "REVIVER (ANÚNCIO)", 44f,
+                UiSkin.ButtonGreen, Green,
+                Anchors.Middle, new Vector2(0f, -205f), new Vector2(660f, 150f), out reviveLabel);
+            if (AddIcon(reviveButton.transform, "VideoIcon", UiSkin.IconVideo, new Vector2(-255f, 0f), 60f) != null)
+                ((RectTransform)reviveLabel.transform).anchoredPosition = new Vector2(32f, 0f);
+
+            Button declineButton = CreateButton(card.transform, "DeclineButton", "DESISTIR", 38f,
+                UiSkin.ButtonGrey, ButtonGrey,
+                Anchors.Middle, new Vector2(0f, -385f), new Vector2(420f, 100f), out _);
 
             WireSerializedField(overlay, "_titleText", title);
             WireSerializedField(overlay, "_reviveButton", reviveButton);
             WireSerializedField(overlay, "_reviveLabel", reviveLabel);
             WireSerializedField(overlay, "_declineButton", declineButton);
+            WireSerializedField(overlay, "_countdownText", countdown);
+            WireSerializedField(overlay, "_timerFill", timerFill);
 
             DeactivateUiRoot(panel);
             return overlay;
@@ -558,9 +711,11 @@ namespace MutantArmy.Editor
         {
             public static readonly Vector2 Middle = new Vector2(0.5f, 0.5f);
             public static readonly Vector2 TopCenter = new Vector2(0.5f, 1f);
+            public static readonly Vector2 BottomCenter = new Vector2(0.5f, 0f);
             public static readonly Vector2 TopLeft = new Vector2(0f, 1f);
             public static readonly Vector2 TopRight = new Vector2(1f, 1f);
             public static readonly Vector2 MiddleLeft = new Vector2(0f, 0.5f);
+            public static readonly Vector2 MiddleRight = new Vector2(1f, 0.5f);
         }
 
         private static void PlaceRect(RectTransform rect, Vector2 anchor, Vector2 anchoredPos, Vector2 size)
@@ -594,17 +749,112 @@ namespace MutantArmy.Editor
             text.alignment = alignment;
             text.color = color;
             text.raycastTarget = false;
-
-            // Fonte explícita quando os TMP Essentials já existem; sem ela o TMP cai no
-            // defaultFontAsset do TMP Settings em runtime.
-            var font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
-            if (font != null) text.font = font;
+            ApplyFont(text);
             return text;
         }
 
+        /// <summary>
+        /// Fonte do skin (Kenney Future SDF com outline no material default); fallback
+        /// LiberationSans BOLD + material outline do UiSkinFactory — o jogo nunca fica
+        /// sem fonte nem sem contorno legível (doc 01 §6.4).
+        /// </summary>
+        private static void ApplyFont(TMP_Text text)
+        {
+            TMP_FontAsset skinFont = UiSkin.FontAsset;
+            if (skinFont != null)
+            {
+                text.font = skinFont;
+                return;
+            }
+
+            var liberation = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+            if (liberation == null) return;   // TMP Essentials ausentes: TMP usa o default
+            text.font = liberation;
+            text.fontStyle = FontStyles.Bold;
+            Material outline = UiSkin.FallbackOutlineMaterial;
+            if (outline != null) text.fontSharedMaterial = outline;
+        }
+
+        /// <summary>Estilo do logo: gradiente dourado + leve rotação (doc 09 §4.1).</summary>
+        private static void ApplyTitleStyle(TMP_Text title, float rotationZ)
+        {
+            title.enableVertexGradient = true;
+            title.colorGradient = new VertexGradient(Gold, Gold, GoldDeep, GoldDeep);
+            title.lineSpacing = -20f;
+            if (!Mathf.Approximately(rotationZ, 0f))
+                title.rectTransform.localRotation = Quaternion.Euler(0f, 0f, rotationZ);
+        }
+
+        /// <summary>
+        /// Image utilitária do skin: sprite 9-slice (ou builtin quando o skin falta),
+        /// raycast OFF — só botões e o skip do Boss Scout bloqueiam toque.
+        /// </summary>
+        private static Image CreateImage(Transform parent, string name, Sprite sprite, Color color,
+                                         Vector2 anchor, Vector2 anchoredPos, Vector2 size,
+                                         Image.Type type = Image.Type.Sliced)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            PlaceRect(rect, anchor, anchoredPos, size);
+
+            var image = go.GetComponent<Image>();
+            if (sprite != null)
+            {
+                image.sprite = sprite;
+                image.type = type;
+                if (type == Image.Type.Simple) image.preserveAspect = true;
+            }
+            else
+            {
+                image.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+                image.type = Image.Type.Sliced;
+            }
+            image.color = color;
+            image.raycastTarget = false;
+            return image;
+        }
+
+        /// <summary>Ícone simples (preserveAspect); retorna null se o sprite não existe no skin.</summary>
+        private static Image AddIcon(Transform parent, string name, Sprite sprite, Vector2 anchoredPos, float size)
+        {
+            if (sprite == null) return null;
+            return CreateImage(parent, name, sprite, Color.white, Anchors.Middle, anchoredPos,
+                               new Vector2(size, size), Image.Type.Simple);
+        }
+
+        /// <summary>
+        /// Chip de carteira (moeda/gema): badge escuro translúcido + ícone + valor.
+        /// Retorna o TMP do VALOR (é ele que os controllers escrevem).
+        /// </summary>
+        private static TMP_Text CreateWalletChip(Transform parent, string name, Sprite icon, Color iconTint,
+                                                 Vector2 anchor, Vector2 anchoredPos, Vector2 size, Color textColor)
+        {
+            Image chip = CreateImage(parent, name,
+                UiSkin.BadgeFlat, UiSkin.BadgeFlat != null ? ChipBg : new Color(0f, 0f, 0f, 0.45f),
+                anchor, anchoredPos, size);
+
+            float iconSize = size.y * 0.66f;
+            Image iconImage = null;
+            if (icon != null)
+            {
+                iconImage = CreateImage(chip.transform, "Icon", icon, iconTint,
+                    Anchors.MiddleLeft, new Vector2(iconSize * 0.5f + 14f, 0f),
+                    new Vector2(iconSize, iconSize), Image.Type.Simple);
+            }
+
+            TMP_Text value = CreateTmpLabel(chip.transform, "Value", "0", Mathf.Round(size.y * 0.52f),
+                TextAlignmentOptions.Left, Anchors.Middle, Vector2.zero, size, textColor);
+            var valueRect = (RectTransform)value.transform;
+            StretchFull(valueRect);
+            valueRect.offsetMin = new Vector2(iconImage != null ? iconSize + 28f : 18f, 4f);
+            valueRect.offsetMax = new Vector2(-14f, -4f);
+            return value;
+        }
+
         private static Button CreateButton(Transform parent, string name, string label, float fontSize,
-                                           Color color, Vector2 anchor, Vector2 anchoredPos, Vector2 size,
-                                           out TMP_Text labelText)
+                                           Sprite skin, Color fallbackColor, Vector2 anchor,
+                                           Vector2 anchoredPos, Vector2 size, out TMP_Text labelText)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
             var rect = (RectTransform)go.transform;
@@ -612,9 +862,20 @@ namespace MutantArmy.Editor
             PlaceRect(rect, anchor, anchoredPos, size);
 
             var image = go.GetComponent<Image>();
-            image.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            if (skin != null)
+            {
+                image.sprite = skin;
+                image.color = Color.white;          // os sprites Kenney já vêm coloridos
+            }
+            else
+            {
+                image.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+                image.color = fallbackColor;
+            }
             image.type = Image.Type.Sliced;
-            image.color = color;
+
+            // Microinteração canônica: ScalePop no press em TODO botão (doc 09 §6).
+            go.AddComponent<UIButtonPop>();
 
             labelText = CreateTmpLabel(go.transform, "Label", label, fontSize,
                                        TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, size);
@@ -624,29 +885,84 @@ namespace MutantArmy.Editor
             return go.GetComponent<Button>();
         }
 
-        /// <summary>Barra com fundo escuro + fill horizontal; retorna o Image do FILL.</summary>
+        /// <summary>
+        /// Barra com fundo 9-slice do skin + fill horizontal embutido (6 px de respiro);
+        /// retorna o Image do FILL (Image.Type.Filled, cor própria — o HudController
+        /// re-tinta o Supply para âmbar em ≥80%).
+        /// </summary>
         private static Image CreateBar(Transform parent, string name, Vector2 anchor,
                                        Vector2 anchoredPos, Vector2 size, Color fillColor)
         {
+            Sprite barBg = UiSkin.BarBackground;
             var bg = new GameObject(name, typeof(RectTransform), typeof(Image));
             var bgRect = (RectTransform)bg.transform;
             bgRect.SetParent(parent, false);
             PlaceRect(bgRect, anchor, anchoredPos, size);
             var bgImage = bg.GetComponent<Image>();
-            bgImage.color = new Color(0f, 0f, 0f, 0.45f);
+            if (barBg != null)
+            {
+                bgImage.sprite = barBg;
+                bgImage.type = Image.Type.Sliced;
+                bgImage.color = new Color(0.55f, 0.58f, 0.66f, 0.95f);   // trilho neutro
+            }
+            else
+            {
+                bgImage.color = new Color(0f, 0f, 0f, 0.45f);
+            }
             bgImage.raycastTarget = false;
 
             var fill = new GameObject("Fill", typeof(RectTransform), typeof(Image));
             var fillRect = (RectTransform)fill.transform;
             fillRect.SetParent(bg.transform, false);
             StretchFull(fillRect);
+            fillRect.offsetMin = new Vector2(6f, 6f);
+            fillRect.offsetMax = new Vector2(-6f, -6f);
             var fillImage = fill.GetComponent<Image>();
-            // Image.Type.Filled exige sprite — o builtin UISprite serve de máscara branca.
+            // Image.Type.Filled exige sprite — o builtin UISprite serve de máscara branca
+            // (sprite colorido aqui brigaria com o re-tint do HudController).
             fillImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
             fillImage.type = Image.Type.Filled;
             fillImage.fillMethod = Image.FillMethod.Horizontal;
             fillImage.fillAmount = 0f;
             fillImage.color = fillColor;
+            fillImage.raycastTarget = false;
+            return fillImage;
+        }
+
+        /// <summary>
+        /// Timer circular: trilho apagado + anel radial (Radial360, origem no topo,
+        /// anti-horário) que o código de runtime esvazia via fillAmount. Sem o sprite
+        /// de anel no skin, degrada para um disco radial translúcido (builtin).
+        /// </summary>
+        private static Image CreateRingTimer(Transform parent, string name, Vector2 anchoredPos,
+                                             float size, Color fillColor)
+        {
+            var holder = new GameObject(name, typeof(RectTransform));
+            var holderRect = (RectTransform)holder.transform;
+            holderRect.SetParent(parent, false);
+            PlaceRect(holderRect, Anchors.Middle, anchoredPos, new Vector2(size, size));
+
+            Sprite ring = UiSkin.Ring;
+            if (ring != null)
+            {
+                CreateImage(holder.transform, "Track", ring, new Color(1f, 1f, 1f, 0.18f),
+                            Anchors.Middle, Vector2.zero, new Vector2(size, size), Image.Type.Simple);
+            }
+
+            var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+            var fillRect = (RectTransform)fillGo.transform;
+            fillRect.SetParent(holder.transform, false);
+            PlaceRect(fillRect, Anchors.Middle, Vector2.zero, new Vector2(size, size));
+            var fillImage = fillGo.GetComponent<Image>();
+            fillImage.sprite = ring != null
+                ? ring
+                : AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            fillImage.type = Image.Type.Filled;
+            fillImage.fillMethod = Image.FillMethod.Radial360;
+            fillImage.fillOrigin = (int)Image.Origin360.Top;
+            fillImage.fillClockwise = false;
+            fillImage.fillAmount = 1f;
+            fillImage.color = ring != null ? fillColor : new Color(fillColor.r, fillColor.g, fillColor.b, 0.35f);
             fillImage.raycastTarget = false;
             return fillImage;
         }

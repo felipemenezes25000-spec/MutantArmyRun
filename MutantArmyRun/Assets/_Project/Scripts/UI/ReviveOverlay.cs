@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,9 @@ namespace MutantArmy.UI
     /// com NullAdsProvider só o "DESISTIR" aparece). Aceitar mostra o rewarded via hook do
     /// blackboard (UI não referencia Services, doc 12 §2.3) e responde ao GameManager com
     /// ResolveRevive(granted) — recusa/falha resolve false e o estado vira Defeat.
+    /// Painel URGENTE: countdown em unscaled time (número grande + anel esvaziando);
+    /// zerar = desistir automático — a oferta nunca fica pendurada (doc 09 §5.5). O timer
+    /// PAUSA enquanto o rewarded está em exibição (_pending).
     /// </summary>
     public class ReviveOverlay : UIOverlay
     {
@@ -19,8 +23,12 @@ namespace MutantArmy.UI
         [SerializeField] private Button _reviveButton;
         [SerializeField] private TMP_Text _reviveLabel;
         [SerializeField] private Button _declineButton;
+        [SerializeField] private TMP_Text _countdownText;       // segundos restantes, número grande
+        [SerializeField] private Image _timerFill;               // anel radial em volta do número
+        [SerializeField] private float _countdownSeconds = 5f;   // ≤0 desliga o auto-decline
 
         private bool _pending;   // rewarded em exibição: trava os dois botões
+        private Coroutine _countdown;
 
         protected override void Awake()
         {
@@ -42,6 +50,37 @@ namespace MutantArmy.UI
             if (_declineButton != null) _declineButton.interactable = true;
             if (_titleText != null) _titleText.text = "EXÉRCITO DERROTADO";
             if (_reviveLabel != null) _reviveLabel.text = "REVIVER (ANÚNCIO)";
+
+            if (_countdown != null) StopCoroutine(_countdown);
+            if (_countdownSeconds > 0f) _countdown = StartCoroutine(CountdownRoutine());
+        }
+
+        /// <summary>
+        /// Urgência visível: número + anel esvaziando em UNSCALED time (o overlay abre com
+        /// o jogo pausado/derrotado). Zerou sem decisão = Resolve(false) — mesmo caminho
+        /// do DESISTIR; pausa enquanto o rewarded está aberto para nunca roubar o prêmio.
+        /// </summary>
+        private IEnumerator CountdownRoutine()
+        {
+            float remaining = _countdownSeconds;
+            RenderCountdown(remaining);
+            while (remaining > 0f)
+            {
+                yield return null;
+                if (_pending) continue;          // rewarded aberto: timer congela
+                remaining -= Time.unscaledDeltaTime;
+                RenderCountdown(remaining);
+            }
+            _countdown = null;
+            if (!_pending) Resolve(false);       // tempo esgotado = desistiu (CANON §11: opcional)
+        }
+
+        private void RenderCountdown(float remaining)
+        {
+            if (_countdownText != null)
+                _countdownText.text = Mathf.CeilToInt(Mathf.Max(0f, remaining)).ToString();
+            if (_timerFill != null && _countdownSeconds > 0f)
+                _timerFill.fillAmount = Mathf.Clamp01(remaining / _countdownSeconds);
         }
 
         private void OnReviveClicked()
@@ -60,6 +99,7 @@ namespace MutantArmy.UI
             root.ShowRewardedAd(AdPlacement.ReviveBoss, granted =>
             {
                 _pending = false;
+                StopCountdown();    // decisão tomada: o timer não pode re-resolver no fade
                 Resolve(granted);   // o Pop do estado fecha este overlay via UIManager
             });
         }
@@ -67,7 +107,15 @@ namespace MutantArmy.UI
         private void OnDeclineClicked()
         {
             if (_pending) return;
+            StopCountdown();
             Resolve(false);
+        }
+
+        private void StopCountdown()
+        {
+            if (_countdown == null) return;
+            StopCoroutine(_countdown);
+            _countdown = null;
         }
 
         private static void Resolve(bool revived)

@@ -23,8 +23,24 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b82ae8624cfab0d46a5b06d76ba5c6d0, type: 2}
   - {fileID: 11400000, guid: 073e7d42564e1c24db2e028b7ac3b881, type: 2}
   worldBoss: {fileID: 11400000, guid: ad185b2c82a4fd5438e02aa81388e908, type: 2}
-  skyboxMaterial: {fileID: 0}
+  skyboxMaterial: {fileID: 2100000, guid: a6fb5f8d048294940ad866f1a2ba5922, type: 2}
   trackSegmentPrefabs:
-  - {fileID: 8906817117229079529, guid: 868cca6b978840d419f292b010c9ed6b, type: 3}
+  - {fileID: 7418140379416996672, guid: a94787dfebee4c24cb167841d8329c52, type: 3}
+  - {fileID: 5863722560375991700, guid: e9ca423fff771434a8a1233f873d1e4a, type: 3}
   musicTrack: {fileID: 0}
   worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
+  skyTopColor: {r: 0.34, g: 0.62, b: 0.99, a: 1}
+  skyHorizonColor: {r: 0.8, g: 0.93, b: 1, a: 1}
+  fogColor: {r: 0.76, g: 0.88, b: 0.98, a: 1}
+  sunColor: {r: 1, g: 0.96, b: 0.84, a: 1}
+  ambientColor: {r: 0.64, g: 0.7, b: 0.78, a: 1}
+  trackMaterial: {fileID: 2100000, guid: 2633be32ffbccfa438872047f0516802, type: 2}
+  propPrefabs:
+  - {fileID: 3317418946980458237, guid: 66b2aa486cf12b44289aca320b9635e9, type: 3}
+  - {fileID: 5754099050862252860, guid: d221aa119fea52c49b599b775fa6c7af, type: 3}
+  - {fileID: 6432368533617223331, guid: bbd751e23670d9c4a96a1f12d8eb6438, type: 3}
+  - {fileID: 3852930770558171636, guid: 67e9a2659352e4d4397f40ab218b7074, type: 3}
+  - {fileID: 8873740427007255897, guid: 6889c6f04997dcd41bfc98d5fda99109, type: 3}
+  - {fileID: 4297999843104090431, guid: 24523b5318c334448a37065d997a4d62, type: 3}
+  - {fileID: 3727079308308089278, guid: 284d48bb4bfaf38408ce222a2260952e, type: 3}
+  - {fileID: 1118342519008073251, guid: 47445e919299b54409020f469a19c9f5, type: 3}

@@ -18,6 +18,7 @@ namespace MutantArmy.UI
     /// </summary>
     public class ResultScreen : UIScreen
     {
+        [SerializeField] private Image _headerBg;               // faixa do header: verde vitória / vermelho derrota
         [SerializeField] private TMP_Text _titleText;
         [SerializeField] private TMP_Text _coinsDeltaText;      // "+100" — DELTA, nunca o total
         [SerializeField] private TMP_Text _xpDeltaText;
@@ -48,6 +49,10 @@ namespace MutantArmy.UI
         private bool _doubled;
         private bool _doublePending;   // rewarded em exibição: trava o botão sem conceder
 
+        // Código de cores reservado do doc 01 §6.5: verde = ganho, vermelho = perda.
+        private static readonly Color VictoryHeader = new Color(0.22f, 0.72f, 0.35f);
+        private static readonly Color DefeatHeader = new Color(0.85f, 0.25f, 0.28f);
+
         protected override void Awake()
         {
             base.Awake();
@@ -68,6 +73,7 @@ namespace MutantArmy.UI
             _doublePending = false;
 
             if (_titleText != null) _titleText.text = won ? "VITÓRIA!" : "DERROTA...";
+            if (_headerBg != null) _headerBg.color = won ? VictoryHeader : DefeatHeader;
             RenderCoinsDelta(coinsDelta);
 
             if (_xpDeltaText != null)
@@ -102,8 +108,9 @@ namespace MutantArmy.UI
             }
             if (_doubleButtonLabel != null && coinsDelta > 0)
             {
+                // "x2" ASCII: ✓/× fora do Latin-1 viram glifo ausente nas fontes SDF.
                 _sb.Length = 0;
-                _sb.Append("DOBRAR ×2  +").Append(coinsDelta);
+                _sb.Append("DOBRAR x2  +").Append(coinsDelta);
                 _doubleButtonLabel.SetText(_sb);
             }
         }
@@ -128,7 +135,7 @@ namespace MutantArmy.UI
             if (_doubled) return;
             _doubled = true;
             RenderCoinsDelta(_coinsDelta * 2);
-            if (_doubleButtonLabel != null) _doubleButtonLabel.text = "✓ DOBRADO";
+            if (_doubleButtonLabel != null) _doubleButtonLabel.text = "DOBRADO!";
             if (_doubleButton != null) _doubleButton.interactable = false;
         }
 
