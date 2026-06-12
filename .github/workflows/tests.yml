@@ -1,0 +1,36 @@
+name: Domain Tests
+
+# Roda os testes do assembly MutantArmy.Domain (logica pura, sem Unity) a cada
+# push e pull request. Sao 327 testes que cobrem portais, suprimento, elementos,
+# economia, save e missoes — a parte onde bugs custam caro. Os testes do Unity
+# (EditMode/PlayMode) exigem licenca da engine e rodam localmente, nao na CI.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  domain-tests:
+    # windows-latest para casar com o ambiente de dev (os .csproj usam separador
+    # de caminho do Windows no <Compile Include>, que o MSBuild do Windows resolve).
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Domain.Gameplay.Tests
+        run: dotnet test tests/Domain.Gameplay.Tests --nologo
+
+      - name: Domain.Flow.Tests
+        run: dotnet test tests/Domain.Flow.Tests --nologo
+
+      - name: Domain.Persistence.Tests
+        run: dotnet test tests/Domain.Persistence.Tests --nologo

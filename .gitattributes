@@ -1,0 +1,46 @@
+# Normaliza fim de linha: o git guarda LF e o checkout usa o do SO.
+# Resolve os avisos "LF will be replaced by CRLF" no Windows.
+* text=auto
+
+# Fontes e dados de texto (Unity usa YAML em .unity/.prefab/.asset/.mat/.meta)
+*.cs        text diff=csharp
+*.asmdef    text
+*.json      text
+*.md        text
+*.txt       text
+*.csv       text
+*.xml       text
+*.yml       text
+*.yaml      text
+*.shader    text
+*.hlsl      text
+*.cginc     text
+*.unity     text
+*.prefab    text
+*.asset     text
+*.mat       text
+*.meta      text
+*.controller text
+*.anim      text
+
+# Binários (nunca normalizar nem fazer diff de texto)
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.psd       binary
+*.tga       binary
+*.fbx       binary
+*.blend     binary
+*.glb       binary
+*.gltf      binary
+*.ogg       binary
+*.wav       binary
+*.mp3       binary
+*.ttf       binary
+*.otf       binary
+*.dll       binary
+*.so        binary
+*.a         binary
+*.aar       binary
+*.unitypackage binary
