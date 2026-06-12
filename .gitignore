@@ -26,3 +26,13 @@ _unity-template-My-project/
 unity-*.log
 editmode-results.xml
 _assets-staging/
+Build/
+*.ps1
+fac-*.log
+beauty-*.log
+stab-*.log
+t-*.log
+t-*.xml
+r2-*.log
+rebuild-*.log
+final-*.xml

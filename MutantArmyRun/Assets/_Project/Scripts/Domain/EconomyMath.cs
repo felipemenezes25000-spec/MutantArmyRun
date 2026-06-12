@@ -18,6 +18,19 @@ namespace MutantArmy.Domain
             return (int)MathF.Round(baseReward * MathF.Pow(growth, levelIndex - 1) * mult);
         }
 
+        /// <summary>
+        /// XP concedida por fase (CANON §8: XP sobe o nível do jogador e desbloqueia features).
+        /// Curva simples linear: base + step × (fase−1) — fase 1 = base, fase 2 = base+step, …
+        /// Creditada UMA vez por corrida na RunWallet; recalibrável por Remote Config.
+        /// </summary>
+        public static int LevelXp(int levelIndex, int baseXp = 20, int step = 10)
+        {
+            if (levelIndex < 1) levelIndex = 1;
+            if (baseXp < 0) baseXp = 0;
+            if (step < 0) step = 0;
+            return baseXp + step * (levelIndex - 1);
+        }
+
         /// <summary>Custo da trilha de upgrade (CANON §8/§9): custo(n) = costBase × growth^n; nível 0 = 100.</summary>
         public static int UpgradeCost(int level, float costBase = 100f, float growth = 1.35f)
         {

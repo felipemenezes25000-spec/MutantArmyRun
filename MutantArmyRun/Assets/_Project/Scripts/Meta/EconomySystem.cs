@@ -61,12 +61,40 @@ namespace MutantArmy.Meta
                 // Só CONSULTA o valor da recompensa para a tela EXIBIR o total — o crédito
                 // segue exclusivamente por LevelRewardGranter (nunca duplica, doc 12 §4.6).
                 GameManager.Instance.LevelRewardProvider = GetLevelReward;
+
+                // XP DE FASE (CANON §8): cada corrida concede XP de verdade. Creditada na
+                // RunWallet UMA vez no início da fase (LevelStarted); o ResolveEnd a lê via
+                // RunSnapshot e a comita SEMPRE (vitória ou derrota) — sem duplicar. O retry/
+                // próxima fase passa por StartLevel→LevelStarted de novo, já com a wallet zerada
+                // pelo commit anterior. -= antes de += para Init repetido não duplicar a inscrição.
+                GameManager.Instance.LevelStarted -= GrantPhaseXp;
+                GameManager.Instance.LevelStarted += GrantPhaseXp;
             }
         }
 
         private void OnDestroy()
         {
             GameEvents.OnSupplyOverflow -= HandleSupplyOverflow;   // bus estático sobrevive a cenas (doc 12 §3.2)
+            if (GameManager.Instance != null)
+                GameManager.Instance.LevelStarted -= GrantPhaseXp;
+        }
+
+        /// <summary>
+        /// XP da fase creditada na RunWallet no início da corrida (CANON §8). Curva pura do
+        /// Domain (EconomyMath.LevelXp), recalibrável por Remote Config. Único ponto de
+        /// concessão — o commit do fim de fase a transfere para o save (playerXp/nível).
+        /// </summary>
+        private void GrantPhaseXp(int levelIndex)
+        {
+            EarnInRun(0, GetLevelXp(levelIndex));
+        }
+
+        /// <summary>XP base/incremento por fase (CANON §8); recalibrável por Remote Config.</summary>
+        public int GetLevelXp(int levelIndex)
+        {
+            int baseXp = GetRcInt(RcKeys.LevelXpBase, 20);
+            int step = GetRcInt(RcKeys.LevelXpStep, 10);
+            return EconomyMath.LevelXp(levelIndex, baseXp, step);
         }
 
         /// <summary>Crédito imediato do excedente de Supply — fanfarra, nunca punição (CANON §3.2).</summary>

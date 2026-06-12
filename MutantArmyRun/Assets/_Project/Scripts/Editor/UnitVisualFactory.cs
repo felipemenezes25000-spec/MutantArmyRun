@@ -80,17 +80,20 @@ namespace MutantArmy.Editor
             if (BuildUnit("Unit_Mage", "Mage", null, 0.6f, ClassColor.Mage)) built++;
             if (BuildUnit("Unit_Giant", "Barbarian", null, 1.3f, ClassColor.Giant)) built++;
 
-            // ---- Bosses (PLANO §1.4): monstros Quaternius, escala 3.5–5, recolor por boss
+            // ---- Bosses (PLANO §1.4): monstros Quaternius, escala 3.5–5, recolor por boss.
+            // Tints CLAREADOS (doc 01 §6): o atlas Quaternius é escuro; multiplicar por tint
+            // fosco apagava o chefão. Cores mais claras + emission leve (ver TintMaterial) =
+            // golem imponente, lê inteiro sob a luz da cena sem virar plástico.
             if (BuildBoss("Boss_M1_GolemStone", "Goleling_Evolved", "Flying", 4.0f,
-                          new Color(0.62f, 0.62f, 0.66f), 0.05f, 0.30f)) built++;
+                          new Color(0.82f, 0.82f, 0.88f), 0.05f, 0.30f)) built++;
             if (BuildBoss("Boss_M1_WoodGiant", "Tribal", "Big", 4.0f,
-                          new Color(0.55f, 0.38f, 0.22f), 0.00f, 0.30f)) built++;
+                          new Color(0.78f, 0.56f, 0.34f), 0.00f, 0.30f)) built++;
             if (BuildBoss("Boss_M2_ZombieBruiser", "Orc", "Big", 3.5f,
-                          new Color(0.50f, 0.65f, 0.35f), 0.00f, 0.30f)) built++;
+                          new Color(0.66f, 0.84f, 0.48f), 0.00f, 0.30f)) built++;
             if (BuildBoss("Boss_M2_ZombieTitan", "Orc_Skull", "Big", 5.0f,
-                          new Color(0.58f, 0.62f, 0.58f), 0.00f, 0.30f)) built++;
+                          new Color(0.78f, 0.82f, 0.78f), 0.00f, 0.30f)) built++;
             if (BuildBoss("Boss_M3_ScorpionMech", "Alien", "Big", 4.0f,
-                          new Color(0.66f, 0.72f, 0.80f), 0.85f, 0.70f))
+                          new Color(0.78f, 0.84f, 0.92f), 0.85f, 0.70f))
             {
                 built++;
                 Debug.LogWarning("MAR Tools: Boss M3 'Robô Escorpião' usa PLACEHOLDER (Alien recolor " +
@@ -424,6 +427,9 @@ namespace MutantArmy.Editor
         /// <summary>
         /// Recolor CC0 (PLANO §1.4): URP/Lit com a MESMA textura-atlas do FBX e tint
         /// multiplicativo em _BaseColor (+ metallic/smoothness). Usado pelos BOSSES.
+        /// CLÍMAX (doc 01 §6): o atlas Quaternius é escuro e, multiplicado por um tint fosco,
+        /// o golem some na sombra. EMISSION leve da própria cor (~0.18) "acende" o chefão sob
+        /// o bloom da cena — ele lê imponente sem virar plástico (smoothness continua baixa).
         /// </summary>
         private static Material TintMaterial(string name, GameObject model, Color tint,
                                              float metallic, float smoothness)
@@ -458,6 +464,15 @@ namespace MutantArmy.Editor
             material.color = tint;
             if (material.HasProperty("_Metallic")) material.SetFloat("_Metallic", metallic);
             if (material.HasProperty("_Smoothness")) material.SetFloat("_Smoothness", smoothness);
+
+            // EMISSION leve da própria cor: o chefão "acende" sob o bloom (threshold 0.9) e
+            // não afunda na sombra do atlas escuro — leitura imponente sem brilho plástico.
+            material.EnableKeyword("_EMISSION");
+            if (material.HasProperty("_EmissionColor"))
+                material.SetColor("_EmissionColor", tint * 0.18f);
+            material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+
+            material.enableInstancing = true;
             EditorUtility.SetDirty(material);
             return material;
         }

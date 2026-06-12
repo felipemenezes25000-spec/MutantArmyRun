@@ -34,6 +34,14 @@ namespace MutantArmy.Gameplay
         // ---- View do boss: BossConfigSO.prefab pooled; cápsula fallback se nulo ----
         [SerializeField] private float _viewAheadMeters = 12f;   // boss nasce à frente do exército, centro da pista
 
+        // Clímax imponente (CANON §6 / Pilar 3): o golem precisa LER como GIGANTE perto das
+        // tropas (~0,6 de escala). Piso de escala visual garante altura aparente ≥ ~3–4× a
+        // tropa mesmo se o prefab/SO vier pequeno — só PARA CIMA, nunca encolhe o que já é grande.
+        [SerializeField] private float _viewMinScale = 3.5f;
+        // Eleva levemente o boss para a base ficar visível e a silhueta inteira caber no
+        // terço superior do enquadramento de boss (a câmera mira o foco entre exército e boss).
+        [SerializeField] private float _viewLiftMeters = 0.5f;
+
         // contrato do parâmetro int "State" do AnimatorController de boss (UnitVisualFactory)
         private static readonly int ViewStateParamHash = Animator.StringToHash("State");
         private const int ViewStateIdle = 0;
@@ -243,7 +251,8 @@ namespace MutantArmy.Gameplay
         {
             ReleaseView();   // defensivo: re-entrada sem ExitState não vaza instância
 
-            GameObject template = config.prefab != null ? config.prefab : GetFallbackTemplate();
+            bool usingRealPrefab = config.prefab != null;
+            GameObject template = usingRealPrefab ? config.prefab : GetFallbackTemplate();
             if (template == null) return;
 
             _view = GetViewPool(template).Get();
@@ -252,14 +261,24 @@ namespace MutantArmy.Gameplay
             // arena: centro da pista (x=0), alguns metros à frente de onde o exército chegou
             Vector3 pos = CrowdAnchor.Position;
             pos.x = 0f;
-            pos.y = 0f;
+            pos.y = _viewLiftMeters;   // leve elevação: base visível, silhueta inteira no terço superior
             pos.z += _viewAheadMeters;
-            // boss encara o exército, que chega vindo de −Z
+            // boss encara o exército (que chega vindo de −Z) E a câmera (atrás/abaixo do exército):
+            // de frente para −Z é a mesma direção — o chefão encara o jogador no clímax.
             _view.transform.SetPositionAndRotation(pos, Quaternion.LookRotation(Vector3.back));
 
-            // entrada canônica (CANON §6, ≤ 2 s): escala 0 → escala do prefab com ease-out
-            _viewTargetScale = template.transform.localScale;
+            // entrada canônica (CANON §6, ≤ 2 s): escala 0 → escala-alvo com ease-out.
+            // PISO de escala visual (clímax imponente): garante que o golem leia GIGANTE perto
+            // da tropa mesmo se o prefab/SO vier pequeno — uniformiza só PARA CIMA. Aplicado
+            // SÓ ao prefab real (onde a escala do root é a medida do boss); o greybox/cápsula
+            // fallback já codifica os ~8 m num filho 4× e mantém a escala de root 1.0 intacta.
+            Vector3 templateScale = template.transform.localScale;
+            _viewTargetScale = usingRealPrefab ? MakeImposing(templateScale) : templateScale;
             _view.transform.localScale = Vector3.zero;
+
+            // Empurra o enquadramento de boss para a CameraRig (ela só interpola; não conhece o
+            // boss — sem acoplamento/ciclo, doc 12 §2.3). Foco = meio entre o exército e o boss.
+            PushBossFraming(pos);
             _entranceSeconds = Mathf.Max(0.05f, config.entranceSeconds);
             _entrance.Set(_entranceSeconds);
             _entranceActive = true;
@@ -269,6 +288,28 @@ namespace MutantArmy.Gameplay
                 _viewAnimator = null;   // cápsula greybox/fallback não tem o parâmetro — vira no-op
             _viewAnimState = -1;
             ApplyViewAnim(ViewStateIdle);
+        }
+
+        // Piso de escala visual do clímax: leva a MENOR componente da escala-alvo a ≥ _viewMinScale,
+        // preservando a proporção do prefab. Só aumenta — um boss já grande (ex.: 5.0) fica intacto.
+        private Vector3 MakeImposing(Vector3 baseScale)
+        {
+            float minComponent = Mathf.Min(baseScale.x, Mathf.Min(baseScale.y, baseScale.z));
+            if (minComponent <= 0f) return new Vector3(_viewMinScale, _viewMinScale, _viewMinScale);
+            if (minComponent >= _viewMinScale) return baseScale;
+            float k = _viewMinScale / minComponent;
+            return baseScale * k;
+        }
+
+        // Foco do enquadramento = ponto médio entre o Centroid do exército e a posição do boss,
+        // empurrado para a CameraRig (que só interpola). A câmera mira aqui com leve ângulo
+        // p/ baixo: golem inteiro no terço superior-central, frente do exército no inferior.
+        private void PushBossFraming(Vector3 bossPos)
+        {
+            if (CameraRig.Instance == null) return;
+            Vector3 army = CrowdManager.Instance != null ? CrowdManager.Instance.Centroid : CrowdAnchor.Position;
+            Vector3 focus = Vector3.Lerp(army, bossPos, 0.6f);   // viés ao boss: ele é o protagonista do clímax
+            CameraRig.Instance.SetBossFraming(focus);
         }
 
         private void TickEntrance(float dt)
@@ -290,6 +331,11 @@ namespace MutantArmy.Gameplay
             _entranceActive = false;
             _viewAnimator = null;
             _viewAnimState = -1;
+
+            // Saída do BossFight (vitória/derrota/menu): devolve a câmera ao enquadramento de
+            // corrida suavemente. Único ponto de release, simétrico ao SetBossFraming do spawn.
+            if (CameraRig.Instance != null) CameraRig.Instance.ClearBossFraming();
+
             if (_view == null) return;
 
             if (_viewTemplateByInstance.TryGetValue(_view, out GameObject template) && template != null

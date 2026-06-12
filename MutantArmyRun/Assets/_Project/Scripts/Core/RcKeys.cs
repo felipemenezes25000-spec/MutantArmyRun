@@ -10,6 +10,8 @@ namespace MutantArmy.Core
         // Economia (CANON §8)
         public const string LevelRewardBase = "level_reward_base";          // 100
         public const string LevelRewardGrowth = "level_reward_growth";      // 1.10
+        public const string LevelXpBase = "level_xp_base";                  // 20 (XP da fase 1)
+        public const string LevelXpStep = "level_xp_step";                  // 10 (incremento por fase)
         public const string UpgradeCostBase = "upgrade_cost_base";          // 100
         public const string UpgradeCostGrowth = "upgrade_cost_growth";      // 1.35
         public const string ChestRareGemPrice = "chest_rare_gem_price";     // 300
