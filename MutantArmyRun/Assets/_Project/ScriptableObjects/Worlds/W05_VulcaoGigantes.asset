@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b964d4801db8244ba7e1392ed91f9c8, type: 3}
+  m_Name: W05_VulcaoGigantes
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.WorldConfigSO
+  worldIndex: 5
+  displayNameKey: world_05_vulcao_gigantes
+  levels:
+  - {fileID: 11400000, guid: 23f6d6474161fec42ba5d2309dae3f3e, type: 2}
+  - {fileID: 11400000, guid: 82d6f42dc2efe0f47803be9dc4a3efac, type: 2}
+  - {fileID: 11400000, guid: 61b42bb900384b042bb2fd4592e16be8, type: 2}
+  - {fileID: 11400000, guid: 30d10c32c18b0954d83bd829cd57b812, type: 2}
+  - {fileID: 11400000, guid: 591f8c8cdbe3d7c4a8d8fd4373bf5cfb, type: 2}
+  - {fileID: 11400000, guid: 7b0694dcba2b8ea408c29bf6ce6ff779, type: 2}
+  - {fileID: 11400000, guid: 298e167ba82321145a05fe8c51ba94e6, type: 2}
+  - {fileID: 11400000, guid: e3c9276cb01c47f4d95d5f2d12bcf175, type: 2}
+  - {fileID: 11400000, guid: a3cbd1eda1ef3b747b60482ac4df5e8a, type: 2}
+  - {fileID: 11400000, guid: abbf48082b980db43a207fe838caecc3, type: 2}
+  worldBoss: {fileID: 11400000, guid: 8acd369ebd0d2a241b952ac09fc66771, type: 2}
+  skyboxMaterial: {fileID: 2100000, guid: 9116854e2eeb22641b6742ca8390269e, type: 2}
+  trackSegmentPrefabs:
+  - {fileID: 3626790868867737959, guid: e0bf9f58b70d31c42bb9d073b6f65e2b, type: 3}
+  - {fileID: 4499670112837686691, guid: 2ad306548f3aa3046800352f30ae04da, type: 3}
+  musicTrack: {fileID: 0}
+  worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
+  skyTopColor: {r: 0.26, g: 0.1, b: 0.1, a: 1}
+  skyHorizonColor: {r: 1, g: 0.42, b: 0.14, a: 1}
+  fogColor: {r: 0.62, g: 0.24, b: 0.12, a: 1}
+  sunColor: {r: 1, g: 0.66, b: 0.42, a: 1}
+  ambientColor: {r: 0.52, g: 0.28, b: 0.2, a: 1}
+  trackMaterial: {fileID: 2100000, guid: 40180e6d634ba3c4cbe8f339d7bec0a7, type: 2}
+  propPrefabs:
+  - {fileID: 6601668447354614417, guid: dde1914201f98764797d45146862ee3c, type: 3}
+  - {fileID: 1709055592782622363, guid: a63f6a492ac62164eb792adb68609a05, type: 3}
+  - {fileID: 9106791120801728700, guid: 8a1c1623c71506f44b8c44c5faa4f3e2, type: 3}
+  - {fileID: 7623351862669664055, guid: c400fe559e31d33429a2897a44e63865, type: 3}
+  - {fileID: 6377431459747806126, guid: 07a15246b5f796f448d60beff33ccbd7, type: 3}
+  - {fileID: 2140993546999869961, guid: 7b3ed491fbb831a4d9edc0727fa9a6bb, type: 3}
+  - {fileID: 1234015980398119490, guid: 3ec4be91046611147aaed34adb8b896b, type: 3}
+  - {fileID: 4626906395109176329, guid: bcda5a153147e304abcebdc3a61854f2, type: 3}

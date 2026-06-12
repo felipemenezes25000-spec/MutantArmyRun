@@ -17,33 +17,28 @@ MonoBehaviour:
   world: {fileID: 11400000, guid: d998e8483071db446bef1799d70d0ac8, type: 2}
   trackLength: 260
   gateSlots:
-  - trackPosition: 30
-    depth01: 0.115384616
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 77.5
-    depth01: 0.29807693
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 125
-    depth01: 0.48076922
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 172.5
-    depth01: 0.66346157
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 220
-    depth01: 0.84615386
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
+  - trackPosition: 35
+    depth01: 0.13461539
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 4d8f14c4160aa54419ab88ff89e6e518, type: 2}
+    rightGate: {fileID: 11400000, guid: 29e927f0949ad9947a9842de9481c2b1, type: 2}
+  - trackPosition: 117
+    depth01: 0.45
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 00eaa93e54e620d48b5fb754e2e07f1f, type: 2}
+    rightGate: {fileID: 11400000, guid: 4d8f14c4160aa54419ab88ff89e6e518, type: 2}
+  - trackPosition: 171.6
+    depth01: 0.66
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 7f92dbf1f04563545a9cca9826af493c, type: 2}
+    rightGate: {fileID: 11400000, guid: 2680f7cb42570c94683231411af2db11, type: 2}
+  - trackPosition: 215
+    depth01: 0.8269231
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 38603cdfda72a3041b88b71668e5cd74, type: 2}
+    rightGate: {fileID: 11400000, guid: e811d4939ac4d6d478c734c21efb73c7, type: 2}
   obstacles: []
-  boss: {fileID: 11400000, guid: ad185b2c82a4fd5438e02aa81388e908, type: 2}
-  bossHpMultiplier: 1
+  boss: {fileID: 11400000, guid: f014fe0b697b9644b9b67dde425ba453, type: 2}
+  bossHpMultiplier: 0.81
   winReward: {fileID: 0}
   startingUnits: 1

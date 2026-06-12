@@ -21,6 +21,6 @@ MonoBehaviour:
   sizeMult: 1
   grantsFlight: 0
   addsElement: 3
-  shaderVariantFlag: 4
+  shaderVariantFlag: 2
   attachmentPrefab: {fileID: 274600918357346714, guid: d3cf2004169d2e44e97f88bf2c0bd28b, type: 3}
   hudIcon: {fileID: 0}

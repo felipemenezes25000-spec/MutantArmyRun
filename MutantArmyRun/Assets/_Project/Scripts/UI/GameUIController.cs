@@ -131,13 +131,12 @@ namespace MutantArmy.UI
             GameSettingsSO settings = GameSettingsSO.Load();
             if (settings == null) return;   // erro já logado pelo Load()
 
-            // Vitória: fase seguinte (cap do catálogo trava na 20); derrota: retry da MESMA
-            // fase. Os dois re-iniciam NA MESMA cena — StartLevel→BossScout→Running refaz a
-            // pista via soft reset do LevelManager (doc 12 §2.2: nunca SceneManager.LoadScene).
+            // Vitória: fase seguinte SEM teto (o endless do GameSettingsSO gera além da campanha
+            // desenhada de 100); derrota: retry da MESMA fase. Os dois re-iniciam NA MESMA cena —
+            // StartLevel→BossScout→Running refaz a pista via soft reset do LevelManager
+            // (doc 12 §2.2: nunca SceneManager.LoadScene).
             int current = _lastResult.levelIndex;
-            int nextIndex = _lastResult.won
-                ? Mathf.Min(current + 1, Mathf.Max(1, settings.MaxLevelIndex))
-                : Mathf.Max(1, current);
+            int nextIndex = settings.NextLevelAfter(current, _lastResult.won);
             LevelConfigSO level = settings.GetLevel(nextIndex);
             if (level == null)
             {

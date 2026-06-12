@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b964d4801db8244ba7e1392ed91f9c8, type: 3}
+  m_Name: W10_DimensaoFinal
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.WorldConfigSO
+  worldIndex: 10
+  displayNameKey: world_10_dimensao_final
+  levels:
+  - {fileID: 11400000, guid: 2ef811a2dec427a468cd6d784bb03a97, type: 2}
+  - {fileID: 11400000, guid: 01cae23d567fd934fbb9547b423c2e9e, type: 2}
+  - {fileID: 11400000, guid: 52816501dd8b8d3448c236bfae14668f, type: 2}
+  - {fileID: 11400000, guid: a38de7eb0e3baad4b914f280bb4a58d7, type: 2}
+  - {fileID: 11400000, guid: 70f18dd447f281446928116c2ef8be5e, type: 2}
+  - {fileID: 11400000, guid: 52ab3827a49c2334c8058e329e3b14e1, type: 2}
+  - {fileID: 11400000, guid: a6ddd69739d62c544881e3e27dcd412e, type: 2}
+  - {fileID: 11400000, guid: 666887b51adb23f438e1793bac04d725, type: 2}
+  - {fileID: 11400000, guid: 073fd217f393b174ebd4bdb99ae2d860, type: 2}
+  - {fileID: 11400000, guid: efa0ec41deb0a3b49801eb258cf7df96, type: 2}
+  worldBoss: {fileID: 11400000, guid: 6ced2e55e0e680145883651519ac135f, type: 2}
+  skyboxMaterial: {fileID: 2100000, guid: c8539ae5b2a5fa54ea98017c6b4c82b3, type: 2}
+  trackSegmentPrefabs:
+  - {fileID: 8825044641131040568, guid: 2713ef8c653ab44439addac902675ac9, type: 3}
+  - {fileID: 2872355252909433204, guid: 3b9c922b12eeaf6428f3150d0804296c, type: 3}
+  musicTrack: {fileID: 0}
+  worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
+  skyTopColor: {r: 0.3, g: 0.06, b: 0.46, a: 1}
+  skyHorizonColor: {r: 0.98, g: 0.34, b: 0.72, a: 1}
+  fogColor: {r: 0.52, g: 0.18, b: 0.58, a: 1}
+  sunColor: {r: 1, g: 0.72, b: 0.94, a: 1}
+  ambientColor: {r: 0.5, g: 0.34, b: 0.62, a: 1}
+  trackMaterial: {fileID: 2100000, guid: f0306aa5d73150d4b9e3f10b509003e8, type: 2}
+  propPrefabs:
+  - {fileID: 561114427140320883, guid: 63bb74b8c21a83a4c9c3961bc749d617, type: 3}
+  - {fileID: 1948409215017542981, guid: 11d7e53fa0b5fc840b265d142992bd69, type: 3}
+  - {fileID: 5792283265382136292, guid: f59bb7f534cdffe4dad36f145753b355, type: 3}
+  - {fileID: 6868267921247024123, guid: 69816cccd1dab774f866acd5bbbdfa29, type: 3}
+  - {fileID: 4316357023515481006, guid: 420895bf58448a54e98abf6ae38cba84, type: 3}
+  - {fileID: 2410023679369539663, guid: 1cbbdf32960d8b046a53f85971d2563c, type: 3}
+  - {fileID: 8363679775923308759, guid: 7930b8e5d453c5f408666f7ede597616, type: 3}
+  - {fileID: 2181978638154488496, guid: 6889bc0770e4b8148824cc6ea33c7377, type: 3}

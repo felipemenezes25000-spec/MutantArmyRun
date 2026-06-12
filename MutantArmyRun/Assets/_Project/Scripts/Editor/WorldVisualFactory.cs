@@ -15,15 +15,20 @@ namespace MutantArmy.Editor
 {
     /// <summary>
     /// MAR Tools/Build World Visuals — veste o greybox com a direção de arte do doc 01 §6
-    /// (mobile casual premium: colorido, limpo, vibrante, silhuetas claras), por código:
-    /// 1. Materiais URP vibrantes por mundo (pista W01 grama / W02 asfalto frio / W03 areia
-    ///    quente) + faixas laterais brancas emissivas.
+    /// (mobile casual premium: colorido, limpo, vibrante, silhuetas claras), por código.
+    /// Cobre os 10 MUNDOS do CANON §7 (W01 grama · W02 cidade fria · W03 deserto · W04 floresta
+    /// tóxica · W05 vulcão · W06 gelo · W07 medieval · W08 lab neon · W09 metal · W10 caos):
+    /// 1. Materiais URP vibrantes por mundo (cor/metallic/smoothness/emissão da pista por tema)
+    ///    + faixas laterais brancas emissivas.
     /// 2. Skybox gradient procedural por mundo (textura gerada em código + Skybox/Panoramic;
     ///    fallback Skybox/Procedural tintado) gravado no WorldConfigSO.
-    /// 3. Prop-prefabs leves por mundo a partir dos CC0 do staging (W01 Nature, W02
-    ///    City+Streets, W03 cactos/sucata recolor) com recolor por heurística de slot.
-    /// 4. Variants Segment_W01/W02/W03 (A/B) decorados nas BORDAS (fora da pista jogável)
+    /// 3. Prop-prefabs leves por mundo a partir dos CC0 do staging (Nature, City+Streets,
+    ///    Dungeon Remastered p/ o medieval) com recolor por heurística de slot OU recolor
+    ///    temático forçado (brasa/cristal/void/warp). Reusos/recolors documentados em PropSpecs.
+    /// 4. Variants Segment_W01..W10 (A/B) decorados nas BORDAS (fora da pista jogável)
     ///    de forma aleatório-determinística; WorldConfigSO.trackSegmentPrefabs atualizado.
+    ///    W04-W10 só recebem wiring no SO quando o agente de conteúdo cria os WorldConfigSO
+    ///    correspondentes (até lá os assets visuais ficam prontos em disco; ver IsMvpWorld).
     /// 5. Cena Game: luz quente com sombras soft, ambiente gradient, Volume global (Bloom
     ///    moderado, Vignette leve, ACES, saturação +10) e WorldAtmosphereApplier registrado
     ///    no GameSceneBootstrap.
@@ -63,15 +68,21 @@ namespace MutantArmy.Editor
             "models/KayKit-City-Builder-Bits/addons/kaykit_city_builder_bits/Assets/fbx(unity)/";
         private const string NatureBase = "models/Quaternius-UltimateNature/FBX/";
         private const string StreetsBase = "models/Quaternius-ModularStreets/FBX/";
+        private const string DungeonBase =
+            "models/KayKit-Dungeon-Remastered/addons/kaykit_dungeon_remastered/Assets/fbx/";
         private const string ParticleBase = "vfx/kenney_particle-pack/PNG (Transparent)/";
 
         // ------------------------------------------------------------------ dados de tema
 
         private sealed class WorldTheme
         {
-            public string Key;            // "W01" | "W02" | "W03"
-            public string AssetName;      // nome do WorldConfigSO
+            public string Key;            // "W01".."W10"
+            public string AssetName;      // nome do WorldConfigSO (casa com MvpContentFactory)
             public Color SkyTop, SkyHorizon, Fog, Sun, Ambient, Track;
+            // metalliness/smoothness/emissão da pista por mundo (lava brilha, gelo é liso etc.)
+            public float TrackMetallic = 0f;
+            public float TrackSmoothness = 0.1f;
+            public Color? TrackEmission = null;
         }
 
         private sealed class PropSpec
@@ -80,13 +91,18 @@ namespace MutantArmy.Editor
             public float Height;          // altura-alvo em metros (normalização de escala)
             public string DefaultMat;     // chave de material quando a heurística não decide
             public bool Big;              // grandes ficam mais afastados da pista
+            public bool ForceMat;         // true = ignora heurística de slot e pinta TODOS os slots
+                                          // com DefaultMat (recolor temático forte: brasa, cristal,
+                                          // void, warp — onde o nome de slot do FBX não importa)
 
-            public PropSpec(string source, float height, string defaultMat, bool big)
+            public PropSpec(string source, float height, string defaultMat, bool big,
+                            bool forceMat = false)
             {
                 Source = source;
                 Height = height;
                 DefaultMat = defaultMat;
                 Big = big;
+                ForceMat = forceMat;
             }
         }
 
@@ -114,6 +130,79 @@ namespace MutantArmy.Editor
                 SkyTop = new Color(0.30f, 0.55f, 0.92f), SkyHorizon = new Color(1.00f, 0.80f, 0.55f),
                 Fog = new Color(0.95f, 0.79f, 0.58f), Sun = new Color(1.00f, 0.88f, 0.68f),
                 Ambient = new Color(0.78f, 0.68f, 0.55f), Track = new Color(0.88f, 0.72f, 0.46f)
+            },
+
+            // ----------------------------------------------------------- W04..W10 (release)
+            new WorldTheme
+            {
+                // Floresta Mutante: verde-escuro orgânico, névoa tóxica, luz esverdeada doente.
+                Key = "W04", AssetName = "W04_FlorestaMutante",
+                SkyTop = new Color(0.10f, 0.22f, 0.16f), SkyHorizon = new Color(0.32f, 0.52f, 0.26f),
+                Fog = new Color(0.30f, 0.46f, 0.24f), Sun = new Color(0.78f, 0.92f, 0.62f),
+                Ambient = new Color(0.34f, 0.46f, 0.30f), Track = new Color(0.20f, 0.34f, 0.18f),
+                TrackSmoothness = 0.18f
+            },
+            new WorldTheme
+            {
+                // Vulcão dos Gigantes: lava laranja-vermelho, rocha carbonizada, calor; a PISTA
+                // emite leve (rachaduras de magma) e o céu queima no horizonte.
+                Key = "W05", AssetName = "W05_VulcaoGigantes",
+                SkyTop = new Color(0.26f, 0.10f, 0.10f), SkyHorizon = new Color(1.00f, 0.42f, 0.14f),
+                Fog = new Color(0.62f, 0.24f, 0.12f), Sun = new Color(1.00f, 0.66f, 0.42f),
+                Ambient = new Color(0.52f, 0.28f, 0.20f), Track = new Color(0.24f, 0.14f, 0.12f),
+                TrackMetallic = 0.2f, TrackSmoothness = 0.35f,
+                TrackEmission = new Color(0.80f, 0.18f, 0.04f)
+            },
+            new WorldTheme
+            {
+                // Reino Congelado: gelo azul-branco frio, neve, luz fria; pista lisa (smoothness
+                // alta = brilho de gelo). Props nativos do Ultimate Nature (variantes _Snow).
+                Key = "W06", AssetName = "W06_ReinoCongelado",
+                SkyTop = new Color(0.52f, 0.74f, 0.96f), SkyHorizon = new Color(0.86f, 0.94f, 1.00f),
+                Fog = new Color(0.82f, 0.90f, 0.98f), Sun = new Color(0.84f, 0.92f, 1.00f),
+                Ambient = new Color(0.74f, 0.82f, 0.92f), Track = new Color(0.74f, 0.86f, 0.96f),
+                TrackMetallic = 0.05f, TrackSmoothness = 0.55f
+            },
+            new WorldTheme
+            {
+                // Arena Medieval: pedra dourado-terroso, castelo, luz dourada de fim de tarde.
+                Key = "W07", AssetName = "W07_ArenaMedieval",
+                SkyTop = new Color(0.42f, 0.52f, 0.78f), SkyHorizon = new Color(0.96f, 0.82f, 0.56f),
+                Fog = new Color(0.80f, 0.72f, 0.54f), Sun = new Color(1.00f, 0.90f, 0.66f),
+                Ambient = new Color(0.66f, 0.60f, 0.48f), Track = new Color(0.60f, 0.52f, 0.38f),
+                TrackSmoothness = 0.12f
+            },
+            new WorldTheme
+            {
+                // Laboratório Alienígena: neon roxo-ciano, tech estranha, escuro com glow; pista
+                // escura levemente metálica que reflete o neon do céu.
+                Key = "W08", AssetName = "W08_LaboratorioAlienigena",
+                SkyTop = new Color(0.12f, 0.05f, 0.22f), SkyHorizon = new Color(0.42f, 0.16f, 0.62f),
+                Fog = new Color(0.26f, 0.12f, 0.40f), Sun = new Color(0.70f, 0.58f, 1.00f),
+                Ambient = new Color(0.34f, 0.24f, 0.50f), Track = new Color(0.16f, 0.14f, 0.26f),
+                TrackMetallic = 0.4f, TrackSmoothness = 0.5f,
+                TrackEmission = new Color(0.18f, 0.42f, 0.55f)
+            },
+            new WorldTheme
+            {
+                // Planeta Mecânico: metal cinza-ciano industrial, engrenagens, céu de aço frio.
+                Key = "W09", AssetName = "W09_PlanetaMecanico",
+                SkyTop = new Color(0.30f, 0.40f, 0.48f), SkyHorizon = new Color(0.58f, 0.70f, 0.76f),
+                Fog = new Color(0.50f, 0.60f, 0.66f), Sun = new Color(0.84f, 0.92f, 0.98f),
+                Ambient = new Color(0.52f, 0.60f, 0.66f), Track = new Color(0.38f, 0.44f, 0.50f),
+                TrackMetallic = 0.65f, TrackSmoothness = 0.45f,
+                TrackEmission = new Color(0.06f, 0.34f, 0.40f)
+            },
+            new WorldTheme
+            {
+                // Dimensão Final: caos colorido, realidade quebrada, gradiente vibrante; a pista
+                // pulsa com emissão arroxeada e o céu é o mais saturado de todos.
+                Key = "W10", AssetName = "W10_DimensaoFinal",
+                SkyTop = new Color(0.30f, 0.06f, 0.46f), SkyHorizon = new Color(0.98f, 0.34f, 0.72f),
+                Fog = new Color(0.52f, 0.18f, 0.58f), Sun = new Color(1.00f, 0.72f, 0.94f),
+                Ambient = new Color(0.50f, 0.34f, 0.62f), Track = new Color(0.24f, 0.10f, 0.34f),
+                TrackMetallic = 0.3f, TrackSmoothness = 0.6f,
+                TrackEmission = new Color(0.60f, 0.12f, 0.70f)
             }
         };
 
@@ -159,6 +248,102 @@ namespace MutantArmy.Editor
                 new PropSpec(CityBitsBase + "box_B.fbx", 1.0f, "scrap", false),
                 new PropSpec(CityBitsBase + "dumpster.fbx", 1.3f, "scrap", false),
                 new PropSpec(StreetsBase + "Sign_Stop.fbx", 2.6f, "metal", false)
+            },
+
+            // ----- W04 Floresta Mutante: vegetação densa recolor tóxico (verde-escuro/ácido)
+            ["W04"] = new[]
+            {
+                new PropSpec(NatureBase + "PineTree_1.fbx", 6.4f, "leaves", true),
+                new PropSpec(NatureBase + "PineTree_3.fbx", 7.0f, "leaves", true),
+                new PropSpec(NatureBase + "CommonTree_4.fbx", 6.0f, "leaves", true),
+                new PropSpec(NatureBase + "Plant_1.fbx", 1.2f, "leaves", false),
+                new PropSpec(NatureBase + "Plant_3.fbx", 1.4f, "leaves", false),
+                new PropSpec(NatureBase + "Plant_5.fbx", 1.1f, "flower", false),
+                new PropSpec(NatureBase + "Bush_2.fbx", 0.9f, "leaves", false),
+                new PropSpec(NatureBase + "Corn_1.fbx", 1.8f, "leaves", false),
+                new PropSpec(NatureBase + "Rock_Moss_2.fbx", 1.2f, "rock", false),
+                new PropSpec(NatureBase + "TreeStump_Moss.fbx", 0.9f, "trunk", false)
+            },
+
+            // ----- W05 Vulcão: rocha carbonizada + tocos mortos recolor brasa/obsidiana
+            ["W05"] = new[]
+            {
+                new PropSpec(NatureBase + "Rock_4.fbx", 2.4f, "rock", true),
+                new PropSpec(NatureBase + "Rock_6.fbx", 2.0f, "rock", true),
+                // brasa: força o material (o slot "rock" do FBX cairia em charcoal sem o force)
+                new PropSpec(NatureBase + "Rock_2.fbx", 1.4f, "ember", false, true),
+                new PropSpec(NatureBase + "Rock_5.fbx", 1.2f, "ember", false, true),
+                new PropSpec(NatureBase + "CommonTree_Dead_2.fbx", 4.8f, "trunk", true),
+                new PropSpec(NatureBase + "CommonTree_Dead_4.fbx", 4.4f, "trunk", true),
+                new PropSpec(NatureBase + "TreeStump.fbx", 0.9f, "trunk", false),
+                new PropSpec(CityBitsBase + "box_A.fbx", 1.2f, "ember", false, true)
+            },
+
+            // ----- W06 Reino Congelado: variantes _Snow NATIVAS do Ultimate Nature (recolor leve)
+            ["W06"] = new[]
+            {
+                new PropSpec(NatureBase + "PineTree_Snow_1.fbx", 6.6f, "snow", true),
+                new PropSpec(NatureBase + "PineTree_Snow_3.fbx", 7.0f, "snow", true),
+                new PropSpec(NatureBase + "CommonTree_Snow_2.fbx", 5.8f, "snow", true),
+                new PropSpec(NatureBase + "BirchTree_Snow_1.fbx", 5.4f, "snow", true),
+                new PropSpec(NatureBase + "Bush_Snow_1.fbx", 0.9f, "snow", false),
+                new PropSpec(NatureBase + "Rock_Snow_1.fbx", 1.6f, "ice", false),
+                new PropSpec(NatureBase + "Rock_Snow_4.fbx", 1.2f, "ice", false),
+                new PropSpec(NatureBase + "BirchTree_Dead_Snow_2.fbx", 4.6f, "ice", true)
+            },
+
+            // ----- W07 Arena Medieval: props do Dungeon Remastered (pedra/dourado) + prédios=muralha
+            ["W07"] = new[]
+            {
+                new PropSpec(DungeonBase + "pillar.fbx", 3.4f, "stone", true),
+                new PropSpec(DungeonBase + "pillar_decorated.fbx", 3.6f, "stone", true),
+                new PropSpec(DungeonBase + "column.fbx", 3.0f, "stone", true),
+                new PropSpec(DungeonBase + "barrel_large.fbx", 1.3f, "wood", false),
+                new PropSpec(DungeonBase + "barrel_small_stack.fbx", 1.1f, "wood", false),
+                new PropSpec(DungeonBase + "crates_stacked.fbx", 1.4f, "wood", false),
+                new PropSpec(DungeonBase + "banner_patternA_red.fbx", 2.8f, "banner", false),
+                new PropSpec(DungeonBase + "banner_patternB_blue.fbx", 2.8f, "banner", false),
+                new PropSpec(DungeonBase + "torch.fbx", 1.6f, "torch", false),
+                new PropSpec(CityBitsBase + "building_C.fbx", 9f, "stone", true)
+            },
+
+            // ----- W08 Laboratório Alienígena: sucata recolor neon + rochas=cristais emissivos
+            ["W08"] = new[]
+            {
+                new PropSpec(CityBitsBase + "box_A.fbx", 1.4f, "tech", false),
+                new PropSpec(CityBitsBase + "box_B.fbx", 1.1f, "tech", false),
+                new PropSpec(CityBitsBase + "watertower.fbx", 6.0f, "tech", true),
+                new PropSpec(CityBitsBase + "building_E.fbx", 9f, "tech", true),
+                new PropSpec(CityBitsBase + "building_G.fbx", 11f, "tech", true),
+                new PropSpec(NatureBase + "Rock_3.fbx", 2.2f, "crystal", true, true),
+                new PropSpec(NatureBase + "Rock_5.fbx", 1.4f, "crystal", false, true),
+                new PropSpec(StreetsBase + "Streetlight_Single.fbx", 4.6f, "neon", false, true)
+            },
+
+            // ----- W09 Planeta Mecânico: cidade/ruas recolor metal industrial + rochas=destroços
+            ["W09"] = new[]
+            {
+                new PropSpec(CityBitsBase + "watertower.fbx", 6.4f, "metal", true),
+                new PropSpec(CityBitsBase + "building_F.fbx", 11f, "metal", true),
+                new PropSpec(CityBitsBase + "building_H.fbx", 10f, "metal", true),
+                new PropSpec(CityBitsBase + "dumpster.fbx", 1.3f, "metal", false),
+                new PropSpec(CityBitsBase + "box_B.fbx", 1.0f, "metal", false),
+                new PropSpec(StreetsBase + "Streetlight_Triple.fbx", 4.8f, "panel", false),
+                new PropSpec(StreetsBase + "TrafficLight.fbx", 3.4f, "panel", false),
+                new PropSpec(NatureBase + "Rock_4.fbx", 1.8f, "rubble", false)
+            },
+
+            // ----- W10 Dimensão Final: mix caótico (cristais + pilares + rochas) recolor vibrante
+            ["W10"] = new[]
+            {
+                new PropSpec(NatureBase + "Rock_3.fbx", 2.6f, "crystal", true, true),
+                new PropSpec(NatureBase + "Rock_6.fbx", 2.2f, "void", true, true),
+                new PropSpec(NatureBase + "Rock_5.fbx", 1.4f, "crystal", false, true),
+                new PropSpec(DungeonBase + "pillar.fbx", 3.6f, "void", true, true),
+                new PropSpec(DungeonBase + "column.fbx", 3.0f, "crystal", true, true),
+                new PropSpec(NatureBase + "PineTree_2.fbx", 6.0f, "warp", true, true),
+                new PropSpec(CityBitsBase + "box_A.fbx", 1.4f, "warp", false, true),
+                new PropSpec(NatureBase + "Rock_2.fbx", 1.2f, "void", false, true)
             }
         };
 
@@ -346,22 +531,108 @@ namespace MutantArmy.Editor
                                         new Color(0.00f, 0.55f, 0.65f) * 0.8f)
             };
 
+            // -------- W04 Floresta Mutante: tudo puxado p/ verde-ácido tóxico (orgânico doente)
+            var w04 = new Dictionary<string, Material>
+            {
+                ["leaves"] = LitMaterial("M_W04_Toxic", new Color(0.36f, 0.62f, 0.18f), null, 0f, 0.3f),
+                ["trunk"] = LitMaterial("M_W04_Bark", new Color(0.30f, 0.34f, 0.22f)),
+                ["rock"] = LitMaterial("M_W04_Rock", new Color(0.32f, 0.40f, 0.28f)),
+                // flor venenosa: emissivo fraco (brilho ácido sutil)
+                ["flower"] = LitMaterial("M_W04_Spore", new Color(0.62f, 0.90f, 0.34f), null, 0f, 0.4f,
+                                         new Color(0.30f, 0.55f, 0.10f) * 0.6f)
+            };
+
+            // -------- W05 Vulcão: rocha carbonizada + brasa emissiva + madeira chamuscada
+            var w05 = new Dictionary<string, Material>
+            {
+                ["rock"] = LitMaterial("M_W05_Charcoal", new Color(0.18f, 0.15f, 0.15f), null, 0.1f, 0.3f),
+                ["ember"] = LitMaterial("M_W05_Ember", new Color(0.45f, 0.16f, 0.08f), null, 0.15f, 0.45f,
+                                        new Color(1.00f, 0.32f, 0.05f) * 1.1f),
+                ["trunk"] = LitMaterial("M_W05_Burnt", new Color(0.20f, 0.14f, 0.11f), null, 0f, 0.2f),
+                ["leaves"] = LitMaterial("M_W05_Ash", new Color(0.28f, 0.22f, 0.20f))
+            };
+
+            // -------- W06 Reino Congelado: neve/gelo azul-branco, brilho liso de gelo
+            var w06 = new Dictionary<string, Material>
+            {
+                ["snow"] = LitMaterial("M_W06_Snow", new Color(0.92f, 0.96f, 1.00f), null, 0f, 0.35f),
+                ["ice"] = LitMaterial("M_W06_Ice", new Color(0.62f, 0.82f, 0.98f), null, 0.1f, 0.7f),
+                ["trunk"] = LitMaterial("M_W06_Frost", new Color(0.58f, 0.66f, 0.74f), null, 0f, 0.4f),
+                ["leaves"] = LitMaterial("M_W06_Frost", new Color(0.70f, 0.84f, 0.92f), null, 0f, 0.4f)
+            };
+
+            // -------- W07 Arena Medieval: pedra dourado-terroso, madeira quente, estandartes, tocha
+            var w07 = new Dictionary<string, Material>
+            {
+                ["stone"] = LitMaterial("M_W07_Stone", new Color(0.74f, 0.66f, 0.48f), null, 0f, 0.15f),
+                ["wood"] = LitMaterial("M_W07_Wood", new Color(0.50f, 0.34f, 0.20f)),
+                ["banner"] = LitMaterial("M_W07_Banner", new Color(0.78f, 0.18f, 0.18f), null, 0f, 0.2f),
+                ["torch"] = LitMaterial("M_W07_Torch", new Color(0.96f, 0.74f, 0.36f), null, 0f, 0.3f,
+                                        new Color(1.00f, 0.62f, 0.20f) * 1.0f),
+                ["city"] = LitMaterial("M_W07_Wall", new Color(0.70f, 0.62f, 0.46f), cityTex)
+            };
+
+            // -------- W08 Lab Alienígena: sucata escura recolor neon + cristais emissivos ciano/roxo
+            var w08 = new Dictionary<string, Material>
+            {
+                ["tech"] = LitMaterial("M_W08_Tech", new Color(0.30f, 0.28f, 0.42f), cityTex, 0.5f, 0.55f),
+                ["crystal"] = LitMaterial("M_W08_Crystal", new Color(0.45f, 0.20f, 0.70f), null, 0.2f, 0.7f,
+                                          new Color(0.55f, 0.15f, 0.85f) * 1.1f),
+                ["neon"] = LitMaterial("M_W08_Neon", new Color(0.20f, 0.55f, 0.62f), null, 0.4f, 0.6f,
+                                       new Color(0.05f, 0.85f, 0.95f) * 1.1f),
+                ["city"] = LitMaterial("M_W08_Tech", new Color(0.30f, 0.28f, 0.42f), cityTex, 0.5f, 0.55f)
+            };
+
+            // -------- W09 Planeta Mecânico: metal industrial cinza-ciano + painéis emissivos
+            var w09 = new Dictionary<string, Material>
+            {
+                ["metal"] = LitMaterial("M_W09_Metal", new Color(0.42f, 0.48f, 0.54f), cityTex, 0.7f, 0.5f),
+                ["panel"] = LitMaterial("M_W09_Panel", new Color(0.30f, 0.40f, 0.46f), null, 0.6f, 0.5f,
+                                        new Color(0.05f, 0.55f, 0.62f) * 0.9f),
+                ["rubble"] = LitMaterial("M_W09_Rubble", new Color(0.40f, 0.44f, 0.48f), null, 0.5f, 0.4f),
+                ["city"] = LitMaterial("M_W09_Metal", new Color(0.42f, 0.48f, 0.54f), cityTex, 0.7f, 0.5f)
+            };
+
+            // -------- W10 Dimensão Final: cristais/vazio/warp em emissivos vibrantes saturados
+            var w10 = new Dictionary<string, Material>
+            {
+                ["crystal"] = LitMaterial("M_W10_Crystal", new Color(0.55f, 0.20f, 0.85f), null, 0.2f, 0.75f,
+                                          new Color(0.75f, 0.20f, 1.00f) * 1.2f),
+                ["void"] = LitMaterial("M_W10_Void", new Color(0.12f, 0.06f, 0.24f), null, 0.3f, 0.6f,
+                                       new Color(0.30f, 0.05f, 0.55f) * 0.8f),
+                ["warp"] = LitMaterial("M_W10_Warp", new Color(0.95f, 0.30f, 0.66f), null, 0.1f, 0.6f,
+                                       new Color(1.00f, 0.25f, 0.70f) * 1.1f),
+                ["city"] = LitMaterial("M_W10_Warp", new Color(0.95f, 0.30f, 0.66f), null, 0.1f, 0.6f,
+                                       new Color(1.00f, 0.25f, 0.70f) * 1.1f)
+            };
+
             return new Dictionary<string, Dictionary<string, Material>>
             {
                 ["W01"] = w01,
                 ["W02"] = w02,
-                ["W03"] = w03
+                ["W03"] = w03,
+                ["W04"] = w04,
+                ["W05"] = w05,
+                ["W06"] = w06,
+                ["W07"] = w07,
+                ["W08"] = w08,
+                ["W09"] = w09,
+                ["W10"] = w10
             };
         }
 
         private static Dictionary<string, Material> CreateTrackMaterials()
         {
-            return new Dictionary<string, Material>
+            // Uma pista por mundo: cor da tabela + metallic/smoothness/emissão do tema (lava
+            // racha em brasa, gelo brilha liso, metal reflete). Itera os 10 temas — nada hard-coded.
+            var result = new Dictionary<string, Material>();
+            foreach (WorldTheme theme in Themes)
             {
-                ["W01"] = LitMaterial("M_Track_W01", Themes[0].Track, null, 0f, 0.08f),
-                ["W02"] = LitMaterial("M_Track_W02", Themes[1].Track, null, 0.1f, 0.25f),
-                ["W03"] = LitMaterial("M_Track_W03", Themes[2].Track, null, 0f, 0.05f)
-            };
+                result[theme.Key] = LitMaterial("M_Track_" + theme.Key, theme.Track, null,
+                                                 theme.TrackMetallic, theme.TrackSmoothness,
+                                                 theme.TrackEmission);
+            }
+            return result;
         }
 
         private static Material CreateStripeMaterial()
@@ -536,12 +807,15 @@ namespace MutantArmy.Editor
                 var instance = (GameObject)PrefabUtility.InstantiatePrefab(model);
                 instance.transform.SetParent(wrapper.transform, false);
 
-                // recolor por slot: heurística de nome do material do FBX → paleta vibrante
+                // recolor por slot: heurística de nome do material do FBX → paleta vibrante.
+                // ForceMat=true pinta TODOS os slots com DefaultMat (recolor temático forte).
+                Material forced = spec.ForceMat ? ResolvePaletteKey(palette, spec.DefaultMat) : null;
                 foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
                 {
                     Material[] mats = renderer.sharedMaterials;
                     for (int i = 0; i < mats.Length; i++)
                     {
+                        if (forced != null) { mats[i] = forced; continue; }
                         string slotName = mats[i] != null ? mats[i].name : string.Empty;
                         mats[i] = ResolveSlotMaterial(palette, slotName, spec.DefaultMat);
                     }
@@ -576,7 +850,14 @@ namespace MutantArmy.Editor
             string key = ClassifySlot(slotName, defaultKey);
             Material mat;
             if (palette.TryGetValue(key, out mat) && mat != null) return mat;
-            if (palette.TryGetValue(defaultKey, out mat) && mat != null) return mat;
+            return ResolvePaletteKey(palette, defaultKey);
+        }
+
+        /// <summary>Material da paleta pela chave; cai no default e por fim em qualquer material.</summary>
+        private static Material ResolvePaletteKey(Dictionary<string, Material> palette, string key)
+        {
+            Material mat;
+            if (palette.TryGetValue(key, out mat) && mat != null) return mat;
             foreach (KeyValuePair<string, Material> any in palette) return any.Value;   // último recurso
             return null;
         }
@@ -681,6 +962,12 @@ namespace MutantArmy.Editor
             return 0;
         }
 
+        /// <summary>W01-W03 são os mundos do MVP (devem sempre existir); W04-W10 são do release.</summary>
+        private static bool IsMvpWorld(string worldKey)
+        {
+            return worldKey == "W01" || worldKey == "W02" || worldKey == "W03";
+        }
+
         /// <summary>Faixa lateral branca emissiva no limite visual da pista (±4 m).</summary>
         private static void AddStripe(Transform root, Material stripeMat, float sign)
         {
@@ -750,8 +1037,16 @@ namespace MutantArmy.Editor
                 var world = AssetDatabase.LoadAssetAtPath<WorldConfigSO>(path);
                 if (world == null)
                 {
-                    Debug.LogError("MAR Tools: WorldConfigSO ausente em " + path +
-                                   " — rode MAR Tools/Create MVP Content.");
+                    // W01-W03 (MVP) ausente é REGRESSÃO; W04-W10 ainda podem não existir até o
+                    // agente de conteúdo (MvpContentFactory) criá-los — então só informa. Os
+                    // materiais/sky/prefabs já ficam gravados em disco, prontos p/ wiring depois.
+                    if (IsMvpWorld(theme.Key))
+                        Debug.LogError("MAR Tools: WorldConfigSO ausente em " + path +
+                                       " — rode MAR Tools/Create MVP Content.");
+                    else
+                        Debug.Log("MAR Tools: WorldConfigSO " + theme.AssetName + " ainda não existe " +
+                                  "(esperado até o agente de conteúdo criar os mundos W04-W10). " +
+                                  "Materiais/skybox/segmentos visuais já gerados em disco.");
                     continue;
                 }
 

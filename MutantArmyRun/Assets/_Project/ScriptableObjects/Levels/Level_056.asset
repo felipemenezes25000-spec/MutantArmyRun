@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fea93fdcbb7dbc41b9d6cf320dc638d, type: 3}
+  m_Name: Level_056
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.LevelConfigSO
+  levelIndex: 56
+  seed: 444698
+  world: {fileID: 11400000, guid: 9ce6de04ba5e9b641a9108c9b2254801, type: 2}
+  trackLength: 240
+  gateSlots:
+  - trackPosition: 30
+    depth01: 0.125
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 72.5
+    depth01: 0.30208334
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 115
+    depth01: 0.47916666
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 157.5
+    depth01: 0.65625
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 200
+    depth01: 0.8333333
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  obstacles: []
+  boss: {fileID: 11400000, guid: ed5e41be009bb2e4da5c270c2f68fcc7, type: 2}
+  bossHpMultiplier: 1.015
+  winReward: {fileID: 0}
+  startingUnits: 1

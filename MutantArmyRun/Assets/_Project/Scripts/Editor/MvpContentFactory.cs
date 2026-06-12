@@ -10,11 +10,14 @@ namespace MutantArmy.Editor
     /// MAR Tools/Create MVP Content — gera por código os assets canônicos do jogo:
     /// 26 GateConfigSO (taxonomia ampliada, CANON §10 + doc 04: matemáticos, classe,
     /// elemento, mutação, risco) · 19 UnitConfigSO (roster completo CANON §5; os 5 do MVP
-    /// intactos) · 9 MutationConfigSO (CANON §3.3) · 5 BossConfigSO (CANON §6 + doc 05 §7) ·
+    /// intactos) · 9 MutationConfigSO (CANON §3.3) · 19 BossConfigSO (CANON §6: 10 arquétipos
+    /// regionais + 10 bosses únicos de mundo, com os 5 do MVP preservados na sobreposição) ·
     /// ElementChartSO default (CANON §4) · 4 RarityConfigSO (CANON §8) · 4 UpgradeConfigSO
-    /// (trilhas MVP, CANON §9) · 3 RewardConfigSO (CANON §8/§16) · 3 WorldConfigSO (CANON
-    /// §7/§15) · 20 LevelConfigSO com seeds determinísticas, bosses por fase e pares manuais
-    /// curados nas fases-chave (doc 06 §8). Idempotente: re-rodar atualiza os assets existentes.
+    /// (trilhas MVP, CANON §9) · 3 RewardConfigSO (CANON §8/§16) · 10 WorldConfigSO (CANON §7,
+    /// worldIndex 1–10) · 100 LevelConfigSO (10 mundos × 10 fases) com seeds determinísticas,
+    /// curva de dificuldade por fase/mundo e pares manuais curados nas fases-chave (doc 06 §8).
+    /// Acima da fase 100 o GameSettingsSO gera fases proceduralmente (endless infinito, CANON §7).
+    /// Idempotente: re-rodar atualiza os assets existentes.
     /// NOTA p/ runtime: o GateManager carrega TODOS os GateConfigSO da pasta no _autoBalancePool —
     /// negativos/risco/mutação entram nesse sorteio; ver avisos de integração para curar o pool.
     /// </summary>
@@ -55,9 +58,17 @@ namespace MutantArmy.Editor
             public MutationConfigSO Wings, Armor, Laser, Size, Speed, Clone, Regen, Shield, AreaBlast;
         }
 
+        // 10 mundos × (1 arquétipo regional p/ fases 1–9 + 1 boss único p/ fase 10).
+        // Os 5 do MVP (Golem/WoodGiant/Bruiser/Titan/Scorpion) continuam nos índices 0–2
+        // intactos; M4–M10 são novos. arquetype[w]/final[w] por worldIndex 1..10.
         private sealed class BossSet
         {
+            // MVP preservados (não quebrar W1/W2/W3 nem os 5 bosses).
             public BossConfigSO Golem, WoodGiant, Bruiser, Titan, Scorpion;
+            // Arquétipos regionais (fases 1–9) por mundo, indexados por worldIndex 1..10.
+            public readonly BossConfigSO[] Arquetype = new BossConfigSO[11];
+            // Bosses ÚNICOS de mundo (fase 10) por worldIndex 1..10 — o contrato do visual.
+            public readonly BossConfigSO[] Final = new BossConfigSO[11];
         }
 
         private sealed class RewardSet
@@ -91,9 +102,10 @@ namespace MutantArmy.Editor
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("MAR Tools: conteúdo criado/atualizado — 25 portais, 19 tropas, 9 mutações, 5 bosses, " +
-                      "chart elemental, 4 raridades, 4 trilhas de upgrade, 3 recompensas, 3 mundos, " +
-                      "20 fases e o catálogo Resources/GameSettings.asset.");
+            Debug.Log("MAR Tools: conteúdo criado/atualizado — 25 portais, 19 tropas, 9 mutações, 19 bosses " +
+                      "(10 arquétipos regionais + 10 bosses de mundo, com sobreposição dos 5 do MVP), " +
+                      "chart elemental, 4 raridades, 4 trilhas de upgrade, 3 recompensas, 10 mundos, " +
+                      "100 fases (+ endless procedural além da 100) e o catálogo Resources/GameSettings.asset.");
         }
 
         // ------------------------------------------------------------------ Units (CANON §5 · doc 03 §3.1/§4)
@@ -628,21 +640,24 @@ namespace MutantArmy.Editor
 
         // ------------------------------------------------------------------ Bosses (CANON §6 · doc 05 §7)
 
+        private static readonly ElementType[] NoElements = new ElementType[0];
+
         private static BossSet CreateBosses(RewardSet rewards)
         {
             var set = new BossSet();
 
+            // ---- MVP preservados (não quebrar) ----
             // HP base do golem = aparição da fase 3 (400); as demais fases escalam via
             // bossHpMultiplier do LevelConfigSO (doc 05 §7.1: 100/220/400/550/700/900).
             set.Golem = ConfigureBoss("Boss_M1_GolemStone", "m1_golem_stone", "Golem de Pedra",
-                weaknesses: new[] { ElementType.Fire }, immunities: new ElementType[0],
+                weaknesses: new[] { ElementType.Fire }, immunities: NoElements,
                 bodyType: BodyType.Organic, maxHp: 400f, contactDps: 6f,
                 entranceSeconds: 1.8f, telegraphSeconds: 1.2f,
                 specialDamage: 25f, specialArea: 3f, specialCooldown: 3.5f,
                 killReward: rewards.BossDefault);
 
             set.WoodGiant = ConfigureBoss("Boss_M1_WoodGiant", "m1_final_wood_giant", "Gigante de Madeira",
-                new[] { ElementType.Fire }, new ElementType[0],
+                new[] { ElementType.Fire }, NoElements,
                 BodyType.Organic, 1600f, 8f, 2.0f, 1.2f, 30f, 4f, 3.5f,
                 rewards.WorldBoss);
 
@@ -662,6 +677,82 @@ namespace MutantArmy.Editor
                 BodyType.Machine, 3000f, 12f, 2.0f, 1.1f, 40f, 4f, 3.0f,
                 rewards.WorldBoss);
 
+            // ---- W1–W3: arquétipo regional + boss final (reutiliza os MVP) ----
+            set.Arquetype[1] = set.Golem; set.Final[1] = set.WoodGiant;
+            set.Arquetype[2] = set.Bruiser; set.Final[2] = set.Titan;
+            // W3 não tem arquétipo dedicado no MVP: o Escorpião serve de variante regional
+            // (escalado p/ baixo nas fases 21–29) E de boss final (fase 30) — comportamento atual.
+            set.Arquetype[3] = set.Scorpion; set.Final[3] = set.Scorpion;
+
+            // ---- W4–W10: arquétipo regional NOVO + boss único de mundo NOVO (CANON §6) ----
+            // bossId estável por mundo (contrato do visual). maxHp do boss final escala por
+            // mundo; o arquétipo tem ~55% do HP do final e entra escalado por fase (1–9).
+            // Fraqueza/imunidade/element seguem o CANON §6 exatamente.
+
+            // M4 Floresta Mutante — Planta Carnívora Gigante (fraco Fogo+Veneno; orgânico).
+            set.Arquetype[4] = ConfigureBoss("Boss_M4_CarnivorousSprout", "m4_carnivorous_sprout",
+                "Broto Carnívoro", new[] { ElementType.Fire, ElementType.Poison }, NoElements,
+                BodyType.Organic, 2200f, 11f, 1.7f, 1.1f, 34f, 3f, 3.0f, rewards.BossDefault);
+            set.Final[4] = ConfigureBoss("Boss_M4_CarnivorousPlant", "m4_carnivorous_plant",
+                "Planta Carnívora Gigante", new[] { ElementType.Fire, ElementType.Poison }, NoElements,
+                BodyType.Organic, 4000f, 14f, 2.0f, 1.2f, 44f, 4.5f, 3.0f, rewards.WorldBoss);
+
+            // M5 Vulcão dos Gigantes — Dragão de Lava (fraco Gelo; RESISTE Fogo → element=Fire).
+            set.Arquetype[5] = ConfigureBoss("Boss_M5_LavaWhelp", "m5_lava_whelp",
+                "Filhote de Lava", new[] { ElementType.Ice }, NoElements,
+                BodyType.Organic, 2900f, 12f, 1.8f, 1.1f, 38f, 3.5f, 3.0f, rewards.BossDefault,
+                element: ElementType.Fire);
+            set.Final[5] = ConfigureBoss("Boss_M5_LavaDragon", "m5_lava_dragon",
+                "Dragão de Lava", new[] { ElementType.Ice }, NoElements,
+                BodyType.Organic, 5200f, 16f, 2.0f, 1.3f, 50f, 5f, 2.8f, rewards.WorldBoss,
+                element: ElementType.Fire);
+
+            // M6 Reino Congelado — Rei de Gelo (fraco Fogo; RESISTE Gelo → element=Ice).
+            set.Arquetype[6] = ConfigureBoss("Boss_M6_FrostSentinel", "m6_frost_sentinel",
+                "Sentinela de Gelo", new[] { ElementType.Fire }, NoElements,
+                BodyType.Organic, 3400f, 13f, 1.8f, 1.1f, 40f, 3.5f, 3.0f, rewards.BossDefault,
+                element: ElementType.Ice);
+            set.Final[6] = ConfigureBoss("Boss_M6_IceKing", "m6_ice_king",
+                "Rei de Gelo", new[] { ElementType.Fire }, NoElements,
+                BodyType.Organic, 6200f, 17f, 2.0f, 1.3f, 52f, 5f, 2.8f, rewards.WorldBoss,
+                element: ElementType.Ice);
+
+            // M7 Arena Medieval — Cavaleiro Colosso (fraco Raio — armadura conduz; máquina/metal).
+            set.Arquetype[7] = ConfigureBoss("Boss_M7_ArmoredKnight", "m7_armored_knight",
+                "Cavaleiro Blindado", new[] { ElementType.Lightning }, NoElements,
+                BodyType.Machine, 4000f, 14f, 1.8f, 1.1f, 42f, 3.5f, 3.0f, rewards.BossDefault);
+            set.Final[7] = ConfigureBoss("Boss_M7_ColossusKnight", "m7_colossus_knight",
+                "Cavaleiro Colosso", new[] { ElementType.Lightning }, NoElements,
+                BodyType.Machine, 7200f, 18f, 2.0f, 1.3f, 56f, 5f, 2.6f, rewards.WorldBoss);
+
+            // M8 Laboratório Alienígena — Alien Supremo (fraqueza ROTATIVA a cada 25% de HP).
+            set.Arquetype[8] = ConfigureBoss("Boss_M8_AlienHybrid", "m8_alien_hybrid",
+                "Híbrido Alienígena", new[] { ElementType.Fire, ElementType.Ice, ElementType.Lightning }, NoElements,
+                BodyType.Organic, 4600f, 15f, 1.8f, 1.1f, 44f, 3.5f, 3.0f, rewards.BossDefault,
+                rotatingWeakness: true);
+            set.Final[8] = ConfigureBoss("Boss_M8_AlienSupreme", "m8_alien_supreme",
+                "Alien Supremo", new[] { ElementType.Fire, ElementType.Ice, ElementType.Lightning }, NoElements,
+                BodyType.Organic, 8400f, 19f, 2.0f, 1.3f, 60f, 5.5f, 2.6f, rewards.WorldBoss,
+                rotatingWeakness: true);
+
+            // M9 Planeta Mecânico — Mecha Supremo (fraco Raio; IMUNE Veneno; máquina).
+            set.Arquetype[9] = ConfigureBoss("Boss_M9_WarDrone", "m9_war_drone",
+                "Drone de Guerra", new[] { ElementType.Lightning }, new[] { ElementType.Poison },
+                BodyType.Machine, 5400f, 16f, 1.8f, 1.1f, 46f, 3.5f, 3.0f, rewards.BossDefault);
+            set.Final[9] = ConfigureBoss("Boss_M9_MechaSupreme", "m9_mecha_supreme",
+                "Mecha Supremo", new[] { ElementType.Lightning }, new[] { ElementType.Poison },
+                BodyType.Machine, 9800f, 20f, 2.0f, 1.3f, 64f, 6f, 2.4f, rewards.WorldBoss);
+
+            // M10 Dimensão Final — Entidade Dimensional (ALTERNA elementos → rotatingWeakness).
+            set.Arquetype[10] = ConfigureBoss("Boss_M10_DimRift", "m10_dim_rift",
+                "Fenda Dimensional", new[] { ElementType.Fire, ElementType.Ice, ElementType.Lightning, ElementType.Poison }, NoElements,
+                BodyType.Organic, 6400f, 17f, 1.8f, 1.1f, 48f, 4f, 2.8f, rewards.BossDefault,
+                rotatingWeakness: true);
+            set.Final[10] = ConfigureBoss("Boss_M10_DimensionalEntity", "m10_dimensional_entity",
+                "Entidade Dimensional", new[] { ElementType.Fire, ElementType.Ice, ElementType.Lightning, ElementType.Poison }, NoElements,
+                BodyType.Organic, 12000f, 22f, 2.0f, 1.4f, 70f, 6.5f, 2.2f, rewards.WorldBoss,
+                rotatingWeakness: true);
+
             return set;
         }
 
@@ -670,16 +761,23 @@ namespace MutantArmy.Editor
                                                   BodyType bodyType, float maxHp, float contactDps,
                                                   float entranceSeconds, float telegraphSeconds,
                                                   float specialDamage, float specialArea, float specialCooldown,
-                                                  RewardConfigSO killReward)
+                                                  RewardConfigSO killReward,
+                                                  ElementType element = ElementType.None,
+                                                  bool rotatingWeakness = false)
         {
             var boss = LoadOrCreate<BossConfigSO>(Root + "/Bosses/" + assetName + ".asset");
             boss.bossId = bossId;
             boss.displayNameKey = bossId + "_name";
             boss.displayName = displayName;     // nome amigável PT-BR (CANON §6) — o Boss Scout exibe este campo
-            boss.element = ElementType.None;
+            // element != None = boss "do elemento" (CANON §4: ataque do MESMO elemento sofre
+            // −50%). É assim que Dragão de Lava resiste Fogo (element=Fire) e Rei de Gelo
+            // resiste Gelo (element=Ice).
+            boss.element = element;
             boss.weaknesses = weaknesses;
             boss.immunities = immunities;
-            boss.rotatingWeakness = false;      // só o Alien Supremo (M8, pós-MVP) rotaciona
+            // CANON §6: só Alien Supremo (M8) e Entidade Dimensional (M10) — e seus arquétipos —
+            // rotacionam a fraqueza a cada 25% de HP.
+            boss.rotatingWeakness = rotatingWeakness;
             boss.bodyType = bodyType;
             boss.maxHp = maxHp;
             boss.contactDps = contactDps;
@@ -695,70 +793,93 @@ namespace MutantArmy.Editor
             return boss;
         }
 
-        // ------------------------------------------------------------------ Worlds + Levels (CANON §7/§15 · doc 06 §8)
+        // ------------------------------------------------------------------ Worlds + Levels (CANON §7/§8 · doc 06 §8)
 
-        // Duração-alvo por variante (doc 06 §8): Onboarding/Curta/Padrão/Longa.
-        private static readonly float[] TrackLengths =
+        // 10 MUNDOS × 10 FASES = 100. Cada mundo: asset name (contrato do WorldVisualFactory —
+        // W{NN}_Nome), worldIndex 1..10, displayNameKey e o elemento de FRAQUEZA dominante do
+        // boss do mundo (usado para curar os pares de elemento das fases marquee).
+        private sealed class WorldDef
         {
-            140f, 160f, 220f, 220f, 220f, 220f, 260f,           // M1: fases 1–7
-            160f, 220f, 220f, 220f, 260f, 260f, 260f,           // M2: fases 8–14
-            160f, 220f, 220f, 260f, 260f, 280f                  // M3: fases 15–20
+            public string AssetName, NameKey;
+            public int Index;
+            public ElementType Weakness;    // fraqueza primária do boss do mundo (rota ótima de elemento)
+            public ElementType Immune;      // imunidade do boss (armadilha de elemento), None se não tem
+
+            public WorldDef(int index, string assetName, string nameKey, ElementType weakness, ElementType immune)
+            {
+                Index = index; AssetName = assetName; NameKey = nameKey;
+                Weakness = weakness; Immune = immune;
+            }
+        }
+
+        // Tabela canônica (CANON §6/§7 + BRIEF). AssetName PRESERVA W01/W02/W03 (visual já os
+        // conhece) e segue o padrão W{NN}_Nome para W04–W10 (o WorldVisualFactory estende os
+        // temas por esse nome). Weakness/Immune ditam a rota ótima e a armadilha de elemento.
+        private static readonly WorldDef[] Worlds =
+        {
+            new WorldDef(1,  "W01_CampoInicial",          "world_01_campo_inicial",          ElementType.Fire,      ElementType.None),
+            new WorldDef(2,  "W02_CidadeZumbi",           "world_02_cidade_zumbi",           ElementType.Fire,      ElementType.Poison),
+            new WorldDef(3,  "W03_DesertoRobotico",       "world_03_deserto_robotico",       ElementType.Lightning, ElementType.Poison),
+            new WorldDef(4,  "W04_FlorestaMutante",       "world_04_floresta_mutante",       ElementType.Fire,      ElementType.None),
+            new WorldDef(5,  "W05_VulcaoGigantes",        "world_05_vulcao_gigantes",        ElementType.Ice,       ElementType.None),
+            new WorldDef(6,  "W06_ReinoCongelado",        "world_06_reino_congelado",        ElementType.Fire,      ElementType.None),
+            new WorldDef(7,  "W07_ArenaMedieval",         "world_07_arena_medieval",         ElementType.Lightning, ElementType.None),
+            new WorldDef(8,  "W08_LaboratorioAlienigena", "world_08_laboratorio_alienigena", ElementType.Fire,      ElementType.None),
+            new WorldDef(9,  "W09_PlanetaMecanico",       "world_09_planeta_mecanico",       ElementType.Lightning, ElementType.Poison),
+            new WorldDef(10, "W10_DimensaoFinal",         "world_10_dimensao_final",         ElementType.Fire,      ElementType.None)
         };
+
+        private const int WorldCount = 10;
+        private const int LevelsPerWorld = 10;
+        private const int TotalLevels = WorldCount * LevelsPerWorld;   // 100
 
         private static List<LevelConfigSO> CreateWorldsAndLevels(BossSet bosses, GateSet gates, RewardSet rewards)
         {
-            WorldConfigSO w1 = ConfigureWorld("W01_CampoInicial", 1, "world_01_campo_inicial", bosses.WoodGiant, rewards.WorldBoss);
-            WorldConfigSO w2 = ConfigureWorld("W02_CidadeZumbi", 2, "world_02_cidade_zumbi", bosses.Titan, rewards.WorldBoss);
-            WorldConfigSO w3 = ConfigureWorld("W03_DesertoRobotico", 3, "world_03_deserto_robotico", bosses.Scorpion, rewards.WorldBoss);
+            var all = new List<LevelConfigSO>(TotalLevels);
 
-            var w1Levels = new List<LevelConfigSO>();
-            var w2Levels = new List<LevelConfigSO>();
-            var w3Levels = new List<LevelConfigSO>();
-
-            for (int levelIndex = 1; levelIndex <= 20; levelIndex++)
+            foreach (WorldDef def in Worlds)
             {
-                WorldConfigSO world = levelIndex <= 7 ? w1 : levelIndex <= 14 ? w2 : w3;
-                var level = LoadOrCreate<LevelConfigSO>(
-                    string.Format("{0}/Levels/Level_{1:000}.asset", Root, levelIndex));
+                // Boss final do mundo (CANON §6) ligado ao WorldConfigSO p/ o Boss Scout/recompensa.
+                WorldConfigSO world = ConfigureWorld(def.AssetName, def.Index, def.NameKey,
+                                                     bosses.Final[def.Index], rewards.WorldBoss);
+                var worldLevels = new List<LevelConfigSO>(LevelsPerWorld);
 
-                level.levelIndex = levelIndex;
-                level.seed = LevelSeed(levelIndex);
-                level.world = world;
-                level.trackLength = TrackLengths[levelIndex - 1];
-                level.boss = BossForLevel(levelIndex, bosses);
-                level.bossHpMultiplier = BossHpMultiplier(levelIndex);
-                // CANON §16: fase 10 = baú épico + 50 gemas; as demais fases pagam moedas
-                // via EconomySystem.GrantLevelReward (curva §8) — winReward fica vazio.
-                level.winReward = levelIndex == 10 ? rewards.Level10 : null;
-                level.startingUnits = 1;        // fase sempre começa com 1 + bônus de meta
-                level.obstacles = new ObstacleSlot[0];
+                for (int fase = 1; fase <= LevelsPerWorld; fase++)
+                {
+                    int globalIndex = (def.Index - 1) * LevelsPerWorld + fase;   // 1..100
+                    var level = LoadOrCreate<LevelConfigSO>(
+                        string.Format("{0}/Levels/Level_{1:000}.asset", Root, globalIndex));
 
-                // Marquee levels recebem pares MANUAIS curados (quantidade vs qualidade,
-                // elemento vs fraqueza do boss, mutação, risco); o resto fica autoBalance
-                // (o GateManager monta contra o boss). Fase 1 = onboarding impossível de perder.
-                GateSlot[] manual = levelIndex == 1
-                    ? BuildOnboardingSlots(level.trackLength, gates)
-                    : BuildManualSlotsForLevel(levelIndex, level.trackLength, gates);
-                level.gateSlots = manual ?? BuildAutoSlots(SlotCount(level.trackLength), level.trackLength);
+                    level.levelIndex = globalIndex;
+                    level.seed = LevelSeed(globalIndex);
+                    level.world = world;
+                    level.trackLength = TrackLengthForFase(globalIndex, fase);
+                    // Fases 1–9: arquétipo regional (escalado); fase 10: boss único do mundo.
+                    level.boss = fase == LevelsPerWorld ? bosses.Final[def.Index] : bosses.Arquetype[def.Index];
+                    level.bossHpMultiplier = BossHpMultiplier(def.Index, fase);
+                    // CANON §16: fase 10 de cada mundo = baú épico + 50 gemas (marco de mundo);
+                    // as demais pagam moedas via EconomySystem.GrantLevelReward (curva §8).
+                    level.winReward = fase == LevelsPerWorld ? rewards.Level10 : null;
+                    level.startingUnits = 1;        // fase sempre começa com 1 + bônus de meta
+                    level.obstacles = new ObstacleSlot[0];
 
-                EditorUtility.SetDirty(level);
+                    // Fase global 1 = onboarding impossível de perder (CANON §16). As demais
+                    // fases-chave de cada mundo recebem pares MANUAIS curados (elemento vs
+                    // fraqueza/armadilha do boss); o resto cai no autoBalance vs o boss.
+                    GateSlot[] manual = globalIndex == 1
+                        ? BuildOnboardingSlots(level.trackLength, gates)
+                        : BuildManualSlotsForLevel(def, fase, level.trackLength, gates);
+                    level.gateSlots = manual ?? BuildAutoSlots(SlotCount(level.trackLength), level.trackLength);
 
-                if (levelIndex <= 7) w1Levels.Add(level);
-                else if (levelIndex <= 14) w2Levels.Add(level);
-                else w3Levels.Add(level);
+                    EditorUtility.SetDirty(level);
+                    worldLevels.Add(level);
+                    all.Add(level);
+                }
+
+                world.levels = worldLevels.ToArray();
+                EditorUtility.SetDirty(world);
             }
 
-            w1.levels = w1Levels.ToArray();
-            w2.levels = w2Levels.ToArray();
-            w3.levels = w3Levels.ToArray();
-            EditorUtility.SetDirty(w1);
-            EditorUtility.SetDirty(w2);
-            EditorUtility.SetDirty(w3);
-
-            var all = new List<LevelConfigSO>(20);
-            all.AddRange(w1Levels);
-            all.AddRange(w2Levels);
-            all.AddRange(w3Levels);
             return all;
         }
 
@@ -799,45 +920,50 @@ namespace MutantArmy.Editor
             return 7919 * levelIndex + 1234;
         }
 
-        /// <summary>Boss por fase, tabela do doc 06 §8 (M1 1–7 · M2 8–14 · M3 15–20).</summary>
-        private static BossConfigSO BossForLevel(int levelIndex, BossSet bosses)
+        // Duração-alvo por fase dentro do mundo (doc 06 §8): a 1ª de cada mundo é mais curta
+        // (re-onboarding do tema), o miolo é padrão, a fase 10 (boss de mundo) é a mais longa.
+        // A fase GLOBAL 1 é o onboarding absoluto (mais curta de todas).
+        private static float TrackLengthForFase(int globalIndex, int fase)
         {
-            if (levelIndex <= 6) return bosses.Golem;
-            if (levelIndex == 7) return bosses.WoodGiant;
-            if (levelIndex <= 13) return bosses.Bruiser;
-            if (levelIndex == 14) return bosses.Titan;
-            return bosses.Scorpion;
+            if (globalIndex == 1) return 140f;     // onboarding absoluto: vitória < 60 s (CANON §16)
+            switch (fase)
+            {
+                case 1: return 170f;
+                case 2: return 200f;
+                case 3: return 220f;
+                case 4: return 220f;
+                case 5: return 240f;
+                case 6: return 240f;
+                case 7: return 260f;
+                case 8: return 260f;
+                case 9: return 260f;
+                default: return 280f;              // fase 10: arena de boss de mundo, a mais longa
+            }
         }
 
         /// <summary>
-        /// Escala da variante regional sobre o HP base do asset:
-        /// golem (base 400) → 100/220/400/550/700/900 nas fases 1–6 (doc 05 §7.1);
-        /// brutamontes (base 1000) → 1000–2100 nas fases 8–13 (doc 05 §7.3);
-        /// escorpião (base 3000) → rampa de protótipos nas fases 15–19 (doc 05 §4.5).
+        /// Escala de HP do boss da fase (sobre o HP base do asset), modelando a curva de
+        /// dificuldade canônica (CANON §12: vitória 95% nas fases 1–3 → ~55% na fase 10 de
+        /// cada mundo). Dois fatores multiplicam:
+        ///   1. <b>Curva por fase</b> (1..10): a fase 1 do mundo nasce fácil (boss enfraquecido),
+        ///      sobe quase linear, e a fase 10 (boss único) entra com HP cheio do asset.
+        ///   2. <b>Rampa por mundo</b> (1..10): mundos mais avançados ficam globalmente mais
+        ///      duros (+8% de HP por mundo acima do 1º) — o jogador entra mais forte (meta), o
+        ///      conteúdo acompanha. Determinístico: mesma fase = mesmo HP, byte a byte.
         /// </summary>
-        private static float BossHpMultiplier(int levelIndex)
+        private static float BossHpMultiplier(int worldIndex, int fase)
         {
-            switch (levelIndex)
-            {
-                case 1: return 0.25f;
-                case 2: return 0.55f;
-                case 3: return 1.00f;
-                case 4: return 1.375f;
-                case 5: return 1.75f;
-                case 6: return 2.25f;
-                case 8: return 1.00f;
-                case 9: return 1.15f;
-                case 10: return 1.40f;
-                case 11: return 1.60f;
-                case 12: return 1.85f;
-                case 13: return 2.10f;
-                case 15: return 0.45f;
-                case 16: return 0.55f;
-                case 17: return 0.65f;
-                case 18: return 0.78f;
-                case 19: return 0.90f;
-                default: return 1.00f;      // bosses de mundo (7/14/20) usam o HP cheio do asset
-            }
+            // Curva por fase: fase 1 ~ 0.30 (impossível perder no começo do mundo) → fase 9 ~ 0.95;
+            // fase 10 = 1.00 (HP cheio do boss único do mundo).
+            float faseCurve;
+            if (fase >= LevelsPerWorld) faseCurve = 1.00f;
+            else faseCurve = 0.30f + 0.085f * (fase - 1);   // 0.30, 0.385, ... , 0.98 na fase 9
+
+            // O 1º mundo é ainda mais suave nas primeiras fases (FTUE — CANON §16).
+            if (worldIndex == 1 && fase <= 2) faseCurve *= 0.85f;
+
+            float worldRamp = 1f + 0.08f * (worldIndex - 1);   // +8% de HP por mundo (meta acompanha)
+            return faseCurve * worldRamp;
         }
 
         private static int SlotCount(float trackLength)
@@ -873,97 +999,118 @@ namespace MutantArmy.Editor
         }
 
         /// <summary>
-        /// Pares MANUAIS marcantes para fases-chave (CANON §16 + briefing "quantidade vs
-        /// qualidade"). Retorna null para fases sem curadoria — elas caem no autoBalance.
-        /// Posições distribuídas ao longo da pista, terminando antes da zona de segurança
-        /// (trackLength − 40). Boss da fase (BossForLevel): M1 Fogo · M2 Fogo/Luz, imune Veneno ·
-        /// M3 Raio, imune Veneno — os pares de elemento expõem a rota ótima vs armadilha.
+        /// Pares MANUAIS marcantes para fases-chave de CADA mundo (CANON §16 + briefing
+        /// "quantidade vs qualidade"). Retorna null para fases sem curadoria — elas caem no
+        /// autoBalance vs o boss. As fases de FTUE do mundo 1 (2,3,4,6) mantêm a curadoria
+        /// original do MVP; os demais mundos recebem 1–2 marquees TEMÁTICOS por mundo, sempre
+        /// expondo a rota ótima de elemento (fraqueza do boss) vs uma armadilha plausível (número
+        /// maior; ou o elemento IMUNE quando o boss tem imunidade). Posições terminam antes da
+        /// zona de segurança (trackLength − 45).
         /// </summary>
-        private static GateSlot[] BuildManualSlotsForLevel(int levelIndex, float trackLength, GateSet g)
+        private static GateSlot[] BuildManualSlotsForLevel(WorldDef def, int fase, float trackLength, GateSet g)
         {
             float p1 = 35f, p2 = trackLength * 0.45f, p3 = trackLength * 0.66f, p4 = trackLength - 45f;
 
-            switch (levelIndex)
+            // ---- Mundo 1: curadoria de FTUE original do MVP (não mexer no onboarding) ----
+            if (def.Index == 1)
             {
-                // Fase 2 (CANON §16): PRIMEIRA escolha estratégica real — quantidade vs qualidade.
-                // x3 soldados frágeis  vs  virar Arqueiro (menos corpos, muito mais DPS à distância).
+                switch (fase)
+                {
+                    // Fase 2 (CANON §16): PRIMEIRA escolha estratégica real — quantidade vs qualidade.
+                    case 2:
+                        return new[]
+                        {
+                            ManualSlot(p1, trackLength, g.TimesThree, g.ClassArcher),
+                            ManualSlot(p4, trackLength, g.AddTwentyFive, g.ClassMage)
+                        };
+                    // Fase 3 (boss "uau" FRACO A FOGO): rota ótima Fogo vs armadilha x5 sem elemento.
+                    case 3:
+                        return new[]
+                        {
+                            ManualSlot(p1, trackLength, g.TimesTwo, g.AddTwentyFive),
+                            ManualSlot(p3, trackLength, g.ElementFire, g.TimesFive),
+                            ManualSlot(p4, trackLength, g.MutWings, g.AddFifty)
+                        };
+                    // Fase 4: introduz o RISCO honesto + 1ª escolha de mutação dupla.
+                    case 4:
+                        return new[]
+                        {
+                            ManualSlot(p1, trackLength, g.TimesThree, g.ElementFire),
+                            ManualSlot(p3, trackLength, g.MutArmor, g.MutSpeed),
+                            ManualSlot(p4, trackLength, g.RiskTen, g.AddFifty)
+                        };
+                    // Fase 6: qualidade pesada antes de fechar a primeira leva do mundo.
+                    case 6:
+                        return new[]
+                        {
+                            ManualSlot(p1, trackLength, g.TimesThree, g.ClassMage),
+                            ManualSlot(p2, trackLength, g.ElementFire, g.TimesFive),
+                            ManualSlot(p3, trackLength, g.MutLaser, g.MutSize),
+                            ManualSlot(p4, trackLength, g.RiskSacrifice, g.AddFifty)
+                        };
+                }
+            }
+
+            // ---- Mundos 2–10: marquees temáticos genéricos por mundo ----
+            GateConfigSO weakGate = ElementGate(def.Weakness, g);       // rota ótima (fraqueza do boss)
+            GateConfigSO immuneGate = ElementGate(def.Immune, g);       // armadilha (elemento imune), se houver
+
+            switch (fase)
+            {
+                // Fase 2 do mundo: "quantidade vs qualidade" reapresentado no novo tema.
                 case 2:
                     return new[]
                     {
-                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassArcher),
-                        ManualSlot(trackLength - 45f, trackLength, g.AddTwentyFive, g.ClassMage)
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassNinja),
+                        ManualSlot(p4, trackLength, g.AddTwentyFive, g.ClassMage)
                     };
 
-                // Fase 3 (boss "uau" Golem, FRACO A FOGO): a rota ótima é elemento Fogo;
-                // a armadilha aparentemente boa é o número maior (x5) sem elemento.
-                case 3:
-                    return new[]
-                    {
-                        ManualSlot(p1, trackLength, g.TimesTwo, g.AddTwentyFive),
-                        ManualSlot(p3, trackLength, g.ElementFire, g.TimesFive),       // Fogo (ótima) vs x5 (armadilha)
-                        ManualSlot(p4, trackLength, g.MutWings, g.AddFifty)            // 1ª mutação ofertada
-                    };
-
-                // Fase 4: introduz o RISCO honesto + primeira escolha de mutação dupla.
+                // Fase 4 do mundo: rota ótima de ELEMENTO (fraqueza) vs armadilha. Quando o boss
+                // tem imunidade, a armadilha é o próprio elemento imune (0 dano honesto-mas-cruel);
+                // senão é o número maior sem elemento.
                 case 4:
                     return new[]
                     {
-                        ManualSlot(p1, trackLength, g.TimesThree, g.ElementFire),
-                        ManualSlot(p3, trackLength, g.MutArmor, g.MutSpeed),           // tanque vs velocidade
-                        ManualSlot(p4, trackLength, g.RiskTen, g.AddFifty)            // risco vs garantido
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassGiant),
+                        ManualSlot(p3, trackLength, weakGate ?? g.TimesFive,
+                                   immuneGate ?? g.TimesFive),
+                        ManualSlot(p4, trackLength, g.MutArmor, g.AddFifty)
                     };
 
-                // Fase 6 (última variante do Golem antes do boss de mundo): qualidade pesada.
-                case 6:
-                    return new[]
-                    {
-                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassMage),
-                        ManualSlot(p2, trackLength, g.ElementFire, g.TimesFive),
-                        ManualSlot(p3, trackLength, g.MutLaser, g.MutSize),
-                        ManualSlot(p4, trackLength, g.RiskSacrifice, g.AddFifty)
-                    };
-
-                // Fase 8 (abre M2 Cidade Zumbi, Brutamontes IMUNE A VENENO): a armadilha é
-                // justamente o portal de Veneno (0 dano vs morto-vivo); ótima é Fogo.
-                case 8:
-                    return new[]
-                    {
-                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassNinja),
-                        ManualSlot(p3, trackLength, g.ElementFire, g.ElementPoison),   // Fogo (ótima) vs Veneno (armadilha — imune)
-                        ManualSlot(trackLength - 45f, trackLength, g.MutArmor, g.AddFifty)
-                    };
-
-                // Fase 11: quantidade absurda vs lendária única (x5 soldados vs virar Gigante).
-                case 11:
-                    return new[]
-                    {
-                        ManualSlot(p1, trackLength, g.TimesFive, g.ClassGiant),        // multidão vs poucos tanques
-                        ManualSlot(p3, trackLength, g.ElementFire, g.MutLaser),
-                        ManualSlot(p4, trackLength, g.RiskTitan, g.TimesThree)
-                    };
-
-                // Fase 15 (abre M3 Deserto Robótico, Escorpião FRACO A RAIO, IMUNE A VENENO):
-                // ótima é Raio; armadilha é Veneno (0 dano vs máquina).
-                case 15:
-                    return new[]
-                    {
-                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassMage),
-                        ManualSlot(p3, trackLength, g.ElementLightning, g.ElementPoison), // Raio (ótima) vs Veneno (armadilha)
-                        ManualSlot(p4, trackLength, g.MutLaser, g.AddFifty)            // Laser (adiciona Raio!) vs número
-                    };
-
-                // Fase 18: pico de decisão — risco grande, mutação lendária, elemento certo.
-                case 18:
+                // Fase 7 do mundo: pico de decisão — risco grande, mutação forte, elemento certo.
+                case 7:
                     return new[]
                     {
                         ManualSlot(p1, trackLength, g.TimesFive, g.ClassGiant),
-                        ManualSlot(p2, trackLength, g.ElementLightning, g.TimesFive),
+                        ManualSlot(p2, trackLength, weakGate ?? g.ElementFire, g.TimesFive),
                         ManualSlot(p3, trackLength, g.MutSize, g.MutSpeed),
                         ManualSlot(p4, trackLength, g.RiskTitan, g.AddFifty)
                     };
 
+                // Fase 9 do mundo (véspera do boss único): prepara o plano elemental certo.
+                case 9:
+                    return new[]
+                    {
+                        ManualSlot(p1, trackLength, g.TimesThree, g.ClassMage),
+                        ManualSlot(p3, trackLength, weakGate ?? g.ElementFire, g.MutLaser),
+                        ManualSlot(p4, trackLength, g.RiskSacrifice, g.AddFifty)
+                    };
+
                 default:
                     return null;   // demais fases: autoBalance (rota ótima + armadilha geradas vs boss)
+            }
+        }
+
+        /// <summary>Portal de elemento correspondente (ou null para None) — usado pelos marquees temáticos.</summary>
+        private static GateConfigSO ElementGate(ElementType element, GateSet g)
+        {
+            switch (element)
+            {
+                case ElementType.Fire: return g.ElementFire;
+                case ElementType.Ice: return g.ElementIce;
+                case ElementType.Lightning: return g.ElementLightning;
+                case ElementType.Poison: return g.ElementPoison;
+                default: return null;
             }
         }
 

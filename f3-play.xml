@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:19Z" duration="5,8471531">
+  <test-suite type="TestSuite" id="1011" name="MutantArmyRun" fullname="MutantArmyRun" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:19Z" duration="5.847153" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1006" name="MutantArmy.Tests.PlayMode.dll" fullname="C:/Users/Felipe/Downloads/jogo test/MutantArmyRun/Library/ScriptAssemblies/MutantArmy.Tests.PlayMode.dll" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:19Z" duration="5.840083" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="39420" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1007" name="MutantArmy" fullname="MutantArmy" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:19Z" duration="5.839729" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1008" name="Tests" fullname="MutantArmy.Tests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:19Z" duration="5.839504" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="GameLoopPlayModeTests" fullname="MutantArmy.Tests.GameLoopPlayModeTests" classname="MutantArmy.Tests.GameLoopPlayModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:19Z" duration="5.838499" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1002" name="BootScene_CarregaSemExcecoes" fullname="MutantArmy.Tests.GameLoopPlayModeTests.BootScene_CarregaSemExcecoes" methodname="BootScene_CarregaSemExcecoes" classname="MutantArmy.Tests.GameLoopPlayModeTests" runstate="Runnable" seed="710715349" result="Passed" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:14Z" duration="0.848992" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="120000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="GameScene_Derrota_OfereceReviveEDefeat" fullname="MutantArmy.Tests.GameLoopPlayModeTests.GameScene_Derrota_OfereceReviveEDefeat" methodname="GameScene_Derrota_OfereceReviveEDefeat" classname="MutantArmy.Tests.GameLoopPlayModeTests" runstate="Runnable" seed="1602429017" result="Passed" start-time="2026-06-12 14:03:14Z" end-time="2026-06-12 14:03:16Z" duration="1.760659" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="180000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="GameScene_Fase1_VitoriaCompleta" fullname="MutantArmy.Tests.GameLoopPlayModeTests.GameScene_Fase1_VitoriaCompleta" methodname="GameScene_Fase1_VitoriaCompleta" classname="MutantArmy.Tests.GameLoopPlayModeTests" runstate="Runnable" seed="237292989" result="Passed" start-time="2026-06-12 14:03:16Z" end-time="2026-06-12 14:03:19Z" duration="2.496154" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="180000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="Supply_Overflow_ViraMoedas" fullname="MutantArmy.Tests.GameLoopPlayModeTests.Supply_Overflow_ViraMoedas" methodname="Supply_Overflow_ViraMoedas" classname="MutantArmy.Tests.GameLoopPlayModeTests" runstate="Runnable" seed="136519119" result="Passed" start-time="2026-06-12 14:03:19Z" end-time="2026-06-12 14:03:19Z" duration="0.721875" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="120000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/Felipe/AppData/LocalLow/DefaultCompany/MutantArmyRun\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

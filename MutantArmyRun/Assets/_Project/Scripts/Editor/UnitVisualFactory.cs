@@ -22,9 +22,18 @@ namespace MutantArmy.Editor
     ///    Se a tropa ainda não tem SO (MvpContentFactory cria só as 5 do MVP), ele é
     ///    LOAD-OR-CREATE com a identidade canônica do roster — nunca sobrescreve stats de SO
     ///    existente (só preenche viewPrefab); assim re-rodar só este factory já basta.
-    /// 2. BOSSES (5): prefab por boss em Prefabs/Bosses (escala 3.5–5, controller Idle(0)/
-    ///    Attack(1) — contrato do BossManager) → BossConfigSO.prefab. M3 Robô Escorpião =
-    ///    Alien recolor metálico (PLACEHOLDER da Lacuna L2 do staging).
+    /// 2. BOSSES (até 10 bosses de mundo, CANON §6): prefab por boss em Prefabs/Bosses (escala
+    ///    com PISO ≥3.5x — chefão imponente —, controller Idle(0)/Attack(1) — contrato do
+    ///    BossManager) → BossConfigSO.prefab. O loop é dirigido pelo bossId ESTÁVEL (doc 05 §7:
+    ///    m1_final_wood_giant … m10_final_*), não pelo nome do arquivo, então funciona seja qual
+    ///    for o asset que o agente de campanha gerou e é re-rodável: varre TODO BossConfigSO da
+    ///    pasta, casa por bossId na BossModelTable e monta. Bosses 6–10 que ainda não existirem
+    ///    (se este factory rodar antes do Create MVP Content) são só pulados — re-rodar fecha.
+    ///    Os 5 do MVP mantêm modelo/recolor IDÊNTICOS aos de hoje. M3 Robô Escorpião = Alien
+    ///    recolor metálico (PLACEHOLDER da Lacuna L2 do staging). load-or-keep: só grava o prefab
+    ///    se o campo estiver vazio, apontar p/ greybox, ou já apontar p/ a view que ESTE factory
+    ///    gera — um prefab específico setado pelo agente de dados é preservado. Os 3 modelos novos
+    ///    (BlueDemon/Squidle/Hywirl) são copiados do _assets-staging sob demanda (idempotente).
     /// 3. MUTAÇÕES VISÍVEIS (CANON §3.3): biblioteca de materiais de tint + acessórios "hero"
     ///    (asas/laser/armadura/tamanho) em Art/Materials/Mutations + Prefabs/Mutations, nomeados
     ///    por convenção a partir do shaderVariantFlag, p/ o runtime aplicar via MaterialPropertyBlock
@@ -37,6 +46,7 @@ namespace MutantArmy.Editor
     {
         private const string SoRoot = "Assets/_Project/ScriptableObjects";
         private const string ModelsRoot = "Assets/_Project/Art/Models";
+        private const string BossesModelFolder = "Assets/_Project/Art/Models/Bosses";
         private const string AnimFolder = "Assets/_Project/Art/Animations";
         private const string ViewMaterialsFolder = "Assets/_Project/Art/Materials/Views";
         private const string MutationMaterialsFolder = "Assets/_Project/Art/Materials/Mutations";
@@ -138,6 +148,72 @@ namespace MutantArmy.Editor
             new MutationVisualSpec { Id = "size",  Flag = 8, Tint = new Color(1.00f, 0.75f, 0.45f), Emission = 0.15f, AttachModel = null,     AttachOffset = Vector3.zero, AttachScale = 1f },
         };
 
+        // ============================================================ BOSSES (CANON §6 / doc 05 §7)
+        private const float BossScaleFloor = 3.5f;   // PISO de escala do brief: chefão sempre imponente
+
+        /// <summary>
+        /// Mapa boss → arte, chaveado pelo bossId ESTÁVEL (doc 05 §7), nunca pelo nome do arquivo.
+        /// Cobre os 10 bosses de mundo do CANON §6: 5 do MVP (modelo/recolor idênticos aos de hoje)
+        /// + 5 novos mundos (W4–W10 menos os 3 já no MVP). Tints CLAREADOS (doc 01 §6): o atlas
+        /// Quaternius é escuro, então a cor é clara e a emissão leve p/ o chefão ler inteiro sob o
+        /// bloom sem virar plástico. Recolor coerente com o tema do mundo (WorldVisualFactory).
+        /// </summary>
+        private sealed class BossModelSpec
+        {
+            public string BossId;        // estável (doc 05 §7) — chave do casamento com o BossConfigSO
+            public string ModelName;     // FBX base (nome exato do arquivo, já no projeto ou copiado do staging)
+            public string PreferFolder;  // desempate de pasta no FindModel
+            public float Scale;          // ≥ BossScaleFloor (reforçado no build)
+            public Color Tint;           // recolor temático do mundo
+            public float Metallic;
+            public float Smoothness;
+        }
+
+        // ordem livre — o build casa por bossId. Os 5 primeiros = MVP (NÃO mudar modelo/recolor).
+        private static readonly BossModelSpec[] BossModelTable =
+        {
+            // -------- MVP (travado: mesmos modelos/recolor/escala de antes) --------
+            // M1 arquétipo Golem de Pedra (fases 1–6) — Goleling tech-pedra, cinza claro.
+            new BossModelSpec { BossId = "m1_golem_stone",          ModelName = "Goleling_Evolved", PreferFolder = "Flying", Scale = 4.0f, Tint = new Color(0.82f, 0.82f, 0.88f), Metallic = 0.05f, Smoothness = 0.30f },
+            // W1 Gigante de Madeira — Tribal recolor madeira.
+            new BossModelSpec { BossId = "m1_final_wood_giant",     ModelName = "Tribal",           PreferFolder = "Big",    Scale = 4.0f, Tint = new Color(0.78f, 0.56f, 0.34f), Metallic = 0.00f, Smoothness = 0.30f },
+            // M2 arquétipo Brutamontes Zumbi (fases 8–13) — Orc recolor verde-pútrido.
+            new BossModelSpec { BossId = "m2_zombie_bruiser",       ModelName = "Orc",              PreferFolder = "Big",    Scale = 3.5f, Tint = new Color(0.66f, 0.84f, 0.48f), Metallic = 0.00f, Smoothness = 0.30f },
+            // W2 Zumbi Titã — Orc_Skull recolor acinzentado.
+            new BossModelSpec { BossId = "m2_final_zombie_titan",   ModelName = "Orc_Skull",        PreferFolder = "Big",    Scale = 5.0f, Tint = new Color(0.78f, 0.82f, 0.78f), Metallic = 0.00f, Smoothness = 0.30f },
+            // W3 Robô Escorpião — Alien recolor metálico (PLACEHOLDER Lacuna L2).
+            new BossModelSpec { BossId = "m3_final_scorpion_mech",  ModelName = "Alien",            PreferFolder = "Big",    Scale = 4.0f, Tint = new Color(0.78f, 0.84f, 0.92f), Metallic = 0.85f, Smoothness = 0.70f },
+
+            // -------- W4–W10: bosses de mundo NOVOS (CANON §6 / doc 05 §7.x) --------
+            // W4 Planta Carnívora (fraco Fogo+Veneno) — MushroomKing orgânico, verde tóxico.
+            new BossModelSpec { BossId = "m4_final_carnivore_plant", ModelName = "MushroomKing",    PreferFolder = "Big",    Scale = 4.2f, Tint = new Color(0.52f, 0.86f, 0.40f), Metallic = 0.00f, Smoothness = 0.32f },
+            // W5 Dragão de Lava (fraco Gelo, resiste Fogo) — Dragon_Evolved recolor lava.
+            new BossModelSpec { BossId = "m5_final_lava_dragon",     ModelName = "Dragon_Evolved",  PreferFolder = "Flying", Scale = 4.5f, Tint = new Color(1.00f, 0.50f, 0.22f), Metallic = 0.10f, Smoothness = 0.45f },
+            // W6 Rei de Gelo (fraco Fogo, resiste Gelo) — Yeti recolor gelo azul-branco.
+            new BossModelSpec { BossId = "m6_final_ice_king",        ModelName = "Yeti",            PreferFolder = "Big",    Scale = 4.2f, Tint = new Color(0.70f, 0.90f, 1.00f), Metallic = 0.05f, Smoothness = 0.55f },
+            // W7 Cavaleiro Colosso (fraco Raio — armadura conduz) — BlueDemon recolor dourado-bronze armadura.
+            new BossModelSpec { BossId = "m7_final_colossus_knight", ModelName = "BlueDemon",       PreferFolder = "Big",    Scale = 4.4f, Tint = new Color(0.92f, 0.74f, 0.36f), Metallic = 0.55f, Smoothness = 0.50f },
+            // W8 Alien Supremo (fraqueza rotativa) — Squidle exótico neon roxo-ciano, emissivo forte.
+            new BossModelSpec { BossId = "m8_final_alien_supreme",   ModelName = "Squidle",         PreferFolder = "Flying", Scale = 4.0f, Tint = new Color(0.70f, 0.45f, 1.00f), Metallic = 0.20f, Smoothness = 0.60f },
+            // W9 Mecha Supremo (fraco Raio, imune Veneno) — Goleling_Evolved recolor industrial ciano-tech.
+            new BossModelSpec { BossId = "m9_final_mecha_supreme",   ModelName = "Goleling_Evolved", PreferFolder = "Flying", Scale = 4.6f, Tint = new Color(0.55f, 0.80f, 0.92f), Metallic = 0.80f, Smoothness = 0.65f },
+            // W10 Entidade Dimensional (alterna elementos) — Hywirl exótico, caos vibrante magenta-ciano.
+            new BossModelSpec { BossId = "m10_final_dimensional_entity", ModelName = "Hywirl",      PreferFolder = "Flying", Scale = 4.3f, Tint = new Color(0.95f, 0.40f, 0.95f), Metallic = 0.25f, Smoothness = 0.55f },
+        };
+
+        /// <summary>
+        /// FBX de boss que o MVP NÃO trouxe p/ Art/Models/Bosses (os 3 novos arquétipos visuais dos
+        /// mundos W7/W8/W10). Copiados do _assets-staging sob demanda — idempotente (skip se já há
+        /// o asset). Os outros modelos da tabela já estão no projeto desde a fase beauty.
+        /// rel = caminho dentro de _assets-staging\models\Quaternius-UltimateMonsters.
+        /// </summary>
+        private static readonly (string File, string StagingRel)[] BossModelsToImport =
+        {
+            ("BlueDemon.fbx", "models/Quaternius-UltimateMonsters/Big/FBX/BlueDemon.fbx"),
+            ("Squidle.fbx",   "models/Quaternius-UltimateMonsters/Flying/FBX/Squidle.fbx"),
+            ("Hywirl.fbx",    "models/Quaternius-UltimateMonsters/Flying/FBX/Hywirl.fbx"),
+        };
+
         [MenuItem("MAR Tools/Build Unit Visuals")]
         public static void BuildAll()
         {
@@ -154,33 +230,23 @@ namespace MutantArmy.Editor
             for (int i = 0; i < Roster.Length; i++)
                 if (BuildUnit(Roster[i])) troops++;
 
-            int bosses = 0;
-            // ---- Bosses (PLANO §1.4): monstros Quaternius, escala 3.5–5, recolor por boss.
-            // Tints CLAREADOS (doc 01 §6): o atlas Quaternius é escuro; cores claras + emissão
-            // leve = chefão imponente que lê inteiro sob a luz da cena sem virar plástico.
-            if (BuildBoss("Boss_M1_GolemStone", "Goleling_Evolved", "Flying", 4.0f,
-                          new Color(0.82f, 0.82f, 0.88f), 0.05f, 0.30f)) bosses++;
-            if (BuildBoss("Boss_M1_WoodGiant", "Tribal", "Big", 4.0f,
-                          new Color(0.78f, 0.56f, 0.34f), 0.00f, 0.30f)) bosses++;
-            if (BuildBoss("Boss_M2_ZombieBruiser", "Orc", "Big", 3.5f,
-                          new Color(0.66f, 0.84f, 0.48f), 0.00f, 0.30f)) bosses++;
-            if (BuildBoss("Boss_M2_ZombieTitan", "Orc_Skull", "Big", 5.0f,
-                          new Color(0.78f, 0.82f, 0.78f), 0.00f, 0.30f)) bosses++;
-            if (BuildBoss("Boss_M3_ScorpionMech", "Alien", "Big", 4.0f,
-                          new Color(0.78f, 0.84f, 0.92f), 0.85f, 0.70f))
-            {
-                bosses++;
-                Debug.LogWarning("MAR Tools: Boss M3 'Robô Escorpião' usa PLACEHOLDER (Alien recolor " +
-                                 "metálico) — Lacuna L2 do PLANO-DE-USO; trocar pelo mech CC0 quando baixado.");
-            }
+            // ---- Bosses (CANON §6, até 10 mundos): monstros Quaternius, escala ≥3.5x, recolor
+            // temático por boss. Dirigido pelo bossId estável (doc 05 §7) — varre TODO BossConfigSO
+            // da pasta e casa na BossModelTable, então não depende do nome do arquivo do agente de
+            // dados e é re-rodável (bosses 6–10 inexistentes são só pulados). Copia sob demanda os
+            // 3 FBX novos do staging antes de procurar os modelos.
+            EnsureBossModelsImported();
+            int bosses = BuildAllBosses();
 
             // ---- Mutações visíveis (CANON §3.3): materiais de tint + acessórios hero.
             int mutations = BuildMutationVisuals();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log($"MAR Tools: visuais construídos — {troops}/{Roster.Length} tropas, {bosses}/5 bosses, " +
-                      $"{mutations}/{MutationVisuals.Length} mutações (faltantes mantêm fallback instanced/greybox; ver avisos acima).");
+            Debug.Log($"MAR Tools: visuais construídos — {troops}/{Roster.Length} tropas, {bosses} bosses " +
+                      $"(de {BossModelTable.Length} mundos mapeados; os ausentes serão preenchidos ao re-rodar após " +
+                      $"Create MVP Content), {mutations}/{MutationVisuals.Length} mutações (faltantes mantêm fallback " +
+                      "instanced/greybox; ver avisos acima).");
         }
 
         // ------------------------------------------------------------------ tropas
@@ -263,35 +329,201 @@ namespace MutantArmy.Editor
 
         // ------------------------------------------------------------------ bosses
 
-        private static bool BuildBoss(string bossAssetName, string modelName, string preferPathFragment,
-                                      float scale, Color tint, float metallic, float smoothness)
+        /// <summary>
+        /// Varre TODO BossConfigSO de ScriptableObjects/Bosses e, p/ cada um cujo bossId esteja na
+        /// BossModelTable (doc 05 §7), monta o prefab de view (modelo Quaternius + recolor + escala
+        /// ≥3.5x + controller Idle/Attack) e grava em BossConfigSO.prefab via load-or-keep. Dirigir
+        /// pelo bossId (não pelo nome do arquivo) torna o factory independente do asset que o agente
+        /// de campanha gerou e re-rodável: bosses de mundo ainda inexistentes simplesmente não
+        /// aparecem na varredura. Retorna quantos bosses receberam view.
+        /// </summary>
+        private static int BuildAllBosses()
         {
-            var boss = AssetDatabase.LoadAssetAtPath<BossConfigSO>(SoRoot + "/Bosses/" + bossAssetName + ".asset");
-            if (boss == null)
+            string bossFolder = SoRoot + "/Bosses";
+            if (!AssetDatabase.IsValidFolder(bossFolder))
             {
-                Debug.LogWarning($"MAR Tools: {bossAssetName}.asset não existe — rode MAR Tools/Create MVP Content antes.");
-                return false;
+                Debug.LogWarning("MAR Tools: pasta de Bosses ainda não existe — rode MAR Tools/Create MVP Content " +
+                                 "antes (este factory roda DEPOIS dele).");
+                return 0;
             }
 
-            GameObject model = FindModel(modelName, preferPathFragment);
-            if (model == null) return false;   // mantém o que estiver no campo (Boss_Greybox ou nulo→cápsula runtime)
+            int built = 0;
+            var seen = new HashSet<string>();
+            foreach (string guid in AssetDatabase.FindAssets("t:BossConfigSO", new[] { bossFolder }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var boss = AssetDatabase.LoadAssetAtPath<BossConfigSO>(path);
+                if (boss == null) continue;
+
+                BossModelSpec spec = FindBossSpec(boss.bossId);
+                if (spec == null) continue;     // boss fora da tabela (ex.: arquétipos de fase) — mantém prefab atual
+                if (!seen.Add(boss.bossId)) continue;
+
+                if (BuildBoss(boss, path, spec)) built++;
+            }
+
+            int total = BossModelTable.Length;
+            if (built < total)
+                Debug.Log($"MAR Tools: {built}/{total} bosses de mundo com modelo nesta passada — os faltantes " +
+                          "(bosses cujo SO ainda não existe) entram ao re-rodar após Create MVP Content.");
+            return built;
+        }
+
+        /// <summary>
+        /// Casa o BossConfigSO com a linha da BossModelTable. 1º por bossId EXATO (doc 05 §7); se o
+        /// agente de campanha tiver usado outro sufixo descritivo p/ o boss de mundo, cai no
+        /// fallback por PREFIXO "m&lt;N&gt;_final_" — cada mundo tem exatamente 1 boss "_final_", então
+        /// o número do mundo identifica o modelo sem ambiguidade. Arquétipos de fase (ex.:
+        /// m1_golem_stone, sem "_final_") casam só pelo id exato — nada de fallback p/ eles.
+        /// </summary>
+        private static BossModelSpec FindBossSpec(string bossId)
+        {
+            if (string.IsNullOrEmpty(bossId)) return null;
+
+            for (int i = 0; i < BossModelTable.Length; i++)
+                if (string.Equals(BossModelTable[i].BossId, bossId, StringComparison.Ordinal))
+                    return BossModelTable[i];
+
+            string worldFinalPrefix = WorldFinalPrefix(bossId);   // "m5_final_" p/ um boss de mundo; null senão
+            if (worldFinalPrefix == null) return null;
+            for (int i = 0; i < BossModelTable.Length; i++)
+                if (BossModelTable[i].BossId.StartsWith(worldFinalPrefix, StringComparison.Ordinal))
+                    return BossModelTable[i];
+            return null;
+        }
+
+        /// <summary>"m7_final_qualquer_coisa" → "m7_final_"; ids sem o marcador "_final_" → null.</summary>
+        private static string WorldFinalPrefix(string bossId)
+        {
+            const string marker = "_final_";
+            int idx = bossId.IndexOf(marker, StringComparison.Ordinal);
+            if (idx < 0) return null;
+            return bossId.Substring(0, idx + marker.Length);
+        }
+
+        private static bool BuildBoss(BossConfigSO boss, string bossAssetPath, BossModelSpec spec)
+        {
+            GameObject model = FindModel(spec.ModelName, spec.PreferFolder);
+            if (model == null) return false;   // FindModel avisou; mantém o campo (greybox/nulo→runtime)
+
+            string bossAssetName = System.IO.Path.GetFileNameWithoutExtension(bossAssetPath);
 
             string fbxPath = AssetDatabase.GetAssetPath(model);
             PrepareImporter(fbxPath);
-            ClipSet clips = FindClips(fbxPath, modelName);
+            ClipSet clips = FindClips(fbxPath, spec.ModelName);
 
             // bosses: 2 estados — Idle(0)/Attack(1), contrato do BossManager.ApplyViewAnim
             AnimatorController controller = BuildController(
                 AnimFolder + "/AC_" + bossAssetName + ".controller",
                 clips.Idle, null, clips.Attack, attackValue: 1);
 
-            Material material = TintMaterial("M_View_" + bossAssetName, model, tint, metallic, smoothness);
+            Material material = TintMaterial("M_View_" + bossAssetName, model, spec.Tint, spec.Metallic, spec.Smoothness);
 
-            GameObject prefab = BuildViewPrefab(
-                model, BossesPrefabFolder + "/" + bossAssetName + "_View.prefab",
-                scale, controller, material);
+            float scale = Mathf.Max(spec.Scale, BossScaleFloor);   // piso de imponência do brief
+            string viewPath = BossesPrefabFolder + "/" + bossAssetName + "_View.prefab";
+            GameObject prefab = BuildViewPrefab(model, viewPath, scale, controller, material);
 
-            SetObjectField(boss, "prefab", prefab);
+            // load-or-keep: só grava se o campo estiver vazio, apontar p/ greybox, ou já apontar p/
+            // a view que ESTE factory gera (re-rodar é idempotente). Um prefab específico que o
+            // agente de dados tenha setado de propósito é preservado.
+            if (ShouldSetBossPrefab(boss, viewPath))
+                SetObjectField(boss, "prefab", prefab);
+
+            if (string.Equals(spec.BossId, "m3_final_scorpion_mech", StringComparison.Ordinal))
+                Debug.LogWarning("MAR Tools: Boss 'Robô Escorpião' usa PLACEHOLDER (Alien recolor metálico) — " +
+                                 "Lacuna L2 do PLANO-DE-USO; trocar pelo mech CC0 quando baixado.");
+            return true;
+        }
+
+        /// <summary>
+        /// load-or-keep do prefab do boss: grava quando vazio, quando aponta p/ um Boss_Greybox,
+        /// ou quando JÁ aponta p/ a view deste factory (caminho Prefabs/Bosses/&lt;asset&gt;_View).
+        /// Caso contrário, preserva o que o agente de dados pôs — sem sobrescrever.
+        /// </summary>
+        private static bool ShouldSetBossPrefab(BossConfigSO boss, string viewPath)
+        {
+            if (boss.prefab == null) return true;
+            string current = AssetDatabase.GetAssetPath(boss.prefab);
+            if (string.IsNullOrEmpty(current)) return true;
+            if (string.Equals(current, viewPath, StringComparison.OrdinalIgnoreCase)) return true;   // re-rodar
+            string file = System.IO.Path.GetFileNameWithoutExtension(current);
+            return file.IndexOf("greybox", StringComparison.OrdinalIgnoreCase) >= 0;                  // placeholder
+        }
+
+        /// <summary>
+        /// Copia do _assets-staging os FBX de boss que o MVP não trouxe (BlueDemon/Squidle/Hywirl,
+        /// CC0 Quaternius) p/ Art/Models/Bosses e configura o importador (rig Generic + animação)
+        /// igual aos demais. Idempotente: pula o que já existe. Sem staging = aviso e o boss fica
+        /// no fallback (FindModel avisa quando o modelo não aparece).
+        /// </summary>
+        private static void EnsureBossModelsImported()
+        {
+            string staging = FindStagingRoot();
+            bool copied = false;
+            for (int i = 0; i < BossModelsToImport.Length; i++)
+            {
+                string destAsset = BossesModelFolder + "/" + BossModelsToImport[i].File;
+                if (CopyStagingFile(staging, BossModelsToImport[i].StagingRel, destAsset)) copied = true;
+            }
+            if (copied) AssetDatabase.Refresh();
+
+            for (int i = 0; i < BossModelsToImport.Length; i++)
+                ConfigureBossModelImporter(BossesModelFolder + "/" + BossModelsToImport[i].File);
+        }
+
+        /// <summary>Boss = modelo ANIMADO: rig Generic + animação (igual ao ImportConfigurator).</summary>
+        private static void ConfigureBossModelImporter(string assetPath)
+        {
+            if (!System.IO.File.Exists(AbsolutePath(assetPath))) return;
+            var importer = AssetImporter.GetAtPath(assetPath) as ModelImporter;
+            if (importer == null) return;
+
+            bool changed = false;
+            if (importer.animationType != ModelImporterAnimationType.Generic)
+            {
+                importer.animationType = ModelImporterAnimationType.Generic;
+                changed = true;
+            }
+            if (!importer.importAnimation) { importer.importAnimation = true; changed = true; }
+            if (importer.importCameras) { importer.importCameras = false; changed = true; }
+            if (importer.importLights) { importer.importLights = false; changed = true; }
+            if (changed) importer.SaveAndReimport();
+        }
+
+        private static string FindStagingRoot()
+        {
+            string projectRoot = System.IO.Directory.GetParent(Application.dataPath).FullName;   // .../MutantArmyRun
+            System.IO.DirectoryInfo parent = System.IO.Directory.GetParent(projectRoot);
+            if (parent == null) return null;
+            string candidate = System.IO.Path.Combine(parent.FullName, "_assets-staging");
+            return System.IO.Directory.Exists(candidate) ? candidate : null;
+        }
+
+        private static string AbsolutePath(string assetPath)
+        {
+            return System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(),
+                                          assetPath.Replace('/', System.IO.Path.DirectorySeparatorChar));
+        }
+
+        /// <summary>Copia 1 arquivo do staging p/ um asset path (skip se já existe). True = copiou agora.</summary>
+        private static bool CopyStagingFile(string stagingRoot, string relSource, string destAssetPath)
+        {
+            if (System.IO.File.Exists(AbsolutePath(destAssetPath))) return false;   // idempotente
+            if (stagingRoot == null)
+            {
+                Debug.LogWarning("MAR Tools: _assets-staging não encontrado ao lado do projeto — modelo de boss '" +
+                                 System.IO.Path.GetFileName(destAssetPath) + "' será pulado (fallback mantido).");
+                return false;
+            }
+
+            string src = System.IO.Path.Combine(stagingRoot, relSource.Replace('/', System.IO.Path.DirectorySeparatorChar));
+            if (!System.IO.File.Exists(src))
+            {
+                Debug.LogWarning("MAR Tools: FBX de boss CC0 ausente no staging: " + relSource);
+                return false;
+            }
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(AbsolutePath(destAssetPath)));
+            System.IO.File.Copy(src, AbsolutePath(destAssetPath));
             return true;
         }
 
@@ -658,6 +890,14 @@ namespace MutantArmy.Editor
             Renderer renderer = model.GetComponentInChildren<Renderer>(true);
             if (renderer != null && renderer.sharedMaterial != null)
                 mainTexture = renderer.sharedMaterial.mainTexture;
+
+            // FBX recém-copiado pode vir SEM material resolvido (atlas ainda não extraído) → o
+            // recolor multiplicaria por nada e o chefão ficaria chapado. Fallback: o atlas
+            // compartilhado dos monstros Quaternius, já em Art/Models/Bosses (todos os modelos da
+            // BossModelTable são desse atlas), preservando a leitura de detalhe do mesh.
+            if (mainTexture == null)
+                mainTexture = AssetDatabase.LoadAssetAtPath<Texture>(
+                    BossesModelFolder + "/Atlas_Monsters.png");
 
             string path = ViewMaterialsFolder + "/" + name + ".mat";
             Material material = LoadOrCreateLit(path);

@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b964d4801db8244ba7e1392ed91f9c8, type: 3}
+  m_Name: W09_PlanetaMecanico
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.WorldConfigSO
+  worldIndex: 9
+  displayNameKey: world_09_planeta_mecanico
+  levels:
+  - {fileID: 11400000, guid: 1e6404a9eacf85543b8985732603d026, type: 2}
+  - {fileID: 11400000, guid: 7388030575d638f4f83372c4b13c780b, type: 2}
+  - {fileID: 11400000, guid: c7a3d4497901bb244a18dc962ea5dc64, type: 2}
+  - {fileID: 11400000, guid: b3d814245cf409b4c81f680d22cdad58, type: 2}
+  - {fileID: 11400000, guid: ce6d537c42b5af74592f0e88b0656772, type: 2}
+  - {fileID: 11400000, guid: 772101983aed5224e851a696a194bbaa, type: 2}
+  - {fileID: 11400000, guid: ca06999f77eb8fe4d979887e5ade5818, type: 2}
+  - {fileID: 11400000, guid: b6be01aa526bd4340afae3d3b1c9e61c, type: 2}
+  - {fileID: 11400000, guid: d4b20bbf7bdfda74cbb3db16dd819671, type: 2}
+  - {fileID: 11400000, guid: 32725a28ce5fd7c4ebcfde354f1e3bb3, type: 2}
+  worldBoss: {fileID: 11400000, guid: 9c8fc2467196a97489386c0c92637f42, type: 2}
+  skyboxMaterial: {fileID: 2100000, guid: 3d535dd98b2b15c43846edcbe231bb2c, type: 2}
+  trackSegmentPrefabs:
+  - {fileID: 4523249437569982880, guid: 9516104176fdbba4e8d700f3c589d546, type: 3}
+  - {fileID: 4036092973308791374, guid: 3499da641bbdd0547912298574f1a0f0, type: 3}
+  musicTrack: {fileID: 0}
+  worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
+  skyTopColor: {r: 0.3, g: 0.4, b: 0.48, a: 1}
+  skyHorizonColor: {r: 0.58, g: 0.7, b: 0.76, a: 1}
+  fogColor: {r: 0.5, g: 0.6, b: 0.66, a: 1}
+  sunColor: {r: 0.84, g: 0.92, b: 0.98, a: 1}
+  ambientColor: {r: 0.52, g: 0.6, b: 0.66, a: 1}
+  trackMaterial: {fileID: 2100000, guid: c5774274942b6884391c3e826c00046a, type: 2}
+  propPrefabs:
+  - {fileID: 1662593418753590015, guid: d37e1acb4113d854bafb52fc3436e290, type: 3}
+  - {fileID: 8545097211339714687, guid: e4f087346327edc4e80776315380cf9f, type: 3}
+  - {fileID: 1889240655352574570, guid: 4339f0152d816c949a26873487104bea, type: 3}
+  - {fileID: 6916171465675875080, guid: 4cbe9083cc3fe244e939cb07db67dafb, type: 3}
+  - {fileID: 8864403452052789796, guid: 0bf0a0bbc773ff5419b680600827b67f, type: 3}
+  - {fileID: 1022804921996093993, guid: 36dba5e1d2854af43ac3456e4dbabd51, type: 3}
+  - {fileID: 6785603745237945281, guid: e3047737c9599c5408452630eccc22c1, type: 3}
+  - {fileID: 3909220035341448381, guid: 0b5babf113012b54ab5f4d510a2a7e40, type: 3}

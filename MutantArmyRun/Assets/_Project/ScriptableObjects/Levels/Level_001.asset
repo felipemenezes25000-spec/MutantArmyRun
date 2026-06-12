@@ -29,6 +29,6 @@ MonoBehaviour:
     rightGate: {fileID: 11400000, guid: b076fdd235389054aa34b310df31a68f, type: 2}
   obstacles: []
   boss: {fileID: 11400000, guid: f014fe0b697b9644b9b67dde425ba453, type: 2}
-  bossHpMultiplier: 0.25
+  bossHpMultiplier: 0.25500003
   winReward: {fileID: 0}
   startingUnits: 1

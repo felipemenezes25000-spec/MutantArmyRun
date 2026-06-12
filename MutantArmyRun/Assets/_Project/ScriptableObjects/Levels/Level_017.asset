@@ -14,31 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.LevelConfigSO
   levelIndex: 17
   seed: 135857
-  world: {fileID: 11400000, guid: bd94224d60b3fca4cba1d059bd98ed4b, type: 2}
-  trackLength: 220
+  world: {fileID: 11400000, guid: b70f6ac4800907841a04f2d6a6da0788, type: 2}
+  trackLength: 260
   gateSlots:
-  - trackPosition: 30
-    depth01: 0.13636364
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 80
-    depth01: 0.36363637
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 130
-    depth01: 0.59090906
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 180
-    depth01: 0.8181818
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
+  - trackPosition: 35
+    depth01: 0.13461539
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 4d8f14c4160aa54419ab88ff89e6e518, type: 2}
+    rightGate: {fileID: 11400000, guid: 29e927f0949ad9947a9842de9481c2b1, type: 2}
+  - trackPosition: 117
+    depth01: 0.45
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 00eaa93e54e620d48b5fb754e2e07f1f, type: 2}
+    rightGate: {fileID: 11400000, guid: 4d8f14c4160aa54419ab88ff89e6e518, type: 2}
+  - trackPosition: 171.6
+    depth01: 0.66
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 7f92dbf1f04563545a9cca9826af493c, type: 2}
+    rightGate: {fileID: 11400000, guid: 2680f7cb42570c94683231411af2db11, type: 2}
+  - trackPosition: 215
+    depth01: 0.8269231
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 38603cdfda72a3041b88b71668e5cd74, type: 2}
+    rightGate: {fileID: 11400000, guid: e811d4939ac4d6d478c734c21efb73c7, type: 2}
   obstacles: []
-  boss: {fileID: 11400000, guid: 5ab3faf0ac858344da939957ad7e2f4c, type: 2}
-  bossHpMultiplier: 0.65
+  boss: {fileID: 11400000, guid: 54b645c9c399fb740a47cc29d76fcc3a, type: 2}
+  bossHpMultiplier: 0.8748
   winReward: {fileID: 0}
   startingUnits: 1

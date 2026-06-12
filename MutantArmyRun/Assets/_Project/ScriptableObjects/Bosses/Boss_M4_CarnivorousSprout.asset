@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e042e148420b4164c841f4871c89970c, type: 3}
+  m_Name: Boss_M4_CarnivorousSprout
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.BossConfigSO
+  bossId: m4_carnivorous_sprout
+  displayNameKey: m4_carnivorous_sprout_name
+  displayName: "Broto Carn\xEDvoro"
+  element: 0
+  weaknesses: 0100000004000000
+  immunities: 
+  rotatingWeakness: 0
+  bodyType: 0
+  maxHp: 2200
+  contactDps: 11
+  entranceSeconds: 1.7
+  telegraphSeconds: 1.1
+  specialAttackDamage: 34
+  specialAttackArea: 3
+  specialBaseCooldown: 3
+  arenaWaves: []
+  prefab: {fileID: 781381211656405589, guid: 46ed0562a819e394e8c82de8db345a8e, type: 3}
+  scoutCardArt: {fileID: 0}
+  killReward: {fileID: 11400000, guid: 1531c095ef3bfa8439b41b1643e6c3cc, type: 2}

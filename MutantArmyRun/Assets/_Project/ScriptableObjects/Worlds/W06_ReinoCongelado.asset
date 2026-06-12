@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b964d4801db8244ba7e1392ed91f9c8, type: 3}
+  m_Name: W06_ReinoCongelado
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.WorldConfigSO
+  worldIndex: 6
+  displayNameKey: world_06_reino_congelado
+  levels:
+  - {fileID: 11400000, guid: 3bb7090fc7bacde489b8a05faae7ea67, type: 2}
+  - {fileID: 11400000, guid: 28cd745ea1a97354ab852a8cb7941cfc, type: 2}
+  - {fileID: 11400000, guid: 6dc1126f1e3fbfa4abb3003f7bd5280e, type: 2}
+  - {fileID: 11400000, guid: 9c1b76ea32f5f184cb22fe158738ab10, type: 2}
+  - {fileID: 11400000, guid: b7588cc03de418644aa225fe237a3173, type: 2}
+  - {fileID: 11400000, guid: 46a716dc7b242b94ba9a70a51490834e, type: 2}
+  - {fileID: 11400000, guid: cd68a23bda941b948b60acc56e3228bf, type: 2}
+  - {fileID: 11400000, guid: a690b7ab2e7ce73488be4a9413b33585, type: 2}
+  - {fileID: 11400000, guid: b4cc4031683ed7a4f831da4b8cb9a5d9, type: 2}
+  - {fileID: 11400000, guid: 393e43a970c3d484cbd1d2658e9007d3, type: 2}
+  worldBoss: {fileID: 11400000, guid: 4929a0673780c9a4a9a79e599e23bd16, type: 2}
+  skyboxMaterial: {fileID: 2100000, guid: be3aa045155a55040ae4bf6d294f4916, type: 2}
+  trackSegmentPrefabs:
+  - {fileID: 2378261085240586564, guid: 731b8a789e9b562429624e6546dfd982, type: 3}
+  - {fileID: 1111402888410632504, guid: 992196db687e52c43a3f9f0f5ff1c680, type: 3}
+  musicTrack: {fileID: 0}
+  worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
+  skyTopColor: {r: 0.52, g: 0.74, b: 0.96, a: 1}
+  skyHorizonColor: {r: 0.86, g: 0.94, b: 1, a: 1}
+  fogColor: {r: 0.82, g: 0.9, b: 0.98, a: 1}
+  sunColor: {r: 0.84, g: 0.92, b: 1, a: 1}
+  ambientColor: {r: 0.74, g: 0.82, b: 0.92, a: 1}
+  trackMaterial: {fileID: 2100000, guid: 7dea4d47550f8a54d84cb1338c3fe5da, type: 2}
+  propPrefabs:
+  - {fileID: 7102575528727987754, guid: 432db07df9f3b5a468571e9646825c3b, type: 3}
+  - {fileID: 5292052311633412499, guid: 7e0c66ce21c3fe343ba634825302354b, type: 3}
+  - {fileID: 3525577888724936689, guid: 9acac244456e013409655e2154d7dcda, type: 3}
+  - {fileID: 7630870943727260388, guid: 820fd1553ed550748a0d238d61dedbb8, type: 3}
+  - {fileID: 5777413433720767812, guid: 80adf2d915cc59447ada047c6185c126, type: 3}
+  - {fileID: 6089097552700199282, guid: 4ed023e15cf88fd469e79a76b990cc85, type: 3}
+  - {fileID: 2595788235958160287, guid: 4ac74bfadd6eaf741b04fef98b565e75, type: 3}
+  - {fileID: 2594150659925368441, guid: 7673c9ddb043b0a49907060f8f29b37e, type: 3}

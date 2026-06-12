@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="18" result="Passed" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0,0487733">
+  <test-suite type="TestSuite" id="1000" name="MutantArmyRun" fullname="MutantArmyRun" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.048773" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1021" name="MutantArmy.Tests.EditMode.dll" fullname="C:/Users/Felipe/Downloads/jogo test/MutantArmyRun/Library/ScriptAssemblies/MutantArmy.Tests.EditMode.dll" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.041430" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="43804" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1022" name="MutantArmy" fullname="MutantArmy" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.041130" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1023" name="Tests" fullname="MutantArmy.Tests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.041007" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="GateConfigTests" fullname="MutantArmy.Tests.GateConfigTests" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.031238" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1002" name="AddTen_IsTargetTotal" fullname="MutantArmy.Tests.GateConfigTests.AddTen_IsTargetTotal" methodname="AddTen_IsTargetTotal" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="155214495" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.014911" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="AddTwentyFive_IsTargetTotal" fullname="MutantArmy.Tests.GateConfigTests.AddTwentyFive_IsTargetTotal" methodname="AddTwentyFive_IsTargetTotal" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="629600887" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000189" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="ClassConvertArcher_DoesNotChangeCount" fullname="MutantArmy.Tests.GateConfigTests.ClassConvertArcher_DoesNotChangeCount" methodname="ClassConvertArcher_DoesNotChangeCount" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="1283782722" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000177" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="ElementFire_DoesNotChangeCount" fullname="MutantArmy.Tests.GateConfigTests.ElementFire_DoesNotChangeCount" methodname="ElementFire_DoesNotChangeCount" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="1648746095" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000179" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1014" name="GateConfig_Apply_MatchesDomainGateMath" fullname="MutantArmy.Tests.GateConfigTests.GateConfig_Apply_MatchesDomainGateMath" methodname="GateConfig_Apply_MatchesDomainGateMath" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="1133526008" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000807" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="HalfGate_EvenHalves" fullname="MutantArmy.Tests.GateConfigTests.HalfGate_EvenHalves" methodname="HalfGate_EvenHalves" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="384293082" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000175" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1008" name="HalfGate_NeverZeroesTheArmy" fullname="MutantArmy.Tests.GateConfigTests.HalfGate_NeverZeroesTheArmy" methodname="HalfGate_NeverZeroesTheArmy" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="843043195" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000168" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1006" name="HalfGate_OddRoundsUp" fullname="MutantArmy.Tests.GateConfigTests.HalfGate_OddRoundsUp" methodname="HalfGate_OddRoundsUp" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="2053744570" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000192" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="RiskGate_ApplyIsIdentity_ResolutionHappensInZone" fullname="MutantArmy.Tests.GateConfigTests.RiskGate_ApplyIsIdentity_ResolutionHappensInZone" methodname="RiskGate_ApplyIsIdentity_ResolutionHappensInZone" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="684086966" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000199" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1013" name="RiskGate_Resolution_FailureHalvesWithFloorOfOne" fullname="MutantArmy.Tests.GateConfigTests.RiskGate_Resolution_FailureHalvesWithFloorOfOne" methodname="RiskGate_Resolution_FailureHalvesWithFloorOfOne" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="586799745" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000346" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="RiskGate_Resolution_SuccessMultipliesByTen" fullname="MutantArmy.Tests.GateConfigTests.RiskGate_Resolution_SuccessMultipliesByTen" methodname="RiskGate_Resolution_SuccessMultipliesByTen" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="1217589428" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000181" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="TimesThree_IsTargetTotal" fullname="MutantArmy.Tests.GateConfigTests.TimesThree_IsTargetTotal" methodname="TimesThree_IsTargetTotal" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="1810341749" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000168" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="TimesTwo_DoublesAndNeverTriples" fullname="MutantArmy.Tests.GateConfigTests.TimesTwo_DoublesAndNeverTriples" methodname="TimesTwo_DoublesAndNeverTriples" classname="MutantArmy.Tests.GateConfigTests" runstate="Runnable" seed="1689740588" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.001574" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1015" name="JsonRoundTripTests" fullname="MutantArmy.Tests.JsonRoundTripTests" classname="MutantArmy.Tests.JsonRoundTripTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.008807" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1017" name="Checksum_Pack_TryUnpack_RoundTrip" fullname="MutantArmy.Tests.JsonRoundTripTests.Checksum_Pack_TryUnpack_RoundTrip" methodname="Checksum_Pack_TryUnpack_RoundTrip" classname="MutantArmy.Tests.JsonRoundTripTests" runstate="Runnable" seed="109488525" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.003158" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="Checksum_PayloadWithoutNewline_FailsWithoutThrow" fullname="MutantArmy.Tests.JsonRoundTripTests.Checksum_PayloadWithoutNewline_FailsWithoutThrow" methodname="Checksum_PayloadWithoutNewline_FailsWithoutThrow" classname="MutantArmy.Tests.JsonRoundTripTests" runstate="Runnable" seed="1898569770" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000269" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1018" name="Checksum_TamperedPayload_FailsUnpack" fullname="MutantArmy.Tests.JsonRoundTripTests.Checksum_TamperedPayload_FailsUnpack" methodname="Checksum_TamperedPayload_FailsUnpack" classname="MutantArmy.Tests.JsonRoundTripTests" runstate="Runnable" seed="1477187547" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000805" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="JsonUtility_RoundTrip_PreservesAllFields" fullname="MutantArmy.Tests.JsonRoundTripTests.JsonUtility_RoundTrip_PreservesAllFields" methodname="JsonUtility_RoundTrip_PreservesAllFields" classname="MutantArmy.Tests.JsonRoundTripTests" runstate="Runnable" seed="783214271" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.002985" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1020" name="Load_FallsBackToBackup_WhenMainChecksumInvalid" fullname="MutantArmy.Tests.JsonRoundTripTests.Load_FallsBackToBackup_WhenMainChecksumInvalid" methodname="Load_FallsBackToBackup_WhenMainChecksumInvalid" classname="MutantArmy.Tests.JsonRoundTripTests" runstate="Runnable" seed="1538937763" result="Passed" start-time="2026-06-12 14:02:46Z" end-time="2026-06-12 14:02:46Z" duration="0.000636" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/Felipe/AppData/LocalLow/DefaultCompany/MutantArmyRun\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

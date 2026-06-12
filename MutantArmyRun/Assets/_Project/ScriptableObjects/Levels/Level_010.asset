@@ -14,31 +14,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.LevelConfigSO
   levelIndex: 10
   seed: 80424
-  world: {fileID: 11400000, guid: b70f6ac4800907841a04f2d6a6da0788, type: 2}
-  trackLength: 220
+  world: {fileID: 11400000, guid: d998e8483071db446bef1799d70d0ac8, type: 2}
+  trackLength: 280
   gateSlots:
   - trackPosition: 30
-    depth01: 0.13636364
+    depth01: 0.10714286
     autoBalance: 1
     leftGate: {fileID: 0}
     rightGate: {fileID: 0}
-  - trackPosition: 80
-    depth01: 0.36363637
+  - trackPosition: 82.5
+    depth01: 0.29464287
     autoBalance: 1
     leftGate: {fileID: 0}
     rightGate: {fileID: 0}
-  - trackPosition: 130
-    depth01: 0.59090906
+  - trackPosition: 135
+    depth01: 0.48214287
     autoBalance: 1
     leftGate: {fileID: 0}
     rightGate: {fileID: 0}
-  - trackPosition: 180
-    depth01: 0.8181818
+  - trackPosition: 187.5
+    depth01: 0.66964287
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 240
+    depth01: 0.85714287
     autoBalance: 1
     leftGate: {fileID: 0}
     rightGate: {fileID: 0}
   obstacles: []
-  boss: {fileID: 11400000, guid: 54b645c9c399fb740a47cc29d76fcc3a, type: 2}
-  bossHpMultiplier: 1.4
+  boss: {fileID: 11400000, guid: ad185b2c82a4fd5438e02aa81388e908, type: 2}
+  bossHpMultiplier: 1
   winReward: {fileID: 11400000, guid: 9ec962e0ca89e354baf2aee4b8ce8fbe, type: 2}
   startingUnits: 1

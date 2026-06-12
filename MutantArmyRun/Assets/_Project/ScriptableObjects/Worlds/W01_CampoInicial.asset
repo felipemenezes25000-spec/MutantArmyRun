@@ -22,6 +22,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c34dd10e04f761b41abf8cab84ffc4c8, type: 2}
   - {fileID: 11400000, guid: b82ae8624cfab0d46a5b06d76ba5c6d0, type: 2}
   - {fileID: 11400000, guid: 073e7d42564e1c24db2e028b7ac3b881, type: 2}
+  - {fileID: 11400000, guid: c45f28be94eca0a4f8ec2760a18e7df3, type: 2}
+  - {fileID: 11400000, guid: 63a97e6863b59304abcae1e2a9f31273, type: 2}
+  - {fileID: 11400000, guid: d5ed2d5144b107d43b1945aca3c1631d, type: 2}
   worldBoss: {fileID: 11400000, guid: ad185b2c82a4fd5438e02aa81388e908, type: 2}
   skyboxMaterial: {fileID: 2100000, guid: a6fb5f8d048294940ad866f1a2ba5922, type: 2}
   trackSegmentPrefabs:

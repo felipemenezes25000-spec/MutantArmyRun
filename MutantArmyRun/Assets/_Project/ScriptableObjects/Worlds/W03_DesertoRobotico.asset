@@ -15,12 +15,16 @@ MonoBehaviour:
   worldIndex: 3
   displayNameKey: world_03_deserto_robotico
   levels:
-  - {fileID: 11400000, guid: cfc015845bac33445ad86844cbfe5d8d, type: 2}
-  - {fileID: 11400000, guid: c76c9d73a1234bf4685dc1c2f169481c, type: 2}
-  - {fileID: 11400000, guid: 886c70dcd60c4854ea8e55de4a5f97f9, type: 2}
-  - {fileID: 11400000, guid: 99f019206e132784987bcd04b0b2341e, type: 2}
-  - {fileID: 11400000, guid: 553f9da55aa15614b82ffa299d2797a7, type: 2}
-  - {fileID: 11400000, guid: 8be75f24a48401746a6ac9b644db6960, type: 2}
+  - {fileID: 11400000, guid: 8ca99635cc8156b43a9e6793b37815ef, type: 2}
+  - {fileID: 11400000, guid: b8d41ce373eefd5469fcf99a19362333, type: 2}
+  - {fileID: 11400000, guid: 002358227873d4549a0e0cffed3f3238, type: 2}
+  - {fileID: 11400000, guid: 4f2aa05c4eb12e847a45d8ab1ece8642, type: 2}
+  - {fileID: 11400000, guid: b1c590d061160c04e963bea577625f61, type: 2}
+  - {fileID: 11400000, guid: 195415bec4d7a094ab28f4b943df766e, type: 2}
+  - {fileID: 11400000, guid: 5b62e5d4cd3ced745a76e2e9831ed1f8, type: 2}
+  - {fileID: 11400000, guid: 5d51485b26b939247a11af9913356f56, type: 2}
+  - {fileID: 11400000, guid: 0bebbf4095b44544e9ed92b4bf691138, type: 2}
+  - {fileID: 11400000, guid: efef429d9d688ba4ea91ed240c86f0c9, type: 2}
   worldBoss: {fileID: 11400000, guid: 5ab3faf0ac858344da939957ad7e2f4c, type: 2}
   skyboxMaterial: {fileID: 2100000, guid: 250a0862ba42ed147967d628818139c5, type: 2}
   trackSegmentPrefabs:

@@ -15,25 +15,30 @@ MonoBehaviour:
   levelIndex: 11
   seed: 88343
   world: {fileID: 11400000, guid: b70f6ac4800907841a04f2d6a6da0788, type: 2}
-  trackLength: 220
+  trackLength: 170
   gateSlots:
-  - trackPosition: 35
-    depth01: 0.1590909
-    autoBalance: 0
-    leftGate: {fileID: 11400000, guid: 4d8f14c4160aa54419ab88ff89e6e518, type: 2}
-    rightGate: {fileID: 11400000, guid: 29e927f0949ad9947a9842de9481c2b1, type: 2}
-  - trackPosition: 145.20001
-    depth01: 0.66
-    autoBalance: 0
-    leftGate: {fileID: 11400000, guid: 00eaa93e54e620d48b5fb754e2e07f1f, type: 2}
-    rightGate: {fileID: 11400000, guid: 6ac95bece3db1d34ab4dafc6878a06af, type: 2}
-  - trackPosition: 175
-    depth01: 0.79545456
-    autoBalance: 0
-    leftGate: {fileID: 11400000, guid: 38603cdfda72a3041b88b71668e5cd74, type: 2}
-    rightGate: {fileID: 11400000, guid: 490f1bc6585471c4eb998ddb318ec5a3, type: 2}
+  - trackPosition: 30
+    depth01: 0.1764706
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 63.333336
+    depth01: 0.37254903
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 96.66667
+    depth01: 0.5686275
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
+  - trackPosition: 130
+    depth01: 0.7647059
+    autoBalance: 1
+    leftGate: {fileID: 0}
+    rightGate: {fileID: 0}
   obstacles: []
   boss: {fileID: 11400000, guid: 54b645c9c399fb740a47cc29d76fcc3a, type: 2}
-  bossHpMultiplier: 1.6
+  bossHpMultiplier: 0.32400003
   winReward: {fileID: 0}
   startingUnits: 1

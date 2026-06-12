@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e042e148420b4164c841f4871c89970c, type: 3}
+  m_Name: Boss_M4_CarnivorousPlant
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.BossConfigSO
+  bossId: m4_carnivorous_plant
+  displayNameKey: m4_carnivorous_plant_name
+  displayName: "Planta Carn\xEDvora Gigante"
+  element: 0
+  weaknesses: 0100000004000000
+  immunities: 
+  rotatingWeakness: 0
+  bodyType: 0
+  maxHp: 4000
+  contactDps: 14
+  entranceSeconds: 2
+  telegraphSeconds: 1.2
+  specialAttackDamage: 44
+  specialAttackArea: 4.5
+  specialBaseCooldown: 3
+  arenaWaves: []
+  prefab: {fileID: 781381211656405589, guid: 46ed0562a819e394e8c82de8db345a8e, type: 3}
+  scoutCardArt: {fileID: 0}
+  killReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}

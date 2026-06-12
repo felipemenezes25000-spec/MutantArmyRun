@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b964d4801db8244ba7e1392ed91f9c8, type: 3}
+  m_Name: W04_FlorestaMutante
+  m_EditorClassIdentifier: MutantArmy.Core::MutantArmy.Core.WorldConfigSO
+  worldIndex: 4
+  displayNameKey: world_04_floresta_mutante
+  levels:
+  - {fileID: 11400000, guid: dc1c6bb2071912242b8ce7baa41646aa, type: 2}
+  - {fileID: 11400000, guid: 879d513ad6f86af419d1c08764ab32d8, type: 2}
+  - {fileID: 11400000, guid: d06bced2ba73fb644b5f81e02fa35b23, type: 2}
+  - {fileID: 11400000, guid: 5b2f539bb9b335643a12025032d88a73, type: 2}
+  - {fileID: 11400000, guid: 363d3ac6c763bf5408a1d1916d3646c8, type: 2}
+  - {fileID: 11400000, guid: fe21123f94644a54a85b07473a65832a, type: 2}
+  - {fileID: 11400000, guid: a939336e802aa074a80887763c03f660, type: 2}
+  - {fileID: 11400000, guid: 7ee623e27be3b124e8fdbe7927fb9307, type: 2}
+  - {fileID: 11400000, guid: 1d3d2f0c94e2bcb4b9a17b4bf1d73d76, type: 2}
+  - {fileID: 11400000, guid: 10a80ab2a5544ca479486eb4b9d2430b, type: 2}
+  worldBoss: {fileID: 11400000, guid: e552c246a9808294f8c8631e9694b012, type: 2}
+  skyboxMaterial: {fileID: 2100000, guid: ab754e6e2b2805545aaec94f511b5fed, type: 2}
+  trackSegmentPrefabs:
+  - {fileID: 6139100822724272376, guid: 6e4fb70c73aa3b44aa7cc0c4fab37f2f, type: 3}
+  - {fileID: 286691617617707283, guid: bd7161122ebe1e94d86553a60d008623, type: 3}
+  musicTrack: {fileID: 0}
+  worldClearReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
+  skyTopColor: {r: 0.1, g: 0.22, b: 0.16, a: 1}
+  skyHorizonColor: {r: 0.32, g: 0.52, b: 0.26, a: 1}
+  fogColor: {r: 0.3, g: 0.46, b: 0.24, a: 1}
+  sunColor: {r: 0.78, g: 0.92, b: 0.62, a: 1}
+  ambientColor: {r: 0.34, g: 0.46, b: 0.3, a: 1}
+  trackMaterial: {fileID: 2100000, guid: 270fd3a5b76b57d4db54a9cad2bcaedf, type: 2}
+  propPrefabs:
+  - {fileID: 6999174457333975587, guid: 536c24d85a9838a439009806723e5aac, type: 3}
+  - {fileID: 664316261532687318, guid: e6653c847bc68724c834045efb6450e1, type: 3}
+  - {fileID: 6528453761845614382, guid: d6de49528cf793e439f2de9a1641650c, type: 3}
+  - {fileID: 7583649757077664870, guid: 06a1c8d17c3dc314d8c1f4acecc5393a, type: 3}
+  - {fileID: 3516022282299228286, guid: 50fc4d42fa02aec4b86cc6a3a45f8ca1, type: 3}
+  - {fileID: 3455756645982345437, guid: 2399d3c2109d40549af62417243f080b, type: 3}
+  - {fileID: 6482006880491651595, guid: e7929eeab1f239a49b6edc52e3c31882, type: 3}
+  - {fileID: 2577610071253289465, guid: 3476c48fef3ccde4f923c2a4ad3bf2a2, type: 3}
+  - {fileID: 4207581079957770428, guid: 3063da23ddca39548a913a84df462db3, type: 3}
+  - {fileID: 3568706611462607038, guid: a426ba7167f4d1d4a84a28a2b37e271d, type: 3}

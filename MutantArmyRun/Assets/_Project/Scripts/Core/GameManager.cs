@@ -58,6 +58,24 @@ namespace MutantArmy.Core
             ChangeState(GameState.BossScout);      // cartão de ~2 s ANTES da corrida (CANON §3.1)
         }
 
+        /// <summary>
+        /// Reinicia a fase a partir de QUALQUER estado (ferramenta de dev: showcase/QA jump de
+        /// fase). StartLevel sozinho falha se o estado atual não alcança BossScout pela tabela
+        /// (ex.: Running/BossFight/ReviveOffer→BossScout é ilegal), então a troca de mundo no
+        /// showcase morria em silêncio e tudo saía com o visual do W1. Aqui a pilha é zerada
+        /// para o estado base (mesmo efeito de uma cena recém-carregada) e o fluxo refaz
+        /// MainMenu→BossScout por transições LEGAIS — sem tocar na tabela do GameStateStack nem
+        /// no fluxo de produção (Victory/Defeat→BossScout continua sendo o caminho normal de
+        /// "próxima fase"). Não dispara ResolveEnd/recompensa: é só um pulo visual.
+        /// </summary>
+        public void RestartLevelFromAnyState(LevelConfigSO level)
+        {
+            if (level == null) return;
+            _states = new GameStateStack();        // volta à base (Boot) — espelha uma cena nova
+            ChangeState(GameState.MainMenu);       // Boot→MainMenu (legal)
+            StartLevel(level);                     // MainMenu→BossScout→… (legal)
+        }
+
         /// <summary>Troca o TOPO da pilha (transição lateral). Ilegal loga erro e é ignorada.</summary>
         public void ChangeState(GameState next)
         {
