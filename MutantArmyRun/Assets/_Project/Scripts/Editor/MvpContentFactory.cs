@@ -1469,28 +1469,63 @@ namespace MutantArmy.Editor
         private const int EnemyLayoutSalt = 5;
 
         /// <summary>
-        /// EnemySlot[] da fase. Curadoria do tutorial: F1–F3 SEM inimigos (pista limpa —
-        /// CANON §16; PlayMode Fase1 vencível), F4 = 2 hordas fracas (o prazer de atropelar),
-        /// F5 = 1 tanque solitário (variedade leve). Fases globais 6+: 2–4 grupos
-        /// determinísticos com kinds do MUNDO da fase, intensidade crescendo com a fase,
-        /// posições fora da vizinhança dos portais (clearance 9 m ≥ ±8 m da missão) e da
-        /// zona de segurança da arena. Fase 10 (boss de mundo): só 1–2 hordas de aquecimento.
+        /// EnemySlot[] da fase. Curadoria do tutorial (missão Nota 10 — o dono jogava as
+        /// primeiras fases SEM ver inimigo nenhum até o boss):
+        ///   F1 (global 1): pista LIMPA de verdade — onboarding impossível de perder
+        ///     (CANON §16; PlayMode Fase1_Vitoria; regra do SoValidator que proíbe inimigos só na F1).
+        ///   F2 (global 2): 1 horda fraca do MUNDO (~5) numa posição segura — o exército
+        ///     atropela, prazer visual, dificuldade zero.
+        ///   F3 (global 3): 2 hordas (~5–7) — já "vivo" antes do Gigante de Madeira, ainda fácil.
+        ///   F4: 3 hordas (reforço da que já existia).
+        ///   F5: 1 tanque + 1 horda (variedade + atropelo).
+        /// Fases globais 6+: 2–4 grupos determinísticos com kinds do MUNDO da fase,
+        /// intensidade crescendo com a fase, posições fora da vizinhança dos portais
+        /// (clearance 9 m ≥ ±8 m da missão) e da zona de segurança da arena. Fase 10
+        /// (boss de mundo): só 1–2 hordas de aquecimento.
+        /// As hordas iniciais (F2–F5) usam o catálogo do W01 (enemies.Horde[1]/Tank[1]) e
+        /// passam pela curadoria anti-portal (TooCloseToGate/NudgeAwayFromGates) — o layout
+        /// é determinístico (sem RNG) e idempotente: re-rodar Create MVP Content reproduz.
         /// </summary>
         private static EnemySlot[] BuildEnemySlotsForLevel(int globalIndex, int worldIndex, int fase,
                                                            float trackLength, GateSlot[] gateSlots,
                                                            EnemySet enemies)
         {
-            if (globalIndex <= 3) return new EnemySlot[0];
+            // F1 permanece VAZIA — não quebrar Fase1_Vitoria nem a regra de tutorial do validador.
+            if (globalIndex == 1) return new EnemySlot[0];
 
+            // F2: 1 horda fraca cedo (~5). Posição-base 80 m (longe dos portais @35/120/170 da
+            // Level_002 e ≥8 m pós-portal); a curadoria garante a folga mesmo se os portais mudarem.
+            if (globalIndex == 2)
+                return CurateGroups(trackLength, gateSlots, new[]
+                {
+                    EnemyGroup(80f, enemies.Horde[1], 5)
+                });
+
+            // F3: 2 hordas (~5 e ~7). Posições-base 70 m e 110 m (longe dos portais @35/145/175 e
+            // dos obstáculos @25/165 da Level_003) — ainda trivial, mas a pista já "respira".
+            if (globalIndex == 3)
+                return CurateGroups(trackLength, gateSlots, new[]
+                {
+                    EnemyGroup(70f, enemies.Horde[1], 5),
+                    EnemyGroup(110f, enemies.Horde[1], 7)
+                });
+
+            // F4: 3 hordas (a 2 originais + 1 no miolo) — atropelo farto, dificuldade ainda baixa.
             if (globalIndex == 4)
-                return new[]
+                return CurateGroups(trackLength, gateSlots, new[]
                 {
                     EnemyGroup(60f, enemies.Horde[1], 6),
-                    EnemyGroup(130f, enemies.Horde[1], 8)
-                };
+                    EnemyGroup(100f, enemies.Horde[1], 6),
+                    EnemyGroup(140f, enemies.Horde[1], 8)
+                });
 
+            // F5: tanque solitário (variedade) + 1 horda de aquecimento antes dele.
             if (globalIndex == 5)
-                return new[] { EnemyGroup(150f, enemies.Tank[1], 1) };
+                return CurateGroups(trackLength, gateSlots, new[]
+                {
+                    EnemyGroup(95f, enemies.Horde[1], 6),
+                    EnemyGroup(150f, enemies.Tank[1], 1)
+                });
 
             // RNG derivado da MESMA seed determinística da fase, com primo próprio — roda na
             // GERAÇÃO (factory), nunca na cadeia de RNG do LevelManager.
@@ -1540,6 +1575,29 @@ namespace MutantArmy.Editor
         private static EnemySlot EnemyGroup(float z, EnemyConfigSO enemy, int count)
         {
             return new EnemySlot { trackPosition = z, enemy = enemy, count = count };
+        }
+
+        /// <summary>
+        /// Curadoria anti-portal das hordas iniciais hand-picked (F2–F5): aplica a MESMA folga
+        /// dos obstáculos (NudgeAwayFromGates) a cada grupo, descarta o que tiver config nula ou
+        /// ficar colado num portal mesmo após o nudge, e mantém o Z dentro da janela útil
+        /// [45, trackLength-50]. 100% determinístico (sem RNG) e idempotente.
+        /// </summary>
+        private static EnemySlot[] CurateGroups(float trackLength, GateSlot[] gateSlots, EnemySlot[] groups)
+        {
+            float first = 45f;
+            float last = trackLength - 50f;
+            var result = new List<EnemySlot>(groups.Length);
+            foreach (EnemySlot g in groups)
+            {
+                if (g == null || g.enemy == null) continue;   // catálogo do mundo sem o papel: pula
+                float z = Mathf.Clamp(g.trackPosition, first, last);
+                if (TooCloseToGate(z, gateSlots)) z = NudgeAwayFromGates(z, first, last, gateSlots);
+                if (TooCloseToGate(z, gateSlots)) continue;   // ainda colado: pula, fase segue válida
+                g.trackPosition = z;
+                result.Add(g);
+            }
+            return result.ToArray();
         }
 
         private static float Jitter(System.Random rng, float amplitude)

@@ -29,13 +29,19 @@ namespace MutantArmy.Editor
     ///    de forma aleatório-determinística; WorldConfigSO.trackSegmentPrefabs atualizado.
     ///    W04-W10 só recebem wiring no SO quando o agente de conteúdo cria os WorldConfigSO
     ///    correspondentes (até lá os assets visuais ficam prontos em disco; ver IsMvpWorld).
-    /// 5. Cena Game: luz quente com sombras soft, ambiente gradient, Volume global (Bloom
-    ///    moderado, Vignette leve, ACES, saturação +10) e WorldAtmosphereApplier registrado
-    ///    no GameSceneBootstrap.
+    /// 5. Cena Game: luz QUENTE em ângulo dramático (sol baixo ~38°, sombra longa) + 2ª luz de
+    ///    fill, ambiente gradient, SSAO leve no renderer (tropas/boss assentam no chão) e Volume
+    ///    global FORTE (Bloom ~0.9, ACES, contraste +14/saturação +22, vinheta, White Balance
+    ///    quente + Split Toning + colorFilter — color grading cinematográfico); WorldAtmosphereApplier
+    ///    registrado no GameSceneBootstrap pinta fog/céu/sol/ambiente POR MUNDO no BeginRun.
     /// 6. Portal bonito: moldura emissiva tintada pelo portalColor, painel translúcido com
     ///    glow, rótulo TMP bold com outline e partícula sutil de borda (textura Kenney).
+    /// 7. Pista VIVA: material de chão com textura procedural sutil (faixas longitudinais +
+    ///    linha central + vinheta lateral, tons de cinza × cor do tema) e trilhos laterais
+    ///    emissivos que acendem no Bloom; props das bordas em CAMADAS (near densa + far distante).
     /// Idempotente: re-rodar atualiza no lugar (mesmos paths/GUIDs), nunca duplica.
-    /// Roda DEPOIS do GreyboxFactory (e re-aplica soft shadows que ele desliga).
+    /// Roda DEPOIS do GreyboxFactory (re-aplica soft shadows que ele desliga e adiciona o SSAO
+    /// ao renderer URP-Greybox_Renderer que ele cria).
     /// </summary>
     public static class WorldVisualFactory
     {
@@ -47,6 +53,8 @@ namespace MutantArmy.Editor
         private const string MaterialsFolder = "Assets/_Project/Art/Materials/World";
         private const string SkyMaterialsFolder = "Assets/_Project/Art/Materials/Skybox";
         private const string SkyTexturesFolder = "Assets/_Project/Art/Textures/Sky";
+        private const string TrackTexturesFolder = "Assets/_Project/Art/Textures/Track";
+        private const string RendererDataPath = "Assets/_Project/Settings/URP/URP-Greybox_Renderer.asset";
         private const string VfxTexturesFolder = "Assets/_Project/Art/VFX";
         private const string PropModelsFolder = "Assets/_Project/Art/Models/Props";
         private const string PropPrefabsFolder = "Assets/_Project/Prefabs/Props";
@@ -62,7 +70,7 @@ namespace MutantArmy.Editor
         private const float SegmentLength = 30f;
         private const float GateWidth = 3.6f;
         private const float GateHeight = 3f;
-        private const int AnchorsPerSide = 5;   // 4-6 âncoras de decoração por borda
+        private const int AnchorsPerSide = 7;   // densidade subida (era 5): pista cheia, não esparsa
 
         private const string CityBitsBase =
             "models/KayKit-City-Builder-Bits/addons/kaykit_city_builder_bits/Assets/fbx(unity)/";
@@ -625,20 +633,87 @@ namespace MutantArmy.Editor
         {
             // Uma pista por mundo: cor da tabela + metallic/smoothness/emissão do tema (lava
             // racha em brasa, gelo brilha liso, metal reflete). Itera os 10 temas — nada hard-coded.
+            // Diagnóstico #1 (pista "verde liso, chapada"): a pista RECEBE AGORA uma textura
+            // procedural de FAIXAS longitudinais + linha central + bordas escurecidas (padrão
+            // MUITO sutil, em tons de cinza multiplicados pela cor do tema) — quebra o chão liso
+            // e dá leitura de "trilho" que corre sob o exército, sem mudar a cor de cada mundo.
+            Texture2D pattern = GenerateTrackPatternTexture(TrackTexturesFolder + "/Tex_TrackLanes.png");
             var result = new Dictionary<string, Material>();
             foreach (WorldTheme theme in Themes)
             {
-                result[theme.Key] = LitMaterial("M_Track_" + theme.Key, theme.Track, null,
-                                                 theme.TrackMetallic, theme.TrackSmoothness,
-                                                 theme.TrackEmission);
+                Material mat = LitMaterial("M_Track_" + theme.Key, theme.Track, pattern,
+                                           theme.TrackMetallic, theme.TrackSmoothness,
+                                           theme.TrackEmission);
+                // Tiling: a textura repete a CADA 8 m de pista (1 ciclo de faixas pintadas por
+                // segmento de ~4 m visíveis) e mantém a largura 1:1 — as faixas correm no sentido
+                // do movimento. _BaseMap_ST = (tileX, tileY, offX, offY).
+                if (mat.HasProperty("_BaseMap")) mat.SetTextureScale("_BaseMap", new Vector2(1f, SegmentLength / 8f));
+                EditorUtility.SetDirty(mat);
+                result[theme.Key] = mat;
             }
             return result;
         }
 
+        /// <summary>
+        /// Textura procedural de pista (escala de cinza, multiplicada pela cor do tema): faixas
+        /// longitudinais sutis (asfalto vs faixa), linha central tracejada e bordas escurecidas
+        /// (vinheta lateral) p/ "afundar" as laterais e focar o centro. 64×64 px, ~12 KB. O
+        /// padrão é DISCRETO (contraste baixo: 0.82..1.06) p/ não competir com o exército —
+        /// resolve o "chão chapado" sem virar tabuleiro de xadrez (doc 01 §6: limpo e legível).
+        /// X = largura da pista (8 m); Y = sentido do movimento (repete por tiling).
+        /// </summary>
+        private static Texture2D GenerateTrackPatternTexture(string assetPath)
+        {
+            const int N = 64;
+            EnsureFolder(TrackTexturesFolder);
+            var tex = new Texture2D(N, N, TextureFormat.RGBA32, false);
+            for (int y = 0; y < N; y++)
+            {
+                float v = (y + 0.5f) / N;                 // 0..1 ao longo do movimento
+                // dash central: segmentos pintados ~70% do ciclo, brilho leve
+                bool dashOn = (v % 0.5f) < 0.34f;
+                for (int x = 0; x < N; x++)
+                {
+                    float u = (x + 0.5f) / N;              // 0..1 na largura
+                    float g = 0.94f;                       // base do "asfalto"
+
+                    // 2 faixas longitudinais sutis a ~1/4 e ~3/4 da largura (trilhos claros)
+                    float laneA = Mathf.Abs(u - 0.27f);
+                    float laneB = Mathf.Abs(u - 0.73f);
+                    if (laneA < 0.018f || laneB < 0.018f) g = 1.06f;
+
+                    // linha central tracejada (mais clara quando o dash está "ligado")
+                    float center = Mathf.Abs(u - 0.5f);
+                    if (center < 0.022f) g = dashOn ? 1.06f : 0.90f;
+
+                    // vinheta lateral: escurece as bordas da pista (foca o centro, dá volume)
+                    float edge = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.5f, 0.96f, center));
+                    g *= Mathf.Lerp(1f, 0.82f, edge);
+
+                    tex.SetPixel(x, y, new Color(g, g, g, 1f));
+                }
+            }
+            tex.Apply();
+            File.WriteAllBytes(AbsolutePath(assetPath), tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+
+            AssetDatabase.ImportAsset(assetPath);
+            var importer = (TextureImporter)AssetImporter.GetAtPath(assetPath);
+            importer.wrapMode = TextureWrapMode.Repeat;   // tiling longitudinal
+            importer.mipmapEnabled = true;                // pista some na névoa sem aliasing
+            importer.maxTextureSize = 64;
+            importer.textureCompression = TextureImporterCompression.CompressedHQ;
+            importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+        }
+
         private static Material CreateStripeMaterial()
         {
-            // branco emissivo ≥ threshold do Bloom (0.9): a faixa lateral "acende" de leve
-            return LitMaterial("M_TrackStripe", Color.white, null, 0f, 0.2f, Color.white);
+            // Trilho lateral emissivo: emissão > 1.0 cruza com folga o threshold do Bloom (0.85),
+            // então a faixa "acende" como um trilho de glow que corre ao lado do exército — leitura
+            // de pista de corrida premium (e ainda guia o olho p/ o centro). Smoothness alta dá o
+            // brilho especular do trilho.
+            return LitMaterial("M_TrackStripe", Color.white, null, 0f, 0.5f, Color.white * 1.6f);
         }
 
         private static Material LitMaterial(string name, Color color, Texture2D baseMap = null,
@@ -983,9 +1058,12 @@ namespace MutantArmy.Editor
         }
 
         /// <summary>
-        /// 5 âncoras de decoração POR BORDA (10 no segmento), fora da pista jogável
-        /// (meia-faixa 2,2 m; pista visual ±4 m): props pequenos a 4,9–6,5 m, grandes a
-        /// 7,6–9,5 m (prédio/árvore não invade o chão). 85% das âncoras recebem prop.
+        /// Decoração das bordas em CAMADAS de profundidade (diagnóstico: pista vazia/sem fundo):
+        /// 7 âncoras NEAR por borda preenchem a beirada (props pequenos a 4,9–6,5 m, grandes a
+        /// 7,6–9,5 m; 92% ocupadas, era 85%) e 3 âncoras FAR por borda jogam silhuetas grandes
+        /// distantes (12–17 m, escala maior) que somem na névoa — dão sensação de mundo grande
+        /// sem invadir a pista jogável (meia-faixa 2,2 m; pista visual ±4 m). Consumo de RNG em
+        /// ordem FIXA por âncora (determinístico): primeiro TODA a camada near, depois a far.
         /// </summary>
         private static void DecorateSegment(Transform root, List<GameObject> big,
                                             List<GameObject> small, System.Random rng)
@@ -993,6 +1071,7 @@ namespace MutantArmy.Editor
             var decor = new GameObject("Decor").transform;
             decor.SetParent(root, false);
 
+            // -------- camada NEAR (beirada da pista): densa, mistura grande/pequeno
             for (int side = 0; side < 2; side++)
             {
                 float sign = side == 0 ? -1f : 1f;
@@ -1001,8 +1080,8 @@ namespace MutantArmy.Editor
                     var anchor = new GameObject("DecorAnchor_" + (side == 0 ? "L" : "R") + i).transform;
                     anchor.SetParent(decor, false);
 
-                    // consumo de RNG em ordem FIXA (z → tipo → x → spawn → prop → rot → escala)
-                    float z = 2.5f + i * 5.8f + (float)rng.NextDouble() * 2.4f;
+                    // ordem FIXA: z → tipo → x → spawn → prop → rot → escala
+                    float z = 1.8f + i * 4.0f + (float)rng.NextDouble() * 2.0f;
                     bool useBig = big.Count > 0 && (small.Count == 0 || rng.NextDouble() < 0.5);
                     List<GameObject> pool = useBig ? big : small;
                     float x = useBig
@@ -1010,13 +1089,43 @@ namespace MutantArmy.Editor
                         : 4.9f + (float)rng.NextDouble() * 1.6f;
                     anchor.localPosition = new Vector3(sign * x, 0f, z);
 
-                    bool spawn = rng.NextDouble() < 0.85 && pool.Count > 0;
+                    bool spawn = rng.NextDouble() < 0.92 && pool.Count > 0;
                     int pick = pool.Count > 0 ? rng.Next(pool.Count) : 0;
                     float rotY = (float)rng.NextDouble() * 360f;
                     float scale = 0.85f + (float)rng.NextDouble() * 0.4f;
                     if (!spawn) continue;   // âncora vazia: respiro visual
 
                     var prop = (GameObject)PrefabUtility.InstantiatePrefab(pool[pick]);
+                    prop.transform.SetParent(anchor, false);
+                    prop.transform.localRotation = Quaternion.Euler(0f, rotY, 0f);
+                    prop.transform.localScale = Vector3.one * scale;
+                }
+            }
+
+            // -------- camada FAR (horizonte): só silhuetas GRANDES, longe, que somem na névoa.
+            // Sem big disponível, cai para small (mundo ainda ganha alguma profundidade).
+            List<GameObject> farPool = big.Count > 0 ? big : small;
+            const int FarPerSide = 3;
+            for (int side = 0; side < 2; side++)
+            {
+                float sign = side == 0 ? -1f : 1f;
+                for (int i = 0; i < FarPerSide; i++)
+                {
+                    var anchor = new GameObject("DecorFar_" + (side == 0 ? "L" : "R") + i).transform;
+                    anchor.SetParent(decor, false);
+
+                    // ordem FIXA: z → x → spawn → prop → rot → escala
+                    float z = 4f + i * 9f + (float)rng.NextDouble() * 4f;
+                    float x = 12f + (float)rng.NextDouble() * 5f;
+                    anchor.localPosition = new Vector3(sign * x, 0f, z);
+
+                    bool spawn = rng.NextDouble() < 0.8 && farPool.Count > 0;
+                    int pick = farPool.Count > 0 ? rng.Next(farPool.Count) : 0;
+                    float rotY = (float)rng.NextDouble() * 360f;
+                    float scale = 1.1f + (float)rng.NextDouble() * 0.5f;   // maiores: leem como longe
+                    if (!spawn) continue;
+
+                    var prop = (GameObject)PrefabUtility.InstantiatePrefab(farPool[pick]);
                     prop.transform.SetParent(anchor, false);
                     prop.transform.localRotation = Quaternion.Euler(0f, rotY, 0f);
                     prop.transform.localScale = Vector3.one * scale;
@@ -1278,6 +1387,7 @@ namespace MutantArmy.Editor
         private static void EnhanceGameScene()
         {
             EnablePipelineSoftShadows();
+            EnsureSsaoFeature();
             VolumeProfile profile = CreatePostFxProfile();
 
             string w01Path = SoRoot + "/Worlds/" + Themes[0].AssetName + ".asset";
@@ -1285,16 +1395,21 @@ namespace MutantArmy.Editor
 
             Scene scene = EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);
 
-            // luz direcional QUENTE com sombras soft (1 realtime, doc 12 §2.4) — intensidade
-            // 1.2 e inclinação ~50° p/ realçar as tropas e dar silhueta clara contra a pista.
+            // luz direcional QUENTE com sombras soft (1 realtime, doc 12 §2.4): ângulo mais
+            // DRAMÁTICO — 38° de elevação (era 50°, sol mais baixo = hora dourada) e azimute
+            // ~40° p/ as tropas/boss projetarem sombra LONGA e oblíqua na pista (assentam no
+            // chão, ganham volume). Intensidade 1.3 e sombra 0.85 (era 0.8): contato legível
+            // sem escurecer o W01. A 2ª luz de fill abaixo segura a frente clara.
             Light sun = FindDirectionalLight();
             if (sun != null)
             {
                 sun.color = new Color(1.00f, 0.95f, 0.84f);
-                sun.intensity = 1.2f;
+                sun.intensity = 1.3f;
                 sun.shadows = LightShadows.Soft;
-                sun.shadowStrength = 0.8f;
-                sun.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
+                sun.shadowStrength = 0.85f;
+                sun.shadowBias = 0.05f;
+                sun.shadowNormalBias = 0.4f;
+                sun.transform.rotation = Quaternion.Euler(38f, -40f, 0f);
                 RenderSettings.sun = sun;
             }
             else
@@ -1351,6 +1466,113 @@ namespace MutantArmy.Editor
             EditorUtility.SetDirty(pipeline);
         }
 
+        /// <summary>
+        /// SSAO LEVE no Universal Renderer (diagnóstico: tropas/boss "flutuam", não assentam):
+        /// oclusão de ambiente afunda os pés/vincos no chão e dá contato sob a multidão — o maior
+        /// ganho de "peso" depois das sombras. Config MOBILE BARATA: downsample (meia resolução),
+        /// fonte DepthNormals (não exige camera depth texture, que está OFF no doc 12 §2.4),
+        /// poucas amostras e blur médio, intensidade contida (não vira sujeira preta no W01 claro).
+        /// O feature recarrega shader/ruído sozinho dos RenderPipeline settings em runtime
+        /// (TryPrepareResources), então NÃO preciso ligar GUIDs de shader à mão. Idempotente:
+        /// só adiciona se ainda não houver um SSAO no renderer; reconfigura os parâmetros sempre.
+        /// </summary>
+        private static void EnsureSsaoFeature()
+        {
+            var rendererData = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(RendererDataPath);
+            if (rendererData == null)
+            {
+                Debug.LogWarning("MAR Tools: Universal Renderer do greybox ausente — SSAO não aplicado " +
+                                 "(rode o GreyboxFactory).");
+                return;
+            }
+
+            ScreenSpaceAmbientOcclusion ssao = null;
+            if (rendererData.rendererFeatures != null)
+            {
+                foreach (ScriptableRendererFeature feature in rendererData.rendererFeatures)
+                    if (feature is ScreenSpaceAmbientOcclusion existing) { ssao = existing; break; }
+            }
+
+            if (ssao == null)
+            {
+                ssao = ScriptableObject.CreateInstance<ScreenSpaceAmbientOcclusion>();
+                ssao.name = "ScreenSpaceAmbientOcclusion";
+                // subasset do renderer (mesmo padrão dos VolumeComponent no perfil) + registra
+                // no array serializado m_RendererFeatures e no mapa de GUIDs m_RendererFeatureMap.
+                AssetDatabase.AddObjectToAsset(ssao, rendererData);
+                RegisterRendererFeature(rendererData, ssao);
+            }
+
+            // Parâmetros via SerializedObject: o struct de settings é internal (sem acesso de tipo),
+            // mas os campos são serializados sob "m_Settings" — caminho de editor robusto.
+            var so = new SerializedObject(ssao);
+            SetFloatField(so, "m_Settings.Intensity", 0.7f);            // contido: contato, não fuligem
+            SetEnumField(so, "m_Settings.Source", 1);                   // DepthNormals (sem depth texture)
+            SetBoolField(so, "m_Settings.Downsample", true);            // meia resolução = barato
+            SetEnumField(so, "m_Settings.Samples", 2);                  // Low (4 amostras)
+            SetEnumField(so, "m_Settings.BlurQuality", 1);              // Medium (gaussiano)
+            SetEnumField(so, "m_Settings.NormalSamples", 1);            // Medium
+            SetFloatField(so, "m_Settings.Radius", 0.18f);              // raio de contato p/ pés/vincos
+            SetFloatField(so, "m_Settings.DirectLightingStrength", 0.2f);
+            SetBoolField(so, "m_Settings.AfterOpaque", true);           // mobile: aplica após opaco (tile-friendly)
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            EditorUtility.SetDirty(ssao);
+            EditorUtility.SetDirty(rendererData);
+        }
+
+        /// <summary>
+        /// Acrescenta o feature na lista do renderer + no mapa de IDs (idempotente p/ instância
+        /// nova). m_RendererFeatures é List&lt;ScriptableRendererFeature&gt; e m_RendererFeatureMap
+        /// é List&lt;long&gt; PARALELA (1 long por feature = localFileIdentifier do subasset). Os
+        /// internos ValidateRendererFeatures/UpdateMap do URP fariam isto, mas são internal — então
+        /// replico a mesma regra (1 entrada por feature, na MESMA ordem) por SerializedObject.
+        /// </summary>
+        private static void RegisterRendererFeature(UniversalRendererData rendererData,
+                                                     ScriptableRendererFeature feature)
+        {
+            // O localFileIdentifier só existe depois do subasset estar no disco — importa antes.
+            AssetDatabase.SaveAssetIfDirty(rendererData);
+            AssetDatabase.ImportAsset(RendererDataPath);
+
+            var so = new SerializedObject(rendererData);
+            SerializedProperty features = so.FindProperty("m_RendererFeatures");
+            SerializedProperty map = so.FindProperty("m_RendererFeatureMap");
+            if (features == null || !features.isArray)
+            {
+                Debug.LogWarning("MAR Tools: campo m_RendererFeatures não encontrado no renderer — SSAO não registrado.");
+                return;
+            }
+            features.arraySize++;
+            features.GetArrayElementAtIndex(features.arraySize - 1).objectReferenceValue = feature;
+
+            if (map != null && map.isArray &&
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(feature, out string guid, out long localId))
+            {
+                map.arraySize = features.arraySize;
+                map.GetArrayElementAtIndex(map.arraySize - 1).longValue = localId;
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetFloatField(SerializedObject so, string path, float value)
+        {
+            SerializedProperty p = so.FindProperty(path);
+            if (p != null) p.floatValue = value;
+        }
+
+        private static void SetBoolField(SerializedObject so, string path, bool value)
+        {
+            SerializedProperty p = so.FindProperty(path);
+            if (p != null) p.boolValue = value;
+        }
+
+        private static void SetEnumField(SerializedObject so, string path, int value)
+        {
+            SerializedProperty p = so.FindProperty(path);
+            if (p != null) p.enumValueIndex = value;
+        }
+
         private static VolumeProfile CreatePostFxProfile()
         {
             string folder = PostFxProfilePath.Substring(0, PostFxProfilePath.LastIndexOf('/'));
@@ -1362,31 +1584,63 @@ namespace MutantArmy.Editor
                 AssetDatabase.CreateAsset(profile, PostFxProfilePath);
             }
 
-            // Bloom moderado: HDR está OFF (doc 12 §2.4), então o threshold fica ABAIXO de
-            // 1.0 — só os emissivos clampados em ~1 (faixas, moldura de portal) acendem.
+            // Diagnóstico #1 (URP ocioso, "ZERO pós-processamento"): a receita abaixo é o
+            // SALTO de qualidade percebida — Bloom forte, ACES, contraste/saturação cheios,
+            // vinheta, e color grading quente (White Balance + Split Toning + colorFilter)
+            // que dá cara cinematográfica a TODOS os mundos. A IDENTIDADE de COR de cada mundo
+            // (verde W1, roxo W8, âmbar W3…) chega por outra via: o WorldAtmosphereApplier
+            // tinge fog/céu/ambiente/sol POR MUNDO no BeginRun (RenderSettings), então a cena
+            // já entra no grading com o tom certo — este perfil só amplifica e "filma" o frame.
+            // Bloom: HDR está OFF (doc 12 §2.4), threshold ABAIXO de 1.0 p/ os emissivos
+            // clampados em ~1 (faixas/trilhos, moldura de portal, lava, cristais) ACENDEREM.
             Bloom bloom = GetOrAddOverride<Bloom>(profile);
             bloom.threshold.overrideState = true;
-            bloom.threshold.value = 0.9f;
+            bloom.threshold.value = 0.85f;
             bloom.intensity.overrideState = true;
-            bloom.intensity.value = 0.55f;
+            bloom.intensity.value = 0.9f;             // 0.55 → 0.9: glow nítido nos emissivos
             bloom.scatter.overrideState = true;
-            bloom.scatter.value = 0.6f;
+            bloom.scatter.value = 0.65f;
+            bloom.tint.overrideState = true;
+            bloom.tint.value = new Color(1f, 0.96f, 0.9f);   // glow levemente quente (premium)
 
             Vignette vignette = GetOrAddOverride<Vignette>(profile);
             vignette.intensity.overrideState = true;
-            vignette.intensity.value = 0.22f;
+            vignette.intensity.value = 0.27f;         // foca o centro (exército/boss) sem escurecer demais
             vignette.smoothness.overrideState = true;
-            vignette.smoothness.value = 0.45f;
+            vignette.smoothness.value = 0.5f;
 
             Tonemapping tonemapping = GetOrAddOverride<Tonemapping>(profile);
             tonemapping.mode.overrideState = true;
             tonemapping.mode.value = TonemappingMode.ACES;
 
             ColorAdjustments colors = GetOrAddOverride<ColorAdjustments>(profile);
-            colors.saturation.overrideState = true;
-            colors.saturation.value = 10f;            // +10 de saturação (vibrante, doc 01 §6)
             colors.postExposure.overrideState = true;
-            colors.postExposure.value = 0.15f;        // compensa o roll-off do ACES em LDR
+            colors.postExposure.value = 0.22f;        // compensa o roll-off do ACES em LDR (cena viva)
+            colors.contrast.overrideState = true;
+            colors.contrast.value = 14f;              // contraste cheio: silhuetas pop, pretos fundos
+            colors.saturation.overrideState = true;
+            colors.saturation.value = 22f;            // +22 (era +10): cor casual vibrante (doc 01 §6)
+            colors.colorFilter.overrideState = true;
+            colors.colorFilter.value = new Color(1f, 0.99f, 0.96f);   // filtro quente sutil (luz de sol)
+
+            // White Balance: aquece levemente o frame inteiro (temperatura +) — tira o look
+            // "neutro de protótipo" e dá hora-dourada de casual premium. Tint 0 (sem verde/magenta).
+            WhiteBalance wb = GetOrAddOverride<WhiteBalance>(profile);
+            wb.temperature.overrideState = true;
+            wb.temperature.value = 8f;
+            wb.tint.overrideState = true;
+            wb.tint.value = 0f;
+
+            // Split Toning: sombras frias-azuladas + altas-luzes quentes-douradas = profundidade
+            // de cor cinematográfica barata (mesma técnica de mobile premium). Balance levemente
+            // p/ as altas-luzes (o céu/sol domina o frame).
+            SplitToning split = GetOrAddOverride<SplitToning>(profile);
+            split.shadows.overrideState = true;
+            split.shadows.value = new Color(0.30f, 0.42f, 0.62f);     // sombra azul fria
+            split.highlights.overrideState = true;
+            split.highlights.value = new Color(0.98f, 0.82f, 0.55f);  // luz quente dourada
+            split.balance.overrideState = true;
+            split.balance.value = 12f;
 
             EditorUtility.SetDirty(profile);
             return profile;

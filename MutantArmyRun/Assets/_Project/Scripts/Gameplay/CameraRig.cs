@@ -24,6 +24,21 @@ namespace MutantArmy.Gameplay
     /// por cima do enquadramento corrente — não é um 3º estado do blend binário: o peso sobe
     /// e desce com exponencial em tempo unscaled e a câmera SEMPRE volta ao enquadramento
     /// vigente (corrida ou boss), mesmo com troca de estado no meio.
+    ///
+    /// CÂMERA VIVA (polimento de feel): três camadas ADITIVAS só na corrida, à prova dos
+    /// estados acima (todas multiplicadas por (1−_bossBlend) e (1−_punchWeight) — boss framing
+    /// e PunchFocus continuam mandando, nunca brigam):
+    /// 1. RESPIRO: à medida que o exército CRESCE, a câmera recua/sobe um pouco MAIS (além do
+    ///    √n base), suavizado — sensação de "ficou gigante". É um deslocamento de POSIÇÃO
+    ///    (dolly), não FOV, de propósito: o JuiceController dá socos de FOV na Camera.main e
+    ///    dois donos escrevendo fieldOfView por frame brigariam — aqui não tocamos FOV.
+    /// 2. MICRO-SWAY idle: ruído de baixa amplitude (Perlin) na POSIÇÃO para a cena nunca
+    ///    parecer congelada; amplitude minúscula, desligável, e some sob boss/punch. É de
+    ///    POSIÇÃO de propósito: o screen shake (Tween.ShakeCamera) é o dono da ROTAÇÃO da
+    ///    Camera.main e o CameraRig só escreve rotação no clímax (boss/punch) — um sway de
+    ///    rotação na corrida clobberaria o shake todo frame (LateUpdate é o último a escrever).
+    /// 3. LEAD: a câmera antecipa LEVEMENTE a direção em que o centróide está se movendo
+    ///    (drag lateral + avanço), suavizado — dá leitura de movimento sem enjoar.
     /// </summary>
     public class CameraRig : MonoBehaviour
     {
@@ -48,7 +63,30 @@ namespace MutantArmy.Gameplay
         [SerializeField] private float _punchCloseFactor = 0.45f;   // 1 = parado · 0 = colado no ponto
         [SerializeField] private float _punchMinHeight = 2.5f;      // nunca mergulha abaixo do ponto
 
+        // ---- Câmera viva (polimento de feel) — tudo ADITIVO só na corrida, dominado por boss/punch ----
+        [Header("Respiro com o tamanho do exército")]
+        [SerializeField] private bool _breatheWithArmy = true;
+        [SerializeField] private int _breatheStartCount = 20;        // abaixo disso, sem recuo extra (exército ainda pequeno)
+        [SerializeField] private int _breatheFullCount = 220;        // "gigante" (≈ teto de pista) — recuo máximo
+        [SerializeField] private float _breatheMaxBack = 4f;         // recuo extra (−Z) no exército máximo
+        [SerializeField] private float _breatheMaxUp = 2.5f;         // elevação extra (+Y) no exército máximo
+        [SerializeField] private float _breatheDamping = 1.5f;       // sobe/desce LENTO: "respiro", não solavanco
+
+        [Header("Micro-sway idle (cena nunca congelada)")]
+        [SerializeField] private bool _idleSway = true;
+        [SerializeField] private float _swayAmplitude = 0.06f;       // METROS: bob minúsculo, legível em 3s e nunca enjoa (CANON)
+        [SerializeField] private float _swaySpeed = 0.35f;           // ciclos lentos de Perlin
+
+        [Header("Lead na direção do movimento")]
+        [SerializeField] private bool _leadMovement = true;
+        [SerializeField] private float _leadSeconds = 0.18f;         // antecipa ~0,18 s do movimento do centróide
+        [SerializeField] private float _leadMaxMeters = 1.6f;        // clamp do lead (nunca descola a câmera)
+        [SerializeField] private float _leadDamping = 6f;            // suaviza a velocidade lida (sem tremer no drag)
+
         private Vector3 _lastCentroid;   // cache anti-NaN do frame anterior
+        private float _breatheT;         // 0..1 suavizado do tamanho do exército
+        private Vector3 _smoothedVelocity;   // velocidade do centróide suavizada (lead)
+        private float _swaySeed;         // offset de fase do Perlin por instância (sway determinístico mas único)
         private Quaternion _runRotation; // orientação de corrida autorada na cena (volta no fim do boss)
 
         // dados empurrados pelo BossManager — a CameraRig só INTERPOLA (não conhece o boss)
@@ -68,6 +106,8 @@ namespace MutantArmy.Gameplay
         {
             Instance = this;
             _runRotation = transform.rotation;   // pitch de corrida autorado no prefab/cena
+            // fase do sway única por instância sem RNG global: usa o id da cena/objeto
+            _swaySeed = (GetInstanceID() & 0xFF) * 0.137f;
         }
 
         private void OnDestroy()
@@ -122,6 +162,17 @@ namespace MutantArmy.Gameplay
             if (crowd == null) return;
 
             Vector3 centroid = crowd.Count > 0 ? crowd.Centroid : _lastCentroid;
+
+            // LEAD: estima a velocidade do centróide a partir do delta de frame (drag lateral +
+            // avanço) e a suaviza — sem isso o drag tremeria a câmera. dt 0 (pausa) é ignorado.
+            float dt = Time.deltaTime;
+            if (dt > 0f)
+            {
+                Vector3 rawVel = (centroid - _lastCentroid) / dt;
+                rawVel.y = 0f;   // só XZ: o lead não levanta/abaixa a câmera
+                float velLerp = 1f - Mathf.Exp(-_leadDamping * dt);
+                _smoothedVelocity = Vector3.Lerp(_smoothedVelocity, rawVel, velLerp);
+            }
             _lastCentroid = centroid;
 
             // blend do clímax sobe/desce com damping exponencial (framerate-independente, como
@@ -132,8 +183,21 @@ namespace MutantArmy.Gameplay
             float blendT = 1f - Mathf.Exp(-blendK * Time.deltaTime);
             _bossBlend = Mathf.Clamp01(Mathf.Lerp(_bossBlend, target, blendT));
 
-            // posição-alvo: mistura entre o enquadramento de corrida e o de boss
-            Vector3 runTarget = centroid + DynamicOffset();
+            // RESPIRO: alvo 0..1 pelo tamanho do exército, suavizado LENTO (constante de tempo
+            // própria — o recuo "respira", não acompanha cada spawn/morte). Roda sempre para o
+            // estado não pular ao voltar do boss; o efeito só É aplicado na corrida (abaixo).
+            int n = crowd.Count;
+            float breatheTarget = _breatheWithArmy
+                ? Mathf.Clamp01(Mathf.InverseLerp(_breatheStartCount, _breatheFullCount, n))
+                : 0f;
+            if (dt > 0f)
+                _breatheT = Mathf.Lerp(_breatheT, breatheTarget, 1f - Mathf.Exp(-_breatheDamping * dt));
+
+            // posição-alvo: mistura entre o enquadramento de corrida e o de boss.
+            // As camadas vivas (respiro + lead) entram SÓ no alvo de corrida — o Lerp para o
+            // enquadramento de boss (e o PunchFocus por cima) as dilui sozinho conforme o peso
+            // sobe, então boss framing/PunchFocus continuam mandando sem código extra.
+            Vector3 runTarget = centroid + DynamicOffset() + LiveRunOffset();
             Vector3 desired = runTarget;
             if (_bossBlend > 0f && _hasBossFocus)
             {
@@ -190,6 +254,40 @@ namespace MutantArmy.Gameplay
                 }
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, t);
             }
+        }
+
+        // Offset de POSIÇÃO das camadas vivas (respiro + lead + micro-sway), só relevante no
+        // alvo de corrida. O respiro recua/sobe com o tamanho do exército; o lead antecipa a
+        // direção XZ do movimento do centróide; o sway é um bob minúsculo de Perlin para a
+        // cena nunca parecer congelada. Tudo clampado — nunca descola a câmera da formação,
+        // e em POSIÇÃO (não rotação) para nunca brigar com o screen shake (dono da rotação).
+        private Vector3 LiveRunOffset()
+        {
+            Vector3 offset = Vector3.zero;
+
+            if (_breatheWithArmy && _breatheT > 0.001f)
+                offset += new Vector3(0f, _breatheMaxUp * _breatheT, -_breatheMaxBack * _breatheT);
+
+            if (_leadMovement)
+            {
+                Vector3 lead = _smoothedVelocity * _leadSeconds;
+                if (lead.sqrMagnitude > _leadMaxMeters * _leadMaxMeters)
+                    lead = lead.normalized * _leadMaxMeters;
+                offset += lead;
+            }
+
+            if (_idleSway && _swayAmplitude > 0f)
+            {
+                // dois canais de Perlin centrados em 0 (Perlin−0.5), tempo UNSCALED para a
+                // cena respirar mesmo no slow-mo. Amplitude em METROS, minúscula (CANON:
+                // legível, sem enjoar). Some sozinho sob boss/punch porque o runTarget é
+                // diluído pelo Lerp para o enquadramento de boss/close.
+                float tt = Time.unscaledTime * _swaySpeed + _swaySeed;
+                float swayX = (Mathf.PerlinNoise(tt, 0.13f) - 0.5f) * 2f;
+                float swayY = (Mathf.PerlinNoise(0.71f, tt) - 0.5f) * 2f;
+                offset += new Vector3(swayX * _swayAmplitude, swayY * _swayAmplitude * 0.6f, 0f);
+            }
+            return offset;
         }
 
         private Vector3 DynamicOffset()

@@ -47,11 +47,13 @@ namespace MutantArmy.Editor
         private const string SoRoot = "Assets/_Project/ScriptableObjects";
         private const string ModelsRoot = "Assets/_Project/Art/Models";
         private const string BossesModelFolder = "Assets/_Project/Art/Models/Bosses";
+        private const string EnemiesModelFolder = "Assets/_Project/Art/Models/Enemies";
         private const string AnimFolder = "Assets/_Project/Art/Animations";
         private const string ViewMaterialsFolder = "Assets/_Project/Art/Materials/Views";
         private const string MutationMaterialsFolder = "Assets/_Project/Art/Materials/Mutations";
         private const string UnitsPrefabFolder = "Assets/_Project/Prefabs/Units";
         private const string BossesPrefabFolder = "Assets/_Project/Prefabs/Bosses";
+        private const string EnemiesPrefabFolder = "Assets/_Project/Prefabs/Enemies";
         private const string MutationsPrefabFolder = "Assets/_Project/Prefabs/Mutations";
 
         private sealed class ClipSet
@@ -222,6 +224,7 @@ namespace MutantArmy.Editor
             EnsureFolder(MutationMaterialsFolder);
             EnsureFolder(UnitsPrefabFolder);
             EnsureFolder(BossesPrefabFolder);
+            EnsureFolder(EnemiesPrefabFolder);
             EnsureFolder(MutationsPrefabFolder);
 
             int troops = 0;
@@ -238,6 +241,14 @@ namespace MutantArmy.Editor
             EnsureBossModelsImported();
             int bosses = BuildAllBosses();
 
+            // ---- Inimigos DE PISTA (missão Nota 10): os 40 EnemyConfigSO nascem com prefab=null e
+            // hoje caem no primitivo tintado do TrackEnemyManager. Aqui cada enemyId estável
+            // (m{w}_{papel}) recebe um modelo CC0 temático por mundo+papel, recolorido e escalado,
+            // gravado em Prefabs/Enemies e ligado ao SO via load-or-keep — vira inimigo de verdade,
+            // não bolha. Copia sob demanda do staging os FBX de monstro que o projeto ainda não tem.
+            EnsureEnemyModelsImported();
+            int enemies = BuildAllEnemies();
+
             // ---- Mutações visíveis (CANON §3.3): materiais de tint + acessórios hero.
             int mutations = BuildMutationVisuals();
 
@@ -245,7 +256,8 @@ namespace MutantArmy.Editor
             AssetDatabase.Refresh();
             Debug.Log($"MAR Tools: visuais construídos — {troops}/{Roster.Length} tropas, {bosses} bosses " +
                       $"(de {BossModelTable.Length} mundos mapeados; os ausentes serão preenchidos ao re-rodar após " +
-                      $"Create MVP Content), {mutations}/{MutationVisuals.Length} mutações (faltantes mantêm fallback " +
+                      $"Create MVP Content), {enemies}/{EnemyModelTable.Length} inimigos de pista, " +
+                      $"{mutations}/{MutationVisuals.Length} mutações (faltantes mantêm fallback " +
                       "instanced/greybox; ver avisos acima).");
         }
 
@@ -527,6 +539,343 @@ namespace MutantArmy.Editor
             return true;
         }
 
+        // ============================================================ INIMIGOS DE PISTA (missão Nota 10)
+        // Os 40 EnemyConfigSO (Enemies/Enemy_M{01..10}_{Horde|Tank|Ranged|Healer}) nascem na
+        // MvpContentFactory com prefab=null e, sem este factory, caem no primitivo tintado do
+        // TrackEnemyManager (esferas/cubos). Aqui cada enemyId estável (m{w}_{papel}) recebe um
+        // monstro CC0 (Quaternius Ultimate Monsters / KayKit Skeletons) que LÊ como inimigo:
+        // tema do MUNDO (M1 floresta, M2 zumbi, M3 robótico, M4 pântano-tóxico, M5 lava, M6 gelo,
+        // M7 medieval, M8 alien, M9 mecânico, M10 dimensional) + silhueta do PAPEL (horda pequena,
+        // tanque grande, atirador médio, curador flutuante claro). O TrackEnemyManager monta o
+        // grupo agregado (1 root animado por bob/giro, ≤3 views pooled) e ESCALA o root por
+        // KindScale(kind)×fração-de-vida — então a escala FINA por inimigo é baked num CHILD do
+        // prefab (o root é clobberado em runtime). Sem collider, sem script de gameplay; Animator
+        // só p/ um idle vivo (bônus — o manager não depende dele).
+
+        /// <summary>
+        /// Linha enemyId → arte. Chaveada pelo enemyId ESTÁVEL (m{w}_{papel}), igual ao casamento
+        /// por bossId do boss. ModelName casa por nome EXATO de arquivo (FindModel), reusando os
+        /// monstros já no projeto (Art/Models/Bosses + Characters/Skeletons) e copiando o resto do
+        /// staging sob demanda. Tint recolore o atlas Quaternius pelo tema do mundo; Scale é a
+        /// escala do CHILD do modelo (multiplicada em runtime pelo KindScale do manager) — calibrada
+        /// p/ horda pequena (~0.55-0.7), tanque grande (~1.2-1.6), atirador médio (~0.8), curador
+        /// claro (~0.8-0.9), conforme o brief.
+        /// </summary>
+        private sealed class EnemyModelSpec
+        {
+            public string EnemyId;       // estável (m{w}_{papel}) — chave do casamento com o EnemyConfigSO
+            public string ModelName;     // FBX base (nome exato do arquivo)
+            public string PreferFolder;  // desempate de pasta no FindModel (Big/Blob/Flying/Skeletons/Bosses)
+            public float Scale;          // escala do CHILD do modelo (o root é re-escalado pelo manager)
+            public Color Tint;           // recolor temático do mundo
+            public float Metallic;
+            public float Smoothness;
+        }
+
+        // Paleta temática reaproveitada nas linhas (claras p/ ler sob o bloom, igual aos bosses).
+        private static readonly Color TintForest   = new Color(0.55f, 0.82f, 0.40f);   // M1 verde-floresta
+        private static readonly Color TintZombie   = new Color(0.62f, 0.74f, 0.55f);   // M2 verde-pútrido acinzentado
+        private static readonly Color TintRobotic  = new Color(0.70f, 0.78f, 0.88f);   // M3 metálico azulado
+        private static readonly Color TintToxic    = new Color(0.58f, 0.85f, 0.30f);   // M4 verde-tóxico
+        private static readonly Color TintLava      = new Color(1.00f, 0.50f, 0.20f);   // M5 laranja-lava
+        private static readonly Color TintIce       = new Color(0.70f, 0.90f, 1.00f);   // M6 azul-gelo
+        private static readonly Color TintMedieval  = new Color(0.85f, 0.74f, 0.46f);   // M7 bronze-pedra
+        private static readonly Color TintAlien     = new Color(0.70f, 0.55f, 1.00f);   // M8 roxo-alien neon
+        private static readonly Color TintMech      = new Color(0.55f, 0.80f, 0.92f);   // M9 ciano-industrial
+        private static readonly Color TintDimension = new Color(0.95f, 0.45f, 0.95f);   // M10 magenta-caos
+
+        // Casa por enemyId (ordem livre). Modelo escolhido por bom senso temático: precisa LER como
+        // inimigo do mundo+papel, não como bolha genérica. Reuso de modelo entre mundos é OK (o tint
+        // dá a leitura temática). Skeletons usam textura própria (no projeto) — tint multiplicativo.
+        private static readonly EnemyModelSpec[] EnemyModelTable =
+        {
+            // -------- M1 Floresta (None, Organic) --------
+            new EnemyModelSpec { EnemyId = "m1_horde",  ModelName = "GreenBlob",       PreferFolder = "Enemies",   Scale = 0.65f, Tint = TintForest, Metallic = 0f,    Smoothness = 0.25f },
+            new EnemyModelSpec { EnemyId = "m1_tank",   ModelName = "Dino",            PreferFolder = "Enemies",   Scale = 1.4f,  Tint = TintForest, Metallic = 0f,    Smoothness = 0.25f },
+            new EnemyModelSpec { EnemyId = "m1_ranged", ModelName = "Pigeon",          PreferFolder = "Enemies",   Scale = 0.8f,  Tint = TintForest, Metallic = 0f,    Smoothness = 0.30f },
+            new EnemyModelSpec { EnemyId = "m1_healer", ModelName = "Goleling",        PreferFolder = "Enemies",   Scale = 0.9f,  Tint = new Color(0.78f, 0.92f, 0.70f), Metallic = 0f, Smoothness = 0.30f },
+
+            // -------- M2 Cidade Zumbi (Undead) --------
+            new EnemyModelSpec { EnemyId = "m2_horde",  ModelName = "Skeleton_Minion", PreferFolder = "Skeletons", Scale = 0.62f, Tint = TintZombie, Metallic = 0f,    Smoothness = 0.20f },
+            new EnemyModelSpec { EnemyId = "m2_tank",   ModelName = "Skeleton_Warrior",PreferFolder = "Skeletons", Scale = 1.25f, Tint = new Color(0.55f, 0.62f, 0.68f), Metallic = 0.10f, Smoothness = 0.25f },
+            new EnemyModelSpec { EnemyId = "m2_ranged", ModelName = "Dog",             PreferFolder = "Enemies",   Scale = 0.75f, Tint = TintZombie, Metallic = 0f,    Smoothness = 0.20f },
+            new EnemyModelSpec { EnemyId = "m2_healer", ModelName = "Ghost",           PreferFolder = "Enemies",   Scale = 0.9f,  Tint = new Color(0.80f, 0.92f, 0.80f), Metallic = 0f, Smoothness = 0.35f },
+
+            // -------- M3 Robótico (Machine, Lightning) --------
+            new EnemyModelSpec { EnemyId = "m3_horde",  ModelName = "Goleling",        PreferFolder = "Enemies",   Scale = 0.6f,  Tint = TintRobotic, Metallic = 0.55f, Smoothness = 0.45f },
+            new EnemyModelSpec { EnemyId = "m3_tank",   ModelName = "Goleling_Evolved",PreferFolder = "Bosses",    Scale = 1.35f, Tint = TintRobotic, Metallic = 0.65f, Smoothness = 0.45f },
+            new EnemyModelSpec { EnemyId = "m3_ranged", ModelName = "Armabee",         PreferFolder = "Enemies",   Scale = 0.8f,  Tint = TintRobotic, Metallic = 0.50f, Smoothness = 0.50f },
+            new EnemyModelSpec { EnemyId = "m3_healer", ModelName = "Armabee_Evolved", PreferFolder = "Enemies",   Scale = 0.8f,  Tint = new Color(0.80f, 0.90f, 1.00f), Metallic = 0.40f, Smoothness = 0.55f },
+
+            // -------- M4 Pântano Tóxico (Poison, Organic) --------
+            new EnemyModelSpec { EnemyId = "m4_horde",  ModelName = "Mushnub",         PreferFolder = "Enemies",   Scale = 0.65f, Tint = TintToxic, Metallic = 0f,    Smoothness = 0.25f },
+            new EnemyModelSpec { EnemyId = "m4_tank",   ModelName = "Mushnub_Evolved", PreferFolder = "Enemies",   Scale = 1.3f,  Tint = TintToxic, Metallic = 0f,    Smoothness = 0.25f },
+            new EnemyModelSpec { EnemyId = "m4_ranged", ModelName = "Cactoro",         PreferFolder = "Enemies",   Scale = 0.8f,  Tint = TintToxic, Metallic = 0f,    Smoothness = 0.25f },
+            new EnemyModelSpec { EnemyId = "m4_healer", ModelName = "GreenSpikyBlob",  PreferFolder = "Enemies",   Scale = 0.9f,  Tint = new Color(0.72f, 0.95f, 0.55f), Metallic = 0f, Smoothness = 0.30f },
+
+            // -------- M5 Lava (Fire, Organic) --------
+            new EnemyModelSpec { EnemyId = "m5_horde",  ModelName = "PinkBlob",        PreferFolder = "Enemies",   Scale = 0.65f, Tint = TintLava, Metallic = 0f,    Smoothness = 0.35f },
+            new EnemyModelSpec { EnemyId = "m5_tank",   ModelName = "Orc",             PreferFolder = "Bosses",    Scale = 1.35f, Tint = TintLava, Metallic = 0.05f, Smoothness = 0.30f },
+            new EnemyModelSpec { EnemyId = "m5_ranged", ModelName = "Cactoro",         PreferFolder = "Enemies",   Scale = 0.8f,  Tint = new Color(1.00f, 0.60f, 0.25f), Metallic = 0f, Smoothness = 0.35f },
+            new EnemyModelSpec { EnemyId = "m5_healer", ModelName = "Goleling",        PreferFolder = "Enemies",   Scale = 0.9f,  Tint = new Color(1.00f, 0.65f, 0.35f), Metallic = 0.05f, Smoothness = 0.35f },
+
+            // -------- M6 Gelo (Ice, Organic) --------
+            new EnemyModelSpec { EnemyId = "m6_horde",  ModelName = "Dog",             PreferFolder = "Enemies",   Scale = 0.7f,  Tint = TintIce, Metallic = 0f,    Smoothness = 0.40f },
+            new EnemyModelSpec { EnemyId = "m6_tank",   ModelName = "Yeti",            PreferFolder = "Bosses",    Scale = 1.35f, Tint = TintIce, Metallic = 0.05f, Smoothness = 0.45f },
+            new EnemyModelSpec { EnemyId = "m6_ranged", ModelName = "Glub",            PreferFolder = "Enemies",   Scale = 0.8f,  Tint = new Color(0.55f, 0.88f, 1.00f), Metallic = 0.10f, Smoothness = 0.55f },
+            new EnemyModelSpec { EnemyId = "m6_healer", ModelName = "Ghost",           PreferFolder = "Enemies",   Scale = 0.9f,  Tint = new Color(0.85f, 0.95f, 1.00f), Metallic = 0f, Smoothness = 0.45f },
+
+            // -------- M7 Medieval (Metal, Machine) --------
+            new EnemyModelSpec { EnemyId = "m7_horde",  ModelName = "Skeleton_Warrior",PreferFolder = "Skeletons", Scale = 0.65f, Tint = TintMedieval, Metallic = 0.25f, Smoothness = 0.35f },
+            new EnemyModelSpec { EnemyId = "m7_tank",   ModelName = "Orc",             PreferFolder = "Bosses",    Scale = 1.35f, Tint = new Color(0.78f, 0.70f, 0.50f), Metallic = 0.30f, Smoothness = 0.35f },
+            new EnemyModelSpec { EnemyId = "m7_ranged", ModelName = "Skeleton_Rogue",  PreferFolder = "Skeletons", Scale = 0.8f,  Tint = TintMedieval, Metallic = 0.20f, Smoothness = 0.35f },
+            new EnemyModelSpec { EnemyId = "m7_healer", ModelName = "Skeleton_Mage",   PreferFolder = "Skeletons", Scale = 0.85f, Tint = new Color(0.92f, 0.86f, 0.62f), Metallic = 0.15f, Smoothness = 0.40f },
+
+            // -------- M8 Alien --------
+            new EnemyModelSpec { EnemyId = "m8_horde",  ModelName = "Squidle",         PreferFolder = "Bosses",    Scale = 0.6f,  Tint = TintAlien, Metallic = 0.20f, Smoothness = 0.55f },
+            new EnemyModelSpec { EnemyId = "m8_tank",   ModelName = "BlueDemon",       PreferFolder = "Bosses",    Scale = 1.3f,  Tint = new Color(0.55f, 0.70f, 1.00f), Metallic = 0.20f, Smoothness = 0.50f },
+            new EnemyModelSpec { EnemyId = "m8_ranged", ModelName = "Glub_Evolved",    PreferFolder = "Enemies",   Scale = 0.8f,  Tint = new Color(0.60f, 0.95f, 0.85f), Metallic = 0.25f, Smoothness = 0.60f },
+            new EnemyModelSpec { EnemyId = "m8_healer", ModelName = "PinkBlob",        PreferFolder = "Enemies",   Scale = 0.9f,  Tint = new Color(0.90f, 0.65f, 1.00f), Metallic = 0.15f, Smoothness = 0.55f },
+
+            // -------- M9 Mecânico (Machine, Lightning) --------
+            new EnemyModelSpec { EnemyId = "m9_horde",  ModelName = "Armabee",         PreferFolder = "Enemies",   Scale = 0.6f,  Tint = TintMech, Metallic = 0.50f, Smoothness = 0.50f },
+            new EnemyModelSpec { EnemyId = "m9_tank",   ModelName = "Goleling_Evolved",PreferFolder = "Bosses",    Scale = 1.35f, Tint = TintMech, Metallic = 0.70f, Smoothness = 0.50f },
+            new EnemyModelSpec { EnemyId = "m9_ranged", ModelName = "Goleling",        PreferFolder = "Enemies",   Scale = 0.8f,  Tint = TintMech, Metallic = 0.60f, Smoothness = 0.50f },
+            new EnemyModelSpec { EnemyId = "m9_healer", ModelName = "Armabee_Evolved", PreferFolder = "Enemies",   Scale = 0.8f,  Tint = new Color(0.70f, 0.90f, 1.00f), Metallic = 0.55f, Smoothness = 0.55f },
+
+            // -------- M10 Dimensional (Shadow) --------
+            new EnemyModelSpec { EnemyId = "m10_horde", ModelName = "Ghost",           PreferFolder = "Enemies",   Scale = 0.65f, Tint = TintDimension, Metallic = 0.15f, Smoothness = 0.50f },
+            new EnemyModelSpec { EnemyId = "m10_tank",  ModelName = "Hywirl",          PreferFolder = "Bosses",    Scale = 1.3f,  Tint = TintDimension, Metallic = 0.25f, Smoothness = 0.55f },
+            new EnemyModelSpec { EnemyId = "m10_ranged",ModelName = "Squidle",         PreferFolder = "Bosses",    Scale = 0.8f,  Tint = new Color(1.00f, 0.55f, 0.95f), Metallic = 0.20f, Smoothness = 0.60f },
+            new EnemyModelSpec { EnemyId = "m10_healer",ModelName = "Ghost_Skull",     PreferFolder = "Enemies",   Scale = 0.9f,  Tint = new Color(0.85f, 0.55f, 1.00f), Metallic = 0.15f, Smoothness = 0.50f },
+        };
+
+        /// <summary>
+        /// FBX de monstro CC0 que o projeto ainda NÃO tem em Art/Models (os bosses já trouxeram
+        /// Alien/BlueDemon/Demon/Dragon_Evolved/Goleling_Evolved/Hywirl/MushroomKing/Orc/Orc_Skull/
+        /// Squidle/Tribal/Yeti e os Skeletons já estão em Characters/Skeletons). Copiados sob demanda
+        /// p/ Art/Models/Enemies — idempotente (skip se já existe). rel = caminho dentro de
+        /// _assets-staging\models\Quaternius-UltimateMonsters. Staging/arquivo ausente = aviso e o
+        /// inimigo correspondente mantém o fallback primitivo (FindModel avisa no build).
+        /// </summary>
+        private static readonly (string File, string StagingRel)[] EnemyModelsToImport =
+        {
+            ("GreenBlob.fbx",       "models/Quaternius-UltimateMonsters/Blob/FBX/GreenBlob.fbx"),
+            ("GreenSpikyBlob.fbx",  "models/Quaternius-UltimateMonsters/Blob/FBX/GreenSpikyBlob.fbx"),
+            ("PinkBlob.fbx",        "models/Quaternius-UltimateMonsters/Blob/FBX/PinkBlob.fbx"),
+            ("Mushnub.fbx",         "models/Quaternius-UltimateMonsters/Blob/FBX/Mushnub.fbx"),
+            ("Mushnub_Evolved.fbx", "models/Quaternius-UltimateMonsters/Blob/FBX/Mushnub_Evolved.fbx"),
+            ("Cactoro.fbx",         "models/Quaternius-UltimateMonsters/Blob/FBX/Cactoro.fbx"),
+            ("Dog.fbx",             "models/Quaternius-UltimateMonsters/Blob/FBX/Dog.fbx"),
+            ("Pigeon.fbx",          "models/Quaternius-UltimateMonsters/Blob/FBX/Pigeon.fbx"),
+            ("Dino.fbx",            "models/Quaternius-UltimateMonsters/Big/FBX/Dino.fbx"),
+            ("Goleling.fbx",        "models/Quaternius-UltimateMonsters/Flying/FBX/Goleling.fbx"),
+            ("Armabee.fbx",         "models/Quaternius-UltimateMonsters/Flying/FBX/Armabee.fbx"),
+            ("Armabee_Evolved.fbx", "models/Quaternius-UltimateMonsters/Flying/FBX/Armabee_Evolved.fbx"),
+            ("Glub.fbx",            "models/Quaternius-UltimateMonsters/Flying/FBX/Glub.fbx"),
+            ("Glub_Evolved.fbx",    "models/Quaternius-UltimateMonsters/Flying/FBX/Glub_Evolved.fbx"),
+            ("Ghost.fbx",           "models/Quaternius-UltimateMonsters/Flying/FBX/Ghost.fbx"),
+            ("Ghost_Skull.fbx",     "models/Quaternius-UltimateMonsters/Flying/FBX/Ghost_Skull.fbx"),
+        };
+
+        /// <summary>
+        /// Copia do staging p/ Art/Models/Enemies os FBX de monstro CC0 que o projeto ainda não tem
+        /// e configura o importador igual aos demais (rig Generic + animação). Idempotente: pula o
+        /// que já existe; sem staging = aviso + fallback mantido.
+        /// </summary>
+        private static void EnsureEnemyModelsImported()
+        {
+            EnsureFolder(EnemiesModelFolder);
+            string staging = FindStagingRoot();
+            bool copied = false;
+            for (int i = 0; i < EnemyModelsToImport.Length; i++)
+            {
+                string destAsset = EnemiesModelFolder + "/" + EnemyModelsToImport[i].File;
+                if (CopyStagingFile(staging, EnemyModelsToImport[i].StagingRel, destAsset)) copied = true;
+            }
+            if (copied) AssetDatabase.Refresh();
+
+            for (int i = 0; i < EnemyModelsToImport.Length; i++)
+                ConfigureBossModelImporter(EnemiesModelFolder + "/" + EnemyModelsToImport[i].File);
+        }
+
+        /// <summary>
+        /// Varre TODO EnemyConfigSO de ScriptableObjects/Enemies e, p/ cada enemyId na
+        /// EnemyModelTable, monta o prefab de view (modelo CC0 + recolor + escala do papel) e grava
+        /// em EnemyConfigSO.prefab via load-or-keep. Dirigir pelo enemyId (não pelo nome do arquivo)
+        /// torna o factory re-rodável e robusto a renomeação de asset. Inimigos fora da tabela
+        /// (nenhum hoje) mantêm o fallback. Retorna quantos inimigos receberam view.
+        /// </summary>
+        private static int BuildAllEnemies()
+        {
+            string enemyFolder = SoRoot + "/Enemies";
+            if (!AssetDatabase.IsValidFolder(enemyFolder))
+            {
+                Debug.LogWarning("MAR Tools: pasta de Enemies ainda não existe — rode MAR Tools/Create MVP Content " +
+                                 "antes (este factory roda DEPOIS dele).");
+                return 0;
+            }
+
+            int built = 0;
+            var seen = new HashSet<string>();
+            foreach (string guid in AssetDatabase.FindAssets("t:EnemyConfigSO", new[] { enemyFolder }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var enemy = AssetDatabase.LoadAssetAtPath<EnemyConfigSO>(path);
+                if (enemy == null) continue;
+
+                EnemyModelSpec spec = FindEnemySpec(enemy.enemyId);
+                if (spec == null) continue;        // enemyId fora da tabela — mantém fallback
+                if (!seen.Add(enemy.enemyId)) continue;
+
+                if (BuildEnemy(enemy, path, spec)) built++;
+            }
+
+            int total = EnemyModelTable.Length;
+            if (built < total)
+                Debug.Log($"MAR Tools: {built}/{total} inimigos de pista com modelo nesta passada — os faltantes " +
+                          "(SO inexistente ou FBX ausente no staging) entram ao re-rodar.");
+            return built;
+        }
+
+        private static EnemyModelSpec FindEnemySpec(string enemyId)
+        {
+            if (string.IsNullOrEmpty(enemyId)) return null;
+            for (int i = 0; i < EnemyModelTable.Length; i++)
+                if (string.Equals(EnemyModelTable[i].EnemyId, enemyId, StringComparison.Ordinal))
+                    return EnemyModelTable[i];
+            return null;
+        }
+
+        private static bool BuildEnemy(EnemyConfigSO enemy, string enemyAssetPath, EnemyModelSpec spec)
+        {
+            GameObject model = FindModel(spec.ModelName, spec.PreferFolder);
+            if (model == null) return false;   // FindModel avisou; mantém o campo (null → primitivo)
+
+            string enemyAssetName = System.IO.Path.GetFileNameWithoutExtension(enemyAssetPath);
+            string fbxPath = AssetDatabase.GetAssetPath(model);
+            PrepareImporter(fbxPath);
+            ClipSet clips = FindClips(fbxPath, spec.ModelName);
+
+            // Idle-only: o TrackEnemyManager não dirige o int "State" (anima o grupo por bob/giro),
+            // então 1 estado Idle(0) basta — se o FBX tiver clipe de idle, o inimigo respira parado
+            // (bônus visual); senão fica no 1º clipe / T-pose, sem quebrar nada.
+            AnimatorController controller = BuildController(
+                AnimFolder + "/AC_Enemy_" + enemyAssetName + ".controller",
+                clips.Idle, null, null, attackValue: 1);
+
+            Material material = TintMaterial("M_View_Enemy_" + enemyAssetName, model, spec.Tint, spec.Metallic, spec.Smoothness);
+
+            string viewPath = EnemiesPrefabFolder + "/" + enemyAssetName + "_View.prefab";
+            GameObject prefab = BuildEnemyViewPrefab(model, viewPath, spec.Scale, enemy.kind, controller, material);
+
+            // load-or-keep: idêntico ao boss — só grava se vazio, greybox, ou já a view deste factory.
+            if (ShouldSetEnemyPrefab(enemy, viewPath))
+                SetObjectField(enemy, "prefab", prefab);
+            return true;
+        }
+
+        /// <summary>load-or-keep do prefab do inimigo (mesma regra do boss — ver ShouldSetBossPrefab).</summary>
+        private static bool ShouldSetEnemyPrefab(EnemyConfigSO enemy, string viewPath)
+        {
+            if (enemy.prefab == null) return true;
+            string current = AssetDatabase.GetAssetPath(enemy.prefab);
+            if (string.IsNullOrEmpty(current)) return true;
+            if (string.Equals(current, viewPath, StringComparison.OrdinalIgnoreCase)) return true;   // re-rodar
+            string file = System.IO.Path.GetFileNameWithoutExtension(current);
+            return file.IndexOf("greybox", StringComparison.OrdinalIgnoreCase) >= 0;                  // placeholder
+        }
+
+        // ESPELHO dos valores privados do TrackEnemyManager.KindScale/KindHalfHeight (Gameplay não é
+        // visível do Editor). Só são usados p/ ATERRAR o modelo no chão; se o manager mudar esses
+        // números, ajustar aqui é só um refino visual (não quebra gameplay). Mantidos lado a lado.
+        private static float EnemyKindScale(TrackEnemyKind kind)
+        {
+            switch (kind)
+            {
+                case TrackEnemyKind.Tank: return 1.6f;
+                case TrackEnemyKind.Ranged: return 0.8f;
+                case TrackEnemyKind.Healer: return 0.9f;
+                default: return 0.5f;   // WeakHorde
+            }
+        }
+
+        private static float EnemyKindHalfHeight(TrackEnemyKind kind)
+        {
+            switch (kind)
+            {
+                case TrackEnemyKind.Tank: return 1.6f * 0.5f;
+                case TrackEnemyKind.Ranged: return 0.8f;
+                case TrackEnemyKind.Healer: return 0.9f * 0.5f;
+                default: return 0.5f;   // WeakHorde
+            }
+        }
+
+        /// <summary>
+        /// Prefab de view de inimigo de pista. CRÍTICO p/ o contrato do TrackEnemyManager:
+        /// 1) o manager RE-ESCALA o ROOT da view em runtime (KindScale×fração-de-vida) — então a
+        ///    escala do papel é baked num CHILD e o root do prefab fica em escala 1, senão seria
+        ///    sobrescrita;
+        /// 2) o manager posiciona a view com viewOffsets.y = KindHalfHeight(kind) — offset pensado p/
+        ///    o PRIMITIVO de fallback (pivot CENTRAL). Os modelos Quaternius/KayKit têm pivot nos PÉS,
+        ///    então sem correção o modelo flutuaria por ~KindHalfHeight. Descemos o child para
+        ///    cancelar esse lift (na escala nominal de grupo cheio s≈KindScale×1.15), aterrando os
+        ///    pés no chão. A pequena variação quando o grupo encolhe é invisível (views já somem).
+        /// Sem collider, sem script de gameplay; Animator idle-only (bônus — o manager não o usa).
+        /// </summary>
+        private static GameObject BuildEnemyViewPrefab(GameObject model, string outPath, float scale,
+                                                       TrackEnemyKind kind, AnimatorController controller,
+                                                       Material overrideMaterial)
+        {
+            var root = new GameObject(System.IO.Path.GetFileNameWithoutExtension(outPath));
+            try
+            {
+                // child = modelo escalado pelo papel; root permanece em escala 1 (o manager re-escala
+                // o root). groundOffset desce o child p/ cancelar o lift KindHalfHeight do manager:
+                // o deslocamento mundial do child = childLocalY × s (root escalado por s), então
+                // childLocalY = −KindHalfHeight / s, com s = KindScale × 1.15 (grupo cheio).
+                float nominalScale = Mathf.Max(0.01f, EnemyKindScale(kind) * 1.15f);
+                float groundOffsetY = -EnemyKindHalfHeight(kind) / nominalScale;
+
+                var child = (GameObject)PrefabUtility.InstantiatePrefab(model, root.transform);
+                child.transform.localPosition = new Vector3(0f, groundOffsetY, 0f);
+                child.transform.localScale = new Vector3(scale, scale, scale);
+
+                // O Animator vive no CHILD = modelo FBX instanciado (raiz dos bones), não no root
+                // vazio que o manager re-escala — é onde o Avatar Generic casa.
+                Animator animator = child.GetComponent<Animator>();
+                if (animator == null) animator = child.AddComponent<Animator>();
+                animator.runtimeAnimatorController = controller;
+                // Avatar do FBX: idle vivo do inimigo exige retargeting (mesmo motivo das tropas).
+                // null (FBX sem rig) = inimigo fica estático sem quebrar.
+                Avatar avatar = LoadFbxAvatar(AssetDatabase.GetAssetPath(model));
+                if (avatar != null) animator.avatar = avatar;
+                animator.applyRootMotion = false;   // posição é do grupo agregado (TrackEnemyManager)
+                animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+
+                if (overrideMaterial != null)
+                {
+                    foreach (Renderer r in child.GetComponentsInChildren<Renderer>(true))
+                    {
+                        Material[] mats = r.sharedMaterials;
+                        for (int i = 0; i < mats.Length; i++) mats[i] = overrideMaterial;
+                        r.sharedMaterials = mats;
+                    }
+                }
+
+                // Sem collider: detecção do TrackEnemyManager é por distância no Update (contrato
+                // anti-per-unidade). Os FBX Quaternius/KayKit não trazem collider, mas garantimos.
+                foreach (Collider col in root.GetComponentsInChildren<Collider>(true))
+                    col.enabled = false;
+
+                return PrefabUtility.SaveAsPrefabAsset(root, outPath);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
+        }
+
         // ------------------------------------------------------------------ mutações visíveis
 
         /// <summary>
@@ -647,6 +996,16 @@ namespace MutantArmy.Editor
                 importer.importAnimation = true;
                 reimport = true;
             }
+            // CRÍTICO p/ a tropa ANDAR: rig Generic SEM avatar (avatarSetup: 0/None) não gera o
+            // sub-asset Avatar, então o Animator não retargeta e o mesh fica em bind pose
+            // (tropa "deslizando" parada). Forçar CreateFromThisModel gera o Avatar do próprio FBX,
+            // que o BuildViewPrefab carrega e atribui ao Animator. Só vale p/ rig != None.
+            if (importer.animationType != ModelImporterAnimationType.None
+                && importer.avatarSetup != ModelImporterAvatarSetup.CreateFromThisModel)
+            {
+                importer.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
+                reimport = true;
+            }
 
             ModelImporterClipAnimation[] clips = importer.clipAnimations;
             if (clips == null || clips.Length == 0) clips = importer.defaultClipAnimations;
@@ -701,6 +1060,22 @@ namespace MutantArmy.Editor
                     if (clip.name.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
                         return clip;
             return null;
+        }
+
+        /// <summary>
+        /// Carrega o Avatar do FBX. CAUSA-RAIZ do "tropa deslizando em pose congelada": com rig
+        /// Generic (KayKit/Quaternius), o clipe anima os bones via RETARGETING pelo Avatar — sem
+        /// ele atribuído ao Animator, o SkinnedMeshRenderer fica na bind pose (estático) mesmo com
+        /// controller/State corretos. O Avatar nasce como SUB-ASSET do FBX (Generic, optimize off),
+        /// então varremos os sub-assets por tipo Avatar; fallback: LoadAssetAtPath direto. FBX sem
+        /// rig (props/mesh extraída) → null → o caller mantém o modelo estático sem quebrar.
+        /// </summary>
+        private static Avatar LoadFbxAvatar(string fbxPath)
+        {
+            if (string.IsNullOrEmpty(fbxPath)) return null;
+            foreach (Object o in AssetDatabase.LoadAllAssetsAtPath(fbxPath))
+                if (o is Avatar avatar) return avatar;
+            return AssetDatabase.LoadAssetAtPath<Avatar>(fbxPath);
         }
 
         // ------------------------------------------------------------------ animator controller
@@ -759,9 +1134,15 @@ namespace MutantArmy.Editor
             {
                 instance.transform.localScale = new Vector3(scale, scale, scale);
 
+                // O Animator vive no transform do MODELO instanciado (raiz da hierarquia de bones
+                // do FBX) — é onde o Avatar Generic foi construído, então o retargeting casa.
                 Animator animator = instance.GetComponent<Animator>();
                 if (animator == null) animator = instance.AddComponent<Animator>();
                 animator.runtimeAnimatorController = controller;
+                // Avatar do FBX de origem: sem ele o rig Generic não retargeta e o mesh fica em
+                // bind pose (tropa/boss "deslizando" parado). null (FBX sem rig) = mantém estático.
+                Avatar avatar = LoadFbxAvatar(AssetDatabase.GetAssetPath(model));
+                if (avatar != null) animator.avatar = avatar;
                 animator.applyRootMotion = false;   // posição vem dos arrays SoA / do BossManager
                 animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
 

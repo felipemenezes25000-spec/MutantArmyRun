@@ -24,4 +24,4 @@ MonoBehaviour:
   worldIndex: 3
   attackRange: 2
   healPerSecond: 0
-  prefab: {fileID: 0}
+  prefab: {fileID: 4861794834892698444, guid: 91f347333dc00e64697a56532eefb61d, type: 3}

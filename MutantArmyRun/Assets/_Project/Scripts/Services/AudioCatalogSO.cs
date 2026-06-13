@@ -10,8 +10,12 @@ namespace MutantArmy.Services
     /// handleCoins (moeda), pepSound (pop de multiplicação), powerUp (fanfarra de Supply / mutação),
     /// impactPunch_heavy (hit no boss), lowFrequency_explosion (rugido — Lacuna L6; explosão),
     /// footstep_grass/concrete (passos da multidão), click/confirmation (UI), jingles_HIT (vitória/derrota).
-    /// Música de fundo por mundo: <see cref="musicByWorld"/> indexado por worldIndex (0-based);
-    /// na ausência de loops dedicados (Lacuna L7) o AudioFactory aponta um jingle adequado em loop.
+    /// Música de fundo: <see cref="menuMusic"/> (telas de menu) e <see cref="musicByWorld"/>
+    /// (indexado por worldIndex). TETO HONESTO (Lacuna L7): o staging CC0 só tem JINGLES curtos
+    /// (todos &lt;2 s) — não há loops/trilhas dedicadas. O AudioFactory aponta os jingles mais
+    /// melódicos e LONGOS (famílias Steel/Sax/Pizzicato/8-Bit, não os stingers "Hit") para tocar
+    /// em loop como ambiente leve, e o AudioManager faz fade entre faixas para suavizar a emenda.
+    /// Música real por mundo é pendência registrada (precisa de trilhas dedicadas — ver AudioFactory).
     /// Slots da missão Nota 10 (weaknessHit/resistedHit/comboSting/bossDeath/coinBurst/enemyPop/
     /// goodChoice/badChoice/riskWin/riskLose/specialWarning) seguem a mesma regra de no-op e
     /// entram no gerador MAR Tools/Build Audio na Onda 4 (até lá ficam mudos — jogo intacto).
@@ -66,7 +70,11 @@ namespace MutantArmy.Services
         public AudioClip victoryJingle;
         public AudioClip defeatJingle;
 
-        [Header("Música de fundo em loop por mundo (indexada por worldIndex — Lacuna L7)")]
+        [Header("Música de fundo em loop (Lacuna L7 — só temos jingles CC0, ver pendência)")]
+        [Tooltip("Toca em loop nas telas de menu/meta (MainMenu). Como toda música do MVP, é " +
+                 "um jingle CC0 em loop até existir trilha dedicada. Vazio = silêncio honesto.")]
+        public AudioClip menuMusic;
+
         [Tooltip("Indexada DIRETO por WorldConfigSO.worldIndex (assets do MVP são 1-based: " +
                  "W01=1, W02=2, W03=3 — o slot 0 fica vago). Vazio/curto cai no fallback: " +
                  "WorldConfigSO.musicTrack e, por fim, no-op silencioso.")]

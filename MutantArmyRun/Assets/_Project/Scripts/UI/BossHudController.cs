@@ -295,25 +295,30 @@ namespace MutantArmy.UI
             RectTransform parent = transform as RectTransform;
             if (parent == null) return;     // fora de canvas: sem HUD do boss (degrada, não quebra)
 
-            // Raiz: topo central, abaixo da barra de progresso do HudController (y -60).
+            // P2-UILAYOUT — Raiz BEM abaixo do HUD de corrida: o badge da contagem do exército
+            // termina em y≈-250 e a barra de Supply em y≈-310 (BuildHudElements). ANTES a raiz
+            // ficava em -110 e a barra caía ~-160, COLIDINDO com o badge "60"/Supply (bug do
+            // screenshot). Agora a raiz começa em -322 (mesma faixa do BuildBossHud da factory):
+            // nome -322, barra -372, fraqueza -428 — sem tocar o HUD de corrida acima.
             var rootGo = new GameObject("BossHud", typeof(RectTransform));
             var root = (RectTransform)rootGo.transform;
             root.SetParent(parent, false);
             root.anchorMin = new Vector2(0.5f, 1f);
             root.anchorMax = new Vector2(0.5f, 1f);
             root.pivot = new Vector2(0.5f, 1f);
-            root.anchoredPosition = new Vector2(0f, -110f);
-            root.sizeDelta = new Vector2(760f, 130f);
+            root.anchoredPosition = new Vector2(0f, -322f);
+            root.sizeDelta = new Vector2(760f, 150f);
 
             _rootGroup = rootGo.AddComponent<CanvasGroup>();
             _rootGroup.alpha = 0f;
             _rootGroup.interactable = false;
             _rootGroup.blocksRaycasts = false;      // AutoPilot joga por baixo intacto (doc 14 §6)
 
-            _bossNameText = CreateText(root, "BossName", 38f, Color.white,
-                new Vector2(0f, -4f), new Vector2(760f, 44f));
+            // Nome do boss no TOPO da raiz (a faixa de corrida já terminou acima).
+            _bossNameText = CreateText(root, "BossName", 40f, Color.white,
+                new Vector2(0f, 0f), new Vector2(760f, 46f));
 
-            // Fundo da barra de HP.
+            // Fundo da barra de HP — 700×46 (mesma medida da factory), abaixo do nome.
             var bgGo = new GameObject("HpBarBg", typeof(RectTransform));
             var bg = (RectTransform)bgGo.transform;
             bg.SetParent(root, false);
@@ -321,9 +326,9 @@ namespace MutantArmy.UI
             bg.anchorMax = new Vector2(0.5f, 1f);
             bg.pivot = new Vector2(0.5f, 1f);
             bg.anchoredPosition = new Vector2(0f, -50f);
-            bg.sizeDelta = new Vector2(740f, 28f);
+            bg.sizeDelta = new Vector2(700f, 46f);
             Image bgImage = bgGo.AddComponent<Image>();
-            bgImage.color = new Color(0.08f, 0.09f, 0.13f, 0.85f);
+            bgImage.color = new Color(0.08f, 0.09f, 0.13f, 0.92f);
             bgImage.raycastTarget = false;
 
             // Fill ANCORADO (anchorMax.x = HP) — Image.Type.Filled exige sprite e o fallback
@@ -333,8 +338,8 @@ namespace MutantArmy.UI
             _hpFillRect.SetParent(bg, false);
             _hpFillRect.anchorMin = Vector2.zero;
             _hpFillRect.anchorMax = Vector2.one;
-            _hpFillRect.offsetMin = new Vector2(3f, 3f);
-            _hpFillRect.offsetMax = new Vector2(-3f, -3f);
+            _hpFillRect.offsetMin = new Vector2(4f, 4f);
+            _hpFillRect.offsetMax = new Vector2(-4f, -4f);
             _hpFillImage = fillGo.AddComponent<Image>();
             _hpFillImage.color = _phase0Color;
             _hpFillImage.raycastTarget = false;
@@ -345,12 +350,12 @@ namespace MutantArmy.UI
             CreateMarker(bg, "Marker25", Phase2Threshold);
 
             // Fraqueza ativa, abaixo da barra (rotativa via OnBossPhaseChanged).
-            _weaknessText = CreateText(root, "WeaknessTag", 26f, Color.white,
-                new Vector2(0f, -84f), new Vector2(760f, 30f));
+            _weaknessText = CreateText(root, "WeaknessTag", 28f, Color.white,
+                new Vector2(0f, -104f), new Vector2(760f, 34f));
 
             // Aviso do especial, com CanvasGroup próprio para piscar sem mexer no resto.
-            _warningText = CreateText(root, "SpecialWarning", 32f, new Color(1.00f, 0.35f, 0.20f),
-                new Vector2(0f, -118f), new Vector2(760f, 38f));
+            _warningText = CreateText(root, "SpecialWarning", 34f, new Color(1.00f, 0.35f, 0.20f),
+                new Vector2(0f, -148f), new Vector2(760f, 40f));
             _warningGroup = _warningText.gameObject.AddComponent<CanvasGroup>();
             _warningGroup.alpha = 0f;
             _warningGroup.interactable = false;

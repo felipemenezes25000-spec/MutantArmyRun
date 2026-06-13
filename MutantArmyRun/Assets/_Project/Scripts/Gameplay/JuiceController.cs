@@ -73,6 +73,30 @@ namespace MutantArmy.Gameplay
         [SerializeField] private float _trackKillBurstInterval = 0.15f;   // burst agregado de pista (≥0,15 s)
         [SerializeField] private float _trackKillHapticInterval = 0.5f;   // tap esporádico, nunca zumbido
 
+        [Header("Crescimento do exército (o ato central — doc 14 §5): peso + legibilidade em 3s")]
+        // DECISÃO (causa-raiz da missão): pegar portal e crescer era SILENCIOSO (só o número do
+        // HUD mudava). Aqui o crescimento ganha CORPO — texto flutuante grande ("+N"/"×N"/
+        // "ARQUEIRO!"), burst tingido na multidão e soco de câmera proporcional ao ganho — tudo
+        // cosmético, reagindo ao OnGateConsumed que JÁ trafega gate+newCount (sem tocar o
+        // CrowdManager nem o funil de consumo). Verde alegre na soma, dourado no multiplicador,
+        // ciano-transformação na conversão de classe.
+        [SerializeField] private float _growthBurstUp = 1.3f;             // altura do burst de crescimento sobre o centróide
+        [SerializeField] private float _addFlatBigThreshold = 25f;        // +25/+50 "estala" (punch maior + Medium)
+        [SerializeField] private float _addFlatFovPunch = -3.5f;          // soco base da soma forte
+        [SerializeField] private float _multiplyFovPunchPerStep = -1.8f;  // soco por "passo" de multiplicador (×2→1 passo…)
+
+        [Header("Impacto que se SENTE (hitstop sem mexer no timeScale)")]
+        // DECISÃO (CONTRACT §1.10): um freeze real de timeScale colidiria com o slow-mo de
+        // morte do BossManager (SlowMotion(0.3,1.6) — a regra de aninhamento ficaria com a
+        // janela MAIOR e a escala MAIS profunda, alongando a luta) e com a pausa; em PlayMode
+        // a 8-10× ainda atrapalharia o ritmo. Em vez disso o "punch" de impacto entrega o
+        // PESO via shake seco + soco de FOV mais fundo + flash forte — 100% cosmético, em
+        // tempo unscaled, à prova de pausa/slow-mo e dos testes.
+        [SerializeField] private float _impactShake = 1.4f;               // shake SECO do impacto grande
+        [SerializeField] private float _impactShakeSeconds = 0.14f;       // curto: tranco, não terremoto
+        [SerializeField] private float _impactFovPunch = -5f;             // soco de FOV mais fundo que o normal
+        [SerializeField] private float _strongWeaknessDamage = 12f;       // ≥ isso, o acerto de fraqueza "estala"
+
         private bool _subscribedToGameManager;
         private BossRuntime _trackedBoss;
         private float _lastBossHp;
@@ -85,6 +109,7 @@ namespace MutantArmy.Gameplay
         private Coroutine _bossFlashRoutine;
         private Coroutine _fovPunchRoutine;
         private Coroutine _bossDeathRoutine;
+        private MutantArmy.UI.FloatingTextSpawner _floatingText;   // cache do glue de texto flutuante (camada UI)
 
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
@@ -175,19 +200,139 @@ namespace MutantArmy.Gameplay
             if (VFXManager.Instance != null)
                 VFXManager.Instance.PlayGateBurst(burstPos, GateBurstColor(gate));
 
-            // Multiplicação ×2+: cascata de pops sobre a formação. ×3/×5 (big) sobe o
-            // espetáculo — screen shake + soco de FOV + vibração média (doc 14 §5).
-            if (gate.gateType == GateType.Multiply && gate.value >= 2f)
+            // CRESCIMENTO/TRANSFORMAÇÃO com PESO (causa-raiz da missão): texto flutuante grande,
+            // burst tingido na multidão e soco proporcional ao ganho. Roteado por tipo — cada
+            // portal "diz" o que fez em ≤3 s. Mantém a cascata/soco antigos do multiplicador.
+            switch (gate.gateType)
             {
-                StartCoroutine(CascadePops(result.newCount));
+                case GateType.AddFlat:
+                    HandleAddFlatGrowth(gate);
+                    break;
+                case GateType.Multiply:
+                    HandleMultiplyGrowth(gate, result.newCount);
+                    break;
+                case GateType.ClassConvert:
+                    HandleClassConvert(gate);
+                    break;
+            }
+        }
+
+        // SOMA (+N): verde alegre na multidão + texto "+N" grande + soco/vibração dosados pelo
+        // tamanho. +25/+50 "estala" (punch fundo + Medium); +10 honesto fica leve. Soma NEGATIVA
+        // (−10, punição disfarçada) cai no caminho vermelho-escuro — nunca humilha (CANON).
+        private void HandleAddFlatGrowth(GateConfigSO gate)
+        {
+            int amount = (int)gate.value;
+            Vector3 center = CrowdCenter();
+
+            if (amount > 0)
+            {
+                if (VFXManager.Instance != null)
+                    VFXManager.Instance.PlayGateBurst(center + Vector3.up * _growthBurstUp, GrowthGreen);
+                ShowGrowthText("+" + amount);
+                // ganho grande soca mais fundo; +10 fica num pulso leve
+                bool big = gate.value >= _addFlatBigThreshold;
+                PunchCameraFov(_addFlatFovPunch * (big ? 1.6f : 1f), 0.25f);
+                if (big) Core.Haptics.Medium();
+                else Core.Haptics.Light();
+            }
+            else if (amount < 0)
+            {
+                PlayNegativeGrowth(center, amount.ToString());   // ex.: "-10"
+            }
+        }
+
+        // MULTIPLICADOR (×N): dourado de proeza + texto "×N" + cascata de pops já existente. O
+        // soco cresce com o multiplicador (×2 leve, ×3/×5 clímax). ÷N (value<1) é armadilha →
+        // caminho vermelho-escuro. value≈1 (sem ganho) não festeja para o elogio não virar ruído.
+        private void HandleMultiplyGrowth(GateConfigSO gate, int newCount)
+        {
+            Vector3 center = CrowdCenter();
+
+            if (gate.value < 1f)
+            {
+                PlayNegativeGrowth(center, "÷" + Mathf.RoundToInt(1f / Mathf.Max(0.01f, gate.value)));
+                return;
+            }
+            if (gate.value < 1.05f) return;   // ×1.0x: ganho nulo, sem festa
+
+            if (VFXManager.Instance != null)
+                VFXManager.Instance.PlayGateBurst(center + Vector3.up * _growthBurstUp, GoldFeedback);
+            ShowGrowthText("×" + FormatMultiplier(gate.value));
+
+            // ×2+ mantém a cascata sobre a formação; ×3/×5 (big) sobe o espetáculo (doc 14 §5)
+            if (gate.value >= 2f)
+            {
+                StartCoroutine(CascadePops(newCount));
                 if (gate.value >= _bigMultiplyValue)
                 {
                     Tween.ShakeCamera(_bigMultiplyShake, 0.22f);
                     PunchCameraFov(_strongPortalFovPunch, 0.25f);
                     Core.Haptics.Medium();
                 }
+                else
+                {
+                    // ×2: punch proporcional aos "passos" de multiplicador, ainda sem terremoto
+                    PunchCameraFov(_multiplyFovPunchPerStep * (gate.value - 1f), 0.22f);
+                    Core.Haptics.Light();
+                }
             }
         }
+
+        // CONVERSÃO DE CLASSE ("VIRAR ARQUEIRO/MAGO"): os modelos já trocam sozinhos (o
+        // CrowdRenderer rebatcha por typeId) — aqui mora o MOMENTO da transformação: burst
+        // ciano-transformação + texto com o nome da classe ("ARQUEIRO!"). Sem mexer no exército.
+        private void HandleClassConvert(GateConfigSO gate)
+        {
+            Vector3 center = CrowdCenter();
+            if (VFXManager.Instance != null)
+                VFXManager.Instance.PlayGateBurst(center + Vector3.up * _growthBurstUp, TransformCyan);
+            string className = gate.unitToAdd != null && !string.IsNullOrEmpty(gate.unitToAdd.displayName)
+                ? gate.unitToAdd.displayName.ToUpperInvariant()
+                : "NOVA CLASSE";
+            ShowGrowthText(className + "!");
+            PunchCameraFov(-3f, 0.22f);
+            Core.Haptics.Light();
+        }
+
+        // Portal NEGATIVO (−N / ÷N): efeito curto vermelho-escuro + shake leve. CANON: o jogo
+        // não humilha — feedback honesto da perda, sem exagero. Texto também mostra a perda.
+        private void PlayNegativeGrowth(Vector3 center, string label)
+        {
+            if (VFXManager.Instance != null)
+                VFXManager.Instance.PlayGateBurst(center + Vector3.up * _growthBurstUp, BadDarkRed);
+            ShowGrowthText(label);
+            Tween.ShakeCamera(0.5f, 0.14f);
+            Core.Haptics.Light();
+        }
+
+        // Texto flutuante grande do crescimento (camada UI, FloatingTextSpawner — Gameplay pode
+        // chamar UI, asmdef permite). Cache resolvido sob demanda e re-tentado se a UI ainda não
+        // existir (cena Game aberta direto no editor); null-safe — degrada para só o burst.
+        private void ShowGrowthText(string text)
+        {
+            if (_floatingText == null)
+                _floatingText = FindFirstObjectByType<MutantArmy.UI.FloatingTextSpawner>(FindObjectsInactive.Include);
+            if (_floatingText != null) _floatingText.ShowFloatingText(text);
+        }
+
+        // Centróide vivo da multidão (âncora do espetáculo de crescimento); fallback no anchor.
+        private static Vector3 CrowdCenter()
+        {
+            CrowdManager crowd = CrowdManager.Instance;
+            return crowd != null ? crowd.Centroid : CrowdAnchor.Position;
+        }
+
+        // "×2" / "×1.5": inteiro quando redondo, 1 casa quando fracionário — leitura honesta.
+        private static string FormatMultiplier(float value)
+        {
+            return Mathf.Approximately(value, Mathf.Round(value))
+                ? Mathf.RoundToInt(value).ToString()
+                : value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        private static readonly Color GrowthGreen = new Color(0.40f, 1f, 0.45f);   // soma: verde alegre
+        private static readonly Color TransformCyan = new Color(0.35f, 0.85f, 1f); // conversão de classe
 
         private static Color GateBurstColor(GateConfigSO gate)
         {
@@ -290,6 +435,10 @@ namespace MutantArmy.Gameplay
             Vector3 center = crowd != null ? crowd.Centroid : CrowdAnchor.Position;
             if (VFXManager.Instance != null)
                 VFXManager.Instance.PlayGateBurst(center + Vector3.up * 1.4f, MutationBurstColor);
+            // nome da mutação flutua junto do burst magenta (ganho raro e permanente, CANON §3.3);
+            // o selo "MUTATION!" do FeedbackTextController é outra camada — aqui o NOME concreto
+            if (mutation != null && !string.IsNullOrEmpty(mutation.displayName))
+                ShowGrowthText(mutation.displayName.ToUpperInvariant() + "!");
             Tween.ShakeCamera(_mutationShake, 0.18f);
             PunchCameraFov(-3f, 0.22f);
             Core.Haptics.Medium();
@@ -484,10 +633,21 @@ namespace MutantArmy.Gameplay
             switch (hit.relation)
             {
                 case ElementRelation.Weakness:
-                    // acertou a fraqueza: o boss ACENDE na cor do elemento + shake leve + tap
-                    StartBossFlash(ElementFlashColor(hit.element), _bossFlashSeconds, emissionBoost: 2.5f);
-                    Tween.ShakeCamera(_weaknessShake, 0.15f);
-                    Core.Haptics.Light();
+                    // acertou a fraqueza: o boss ACENDE na cor do elemento. Fraqueza FORTE
+                    // (dano alto) "estala" — flash mais brilhante + hitstop cosmético no lugar
+                    // do shake leve; fraqueza fraca mantém o pulso suave de sempre. Um caminho
+                    // OU o outro (nunca dois shakes/FOV empilhados no mesmo hit).
+                    if (hit.damage >= _strongWeaknessDamage)
+                    {
+                        StartBossFlash(ElementFlashColor(hit.element), _bossFlashSeconds, emissionBoost: 3.5f);
+                        ImpactPunch(0.8f);
+                    }
+                    else
+                    {
+                        StartBossFlash(ElementFlashColor(hit.element), _bossFlashSeconds, emissionBoost: 2.5f);
+                        Tween.ShakeCamera(_weaknessShake, 0.15f);
+                        Core.Haptics.Light();
+                    }
                     break;
                 case ElementRelation.Resisted:
                 case ElementRelation.Immune:
@@ -520,8 +680,11 @@ namespace MutantArmy.Gameplay
             // payload sem posição (greybox/edge): ancora no view cacheado — nunca zoom no (0,0,0)
             Vector3 anchor = died.position.sqrMagnitude > 0.01f ? died.position : BossViewPosition();
 
-            Tween.ShakeCamera(_bossDeathShake, 0.6f);
-            PunchCameraFov(-6f, 0.6f);
+            // GOLPE FINAL: hitstop cosmético no frame 0 (o "estalo" da morte) — soco de FOV
+            // fundo + tranco seco. Vem ANTES da celebração sustentada para o jogador sentir o
+            // peso do golpe; o slow-mo canônico (BossManager.Die) já roda por baixo.
+            ImpactPunch(1f);
+            Tween.ShakeCamera(_bossDeathShake, 0.6f);   // shake sustentado da celebração (canal próprio)
             Core.Haptics.Heavy();
             if (CameraRig.Instance != null)
                 CameraRig.Instance.PunchFocus(anchor, 0.85f, 1.1f);
@@ -542,12 +705,50 @@ namespace MutantArmy.Gameplay
             _bossDeathRoutine = null;
         }
 
-        // Combo conquistado (ComboSystem, vitória): pulso leve de FOV + tap. O texto/celebração
-        // visual ("PERFECT GATE! +25") é da Onda 3 (FeedbackTextController/ResultScreen).
+        // Combo conquistado (ComboSystem, vitória): zoom-punch dosado pela "grandeza" do combo
+        // + burst tintado por tipo no centróide + tap. O texto/celebração ("PERFECT GATE! +25")
+        // é da Onda 3 (FeedbackTextController/ResultScreen) — aqui só o feel.
         private void HandleComboEarned(ComboEarned combo)
         {
-            PunchCameraFov(_comboFovPunch, 0.25f);
-            Core.Haptics.Light();
+            float weight = ComboPunchWeight(combo.kind);   // 1 = leve · 1.8 = clímax (BossBreaker/Clutch)
+            PunchCameraFov(_comboFovPunch * weight, 0.25f);
+            CrowdManager crowd = CrowdManager.Instance;
+            Vector3 center = crowd != null ? crowd.Centroid : CrowdAnchor.Position;
+            if (VFXManager.Instance != null)
+                VFXManager.Instance.PlayGateBurst(center + Vector3.up * 1.4f, ComboBurstColor(combo.kind));
+            // combos "grandes" merecem mais que um tap; os de rotina mantêm o toque leve
+            if (weight >= 1.4f) Core.Haptics.Medium();
+            else Core.Haptics.Light();
+        }
+
+        // Peso do soco por tipo de combo: os raros/clímax (derrubar o boss rápido, vencer no
+        // fio) socam mais fundo; os de rotina ficam sutis para nunca enjoar (CANON: legível,
+        // sem cansar). Append-safe: combo desconhecido cai no peso leve.
+        private static float ComboPunchWeight(ComboKind kind)
+        {
+            switch (kind)
+            {
+                case ComboKind.BossBreaker: return 1.8f;
+                case ComboKind.Clutch: return 1.7f;
+                case ComboKind.Overkill: return 1.5f;
+                case ComboKind.NoLoss: return 1.3f;
+                case ComboKind.PerfectGate: return 1.2f;
+                default: return 1f;   // WeaknessHit e demais: pulso leve
+            }
+        }
+
+        // Cor de leitura por combo: dourado de proeza para os de exército/perfeição, tons
+        // quentes/vivos para os de combate. Apenas o tint do burst — sem semântica de jogo.
+        private static Color ComboBurstColor(ComboKind kind)
+        {
+            switch (kind)
+            {
+                case ComboKind.BossBreaker: return new Color(1f, 0.35f, 0.20f);   // laranja-fogo: derrubou o boss
+                case ComboKind.Overkill: return new Color(1f, 0.20f, 0.35f);      // carmesim: destruição
+                case ComboKind.Clutch: return new Color(0.30f, 0.95f, 1f);        // ciano-tensão: salvou no fio
+                case ComboKind.WeaknessHit: return new Color(0.55f, 1f, 0.45f);   // verde-acerto
+                default: return GoldFeedback;                                     // PerfectGate/NoLoss: dourado de proeza
+            }
         }
 
         // Inimigo de pista morto: hordas caem em rajada — burst AGREGADO rate-limited
@@ -624,6 +825,19 @@ namespace MutantArmy.Gameplay
             float baseFov = _baseFov;
             _fovPunchRoutine = Tween.Float(baseFov + delta, baseFov, seconds, Tween.Ease.OutCubic,
                                            v => { if (cam != null) cam.fieldOfView = v; });
+        }
+
+        // "Hitstop" cosmético (sem mexer no timeScale — ver header): tranco SECO de câmera +
+        // soco de FOV fundo + vibração média, dosado por <paramref name="intensity"/> (0..1).
+        // É o substituto do freeze: o jogador SENTE o impacto sem nenhuma janela de timeScale
+        // que pudesse aninhar com o slow-mo de morte ou travar a luta a 8-10× nos testes.
+        private void ImpactPunch(float intensity)
+        {
+            intensity = Mathf.Clamp01(intensity);
+            if (intensity <= 0f) return;
+            Tween.ShakeCamera(_impactShake * intensity, _impactShakeSeconds);
+            PunchCameraFov(_impactFovPunch * intensity, 0.18f);
+            Core.Haptics.Medium();
         }
     }
 }

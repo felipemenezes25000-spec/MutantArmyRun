@@ -45,6 +45,9 @@ MonoBehaviour:
   - trackPosition: 195
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
   enemies:
+  - trackPosition: 95
+    enemy: {fileID: 11400000, guid: 975771ca079979c45ab78a93659d93ab, type: 2}
+    count: 6
   - trackPosition: 150
     enemy: {fileID: 11400000, guid: 174b9ee9bc080634899c15afb28de841, type: 2}
     count: 1

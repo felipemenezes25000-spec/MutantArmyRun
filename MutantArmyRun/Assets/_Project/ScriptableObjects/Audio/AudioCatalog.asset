@@ -24,7 +24,7 @@ MonoBehaviour:
   weaknessHit: {fileID: 8300000, guid: f148eea22db6120439573fdbe66a032a, type: 3}
   resistedHit: {fileID: 8300000, guid: 1e7c751e52c4e8948b5c1bcd9dc7487b, type: 3}
   specialWarning: {fileID: 8300000, guid: d225e54a196594b48908643cd5659c2a, type: 3}
-  bossDeath: {fileID: 8300000, guid: 7f89674186aeff246a9fb28d24cf1c38, type: 3}
+  bossDeath: {fileID: 8300000, guid: bd14cba658daef34eb288ac3df346da5, type: 3}
   comboSting: {fileID: 8300000, guid: 02708a4644e9e1a40be9f4702b152057, type: 3}
   coinBurst: {fileID: 8300000, guid: 192d5b872da6f714ea845b032419a7d7, type: 3}
   enemyPop: {fileID: 8300000, guid: 86c07eb48955b0a4896830f427f22de2, type: 3}
@@ -37,8 +37,9 @@ MonoBehaviour:
   uiConfirm: {fileID: 8300000, guid: 11ad9c3d89943a54a8fd2bbb0a8ef483, type: 3}
   victoryJingle: {fileID: 8300000, guid: 3d957fa62f1c5914ca8b80b1644fa6e3, type: 3}
   defeatJingle: {fileID: 8300000, guid: 250282a506c3b584480937e792edc0c5, type: 3}
+  menuMusic: {fileID: 8300000, guid: 7970c82982cfabc468a7790ccf5a8cec, type: 3}
   musicByWorld:
   - {fileID: 0}
-  - {fileID: 8300000, guid: 7af7c5b8d781833458354b0863b89865, type: 3}
-  - {fileID: 8300000, guid: 91c48bb2505ffd748b76016e98eb0214, type: 3}
-  - {fileID: 8300000, guid: 2627b8596661d0a4e8743b487a484160, type: 3}
+  - {fileID: 8300000, guid: aae77f9dbf5c5e641b113d997ddbda46, type: 3}
+  - {fileID: 8300000, guid: 877035e9860da0e478c3d1623a9a69fc, type: 3}
+  - {fileID: 8300000, guid: 82015d0ab6b1a21429765acdf170fac5, type: 3}

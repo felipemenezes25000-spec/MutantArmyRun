@@ -41,7 +41,10 @@ MonoBehaviour:
   - trackPosition: 60
     enemy: {fileID: 11400000, guid: 975771ca079979c45ab78a93659d93ab, type: 2}
     count: 6
-  - trackPosition: 130
+  - trackPosition: 100
+    enemy: {fileID: 11400000, guid: 975771ca079979c45ab78a93659d93ab, type: 2}
+    count: 6
+  - trackPosition: 136
     enemy: {fileID: 11400000, guid: 975771ca079979c45ab78a93659d93ab, type: 2}
     count: 8
   boss: {fileID: 11400000, guid: f014fe0b697b9644b9b67dde425ba453, type: 2}

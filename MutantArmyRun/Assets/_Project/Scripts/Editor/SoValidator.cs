@@ -170,6 +170,9 @@ namespace MutantArmy.Editor
         /// dos primeiros 5 minutos contra regressão de conteúdo:
         /// F1 (levelIndex 1): pista LIMPA (sem obstáculos/inimigos) e só pares manuais de soma
         /// positiva (AddFlat &gt; 0) — mantém o PlayMode GameScene_Fase1_VitoriaCompleta vencível.
+        /// A proibição de inimigos vale SOMENTE para a F1: F2/F3 JÁ TÊM hordas fracas de
+        /// propósito (introduzir cedo o prazer de atropelar — ver MvpContentFactory), então
+        /// nenhuma regra aqui pode barrar inimigos em F2+.
         /// F3 (levelIndex 3): a fase que ensina FRAQUEZA — boss fraco a FOGO e pelo menos um
         /// portal de elemento FOGO entre os slots.
         /// </summary>
@@ -180,7 +183,8 @@ namespace MutantArmy.Editor
                 if (level.obstacles != null && level.obstacles.Length > 0)
                     error("Fase 1 '" + level.name + "' com obstáculos — onboarding deve ser impossível de perder (CANON §16).", level);
                 if (level.enemies != null && level.enemies.Length > 0)
-                    error("Fase 1 '" + level.name + "' com inimigos de pista — onboarding deve ser impossível de perder (CANON §16).", level);
+                    error("Fase 1 '" + level.name + "' com inimigos de pista — onboarding deve ser impossível de perder (CANON §16). " +
+                          "A regra vale SÓ p/ F1: F2+ podem (e devem) ter inimigos.", level);
                 if (level.gateSlots != null)
                 {
                     foreach (GateSlot slot in level.gateSlots)

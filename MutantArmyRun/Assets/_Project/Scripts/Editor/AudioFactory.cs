@@ -20,11 +20,14 @@ namespace MutantArmy.Editor
     ///    slots da missão Nota 10 (weaknessHit/resistedHit/specialWarning/bossDeath/comboSting/
     ///    coinBurst/enemyPop/goodChoice/badChoice/riskWin/riskLose). Cria o asset se não existir.
     ///    Clip ausente = null = evento mudo (contrato do AudioManager).
-    /// 3. Música de fundo por mundo (Lacuna L7 — não há loops dedicados): aponta 1 jingle CC0
-    ///    distinto por mundo para tocar EM LOOP como ambiente leve. Indexado direto por
-    ///    worldIndex (assets do MVP são 1-based: W01=1, W02=2, W03=3 — slot 0 fica vago).
-    ///    Documentado abaixo em <see cref="MusicByWorldMap"/>; trocar por loops reais quando
-    ///    a lacuna fechar é só reapontar as fontes.
+    /// 3. Música de fundo (Lacuna L7 — TETO HONESTO: o staging CC0 só tem JINGLES curtos, todos
+    ///    &lt;2 s; NÃO há loops/trilhas dedicadas). Estratégia: aponta os jingles mais MELÓDICOS e
+    ///    LONGOS (famílias Steel/Sax/8-Bit/Pizzicato — NÃO os stingers "Hit", que têm transiente
+    ///    seco e emenda horrível em loop) para tocar EM LOOP como ambiente leve; o AudioManager
+    ///    faz crossfade na troca de faixa para suavizar a emenda. menuMusic para as telas de menu,
+    ///    musicByWorld[worldIndex] por mundo (1-based: W01=1, W02=2, W03=3 — slot 0 vago).
+    ///    Documentado abaixo em <see cref="MusicByWorldMap"/>. PENDÊNCIA: música real por mundo
+    ///    precisa de trilhas dedicadas — trocar é só reapontar estas fontes.
     /// 4. Costura a cena Boot: catálogo no AudioManager, 2 AudioSources (música+SFX) e o
     ///    AudioListener garantidos (o ProjectSetup já põe; reforçamos por robustez).
     /// </summary>
@@ -67,7 +70,7 @@ namespace MutantArmy.Editor
             ("sfx_weakness_hit.ogg",    @"audio\kenney_impact-sounds\Audio\impactBell_heavy_002.ogg"),   // sino brilhante: "acertou a fraqueza"
             ("sfx_resisted_hit.ogg",    @"audio\kenney_impact-sounds\Audio\impactMetal_heavy_000.ogg"),  // "bateu em parede" seco
             ("sfx_special_warning.ogg", @"audio\kenney_digital-audio\Audio\threeTone2.ogg"),             // alarme curto do telegraph
-            ("sfx_boss_death.ogg",      @"audio\kenney_sci-fi-sounds\Audio\explosionCrunch_002.ogg"),    // camada de peso da morte cinematográfica
+            ("sfx_boss_death.ogg",      @"audio\kenney_sci-fi-sounds\Audio\explosionCrunch_004.ogg"),    // crunch MAIS longo/pesado (~2s) — morte cinematográfica
             ("sfx_combo_sting.ogg",     @"audio\kenney_digital-audio\Audio\powerUp3.ogg"),               // sting de combo conquistado
             ("sfx_coin_burst.ogg",      @"audio\kenney_rpg-audio\Audio\handleCoins2.ogg"),               // chuva de moedas (wave limpa)
             ("sfx_enemy_pop.ogg",       @"audio\kenney_digital-audio\Audio\pepSound2.ogg"),              // pop de inimigo de pista
@@ -76,19 +79,25 @@ namespace MutantArmy.Editor
             ("sfx_risk_win.ogg",        @"audio\kenney_digital-audio\Audio\powerUp8.ogg"),               // risco vencido ("x10!")
             ("sfx_risk_lose.ogg",       @"audio\kenney_digital-audio\Audio\lowDown.ogg"),                // risco perdido (descida seca)
 
-            // --- Música de fundo por mundo (Lacuna L7 — jingles CC0 em loop como ambiente) ---
-            ("music_world_01.ogg",     @"audio\kenney_music-jingles\Audio\Hit jingles\jingles_HIT08.ogg"),
-            ("music_world_02.ogg",     @"audio\kenney_music-jingles\Audio\Hit jingles\jingles_HIT13.ogg"),
-            ("music_world_03.ogg",     @"audio\kenney_music-jingles\Audio\Hit jingles\jingles_HIT01.ogg"),
+            // --- Música de fundo (Lacuna L7 — TETO HONESTO: o staging CC0 só tem JINGLES <2s,
+            //     não há loops dedicados). Trocados dos stingers "Hit" (transientes secos, loop
+            //     horrível) para as famílias MELÓDICAS e mais LONGAS (Steel/Sax/8-Bit/Pizzicato)
+            //     — corpo sustentado emenda menos mal em loop. O AudioManager faz crossfade na
+            //     troca de faixa para suavizar ainda mais. Ver pendência: música real precisa de
+            //     trilhas dedicadas (CC0 só tem jingles).
+            ("music_menu.ogg",         @"audio\kenney_music-jingles\Audio\Pizzicato jingles\jingles_PIZZI07.ogg"), // menu: pizzicato suave/acolhedor (~1.3s, o mais calmo)
+            ("music_world_01.ogg",     @"audio\kenney_music-jingles\Audio\Steel jingles\jingles_STEEL07.ogg"),     // W01 Campo: steel brilhante/heroico (~1.55s, o mais cheio)
+            ("music_world_02.ogg",     @"audio\kenney_music-jingles\Audio\Sax jingles\jingles_SAX07.ogg"),         // W02 Zumbi: sax mais sombrio/grave (~1.74s)
+            ("music_world_03.ogg",     @"audio\kenney_music-jingles\Audio\8-Bit jingles\jingles_NES00.ogg"),       // W03 Robótico: chiptune NES = "tech" (~1.76s)
         };
 
         // worldIndex (1-based nos assets do MVP) → nome canônico da faixa importada.
         // O array musicByWorld é dimensionado para indexar DIRETO por worldIndex (slot 0 vago).
         private static readonly (int worldIndex, string clipName)[] MusicByWorldMap =
         {
-            (1, "music_world_01"),   // W01 Campo Inicial  — jingle alegre/heroico
-            (2, "music_world_02"),   // W02 Cidade Zumbi   — jingle mais sombrio
-            (3, "music_world_03"),   // W03 Deserto Robótico — jingle tech
+            (1, "music_world_01"),   // W01 Campo Inicial    — Steel: brilhante/heroico
+            (2, "music_world_02"),   // W02 Cidade Zumbi     — Sax: mais sombrio/grave
+            (3, "music_world_03"),   // W03 Deserto Robótico — 8-Bit/NES: chiptune "tech"
         };
 
         [MenuItem("MAR Tools/Build Audio")]
@@ -184,6 +193,7 @@ namespace MutantArmy.Editor
             catalog.riskWin = LoadClip("sfx_risk_win");
             catalog.riskLose = LoadClip("sfx_risk_lose");
 
+            catalog.menuMusic = LoadClip("music_menu");   // música de fundo do menu/meta (loop)
             catalog.musicByWorld = BuildMusicByWorld();
 
             EditorUtility.SetDirty(catalog);

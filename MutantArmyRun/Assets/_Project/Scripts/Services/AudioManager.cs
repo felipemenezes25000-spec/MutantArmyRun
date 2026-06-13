@@ -13,10 +13,18 @@ namespace MutantArmy.Services
     /// GameManager.StateEntered e, ao entrar em Running, resolve a faixa do mundo da fase
     /// atual (catálogo musicByWorld[worldIndex] → WorldConfigSO.musicTrack → no-op). Mesma
     /// regra de fronteira do WorldAtmosphereApplier e do AnalyticsManager: Services enxerga
-    /// Core (§2.3), então é aqui que o evento é assinado. PlayMusic(clip) segue público para
-    /// quem queira forçar uma faixa. Clips são opcionais (campos vazios são no-op silencioso) —
-    /// o jogo roda com qualquer subconjunto. Preferências persistem via BindSaveState
-    /// (SaveData é Domain — atravessa a fronteira Meta/Services).
+    /// Core (§2.3), então é aqui que o evento é assinado. Ao entrar em MainMenu, toca a música
+    /// de menu (catálogo.menuMusic). PlayMusic(clip) segue público para quem queira forçar uma
+    /// faixa. Clips são opcionais (campos vazios são no-op silencioso) — o jogo roda com qualquer
+    /// subconjunto. Preferências persistem via BindSaveState (SaveData é Domain — atravessa a
+    /// fronteira Meta/Services).
+    ///
+    /// MIXAGEM (missão Nota 10): música em volume mais BAIXO que os SFX (padrão de runner — o
+    /// punch vem do SFX), crossfade ao trocar de faixa (suaviza a emenda entre jingles curtos —
+    /// ver teto da Lacuna L7) e DUCKING: SFX grandes (morte de boss, cascata de combos, fanfarra
+    /// de Supply, fim de fase, chuva de moedas, risco vencido) mergulham a música por um instante
+    /// para o impacto respirar. Todo fade/duck roda em TEMPO REAL (atravessa o slow motion da
+    /// morte cinematográfica e o timeScale 8-10x dos testes intacto).
     /// </summary>
     public class AudioManager : MonoBehaviour, IInitializable
     {
@@ -95,8 +103,28 @@ namespace MutantArmy.Services
         private Coroutine _comboCascade;
 
         // Música por mundo: troca SÓ quando o worldIndex muda (mudar de fase no mesmo mundo
-        // não reinicia a faixa). -1 = nenhuma faixa tocando ainda.
+        // não reinicia a faixa). -1 = nenhuma faixa tocando ainda. Sentinela do menu = -2
+        // (não é mundo nenhum, mas distingue "menu tocando" de "nada tocando" no cache).
+        private const int MenuMusicWorld = -2;
         private int _currentMusicWorld = -1;
+
+        // ---- Mixagem (música mais BAIXA que SFX, padrão de runner: SFX dão o punch) ----
+        // A música é ambiente; os SFX é que "tocam o jogo". Volumes relativos sensatos para
+        // os jingles CC0 (que são brilhantes/cortantes) não cansarem por cima do gameplay.
+        private const float MusicBaseVolume = 0.42f;   // teto da música quando sem ducking
+        private const float SfxVolume = 1.0f;          // SFX em cheio (one-shots já mixados)
+        private const float MusicFadeSeconds = 0.6f;   // fade ao trocar de faixa (suaviza a emenda)
+
+        // Ducking: SFX grandes (morte de boss, combos, fanfarra, fim de fase) abaixam a música
+        // por um instante para o impacto "respirar", depois ela volta. Tempo REAL (atravessa o
+        // slow motion da morte cinematográfica e o timeScale 8-10x dos testes intacto).
+        private const float DuckVolume = 0.12f;        // quão fundo a música cai durante o duck
+        private const float DuckAttackSeconds = 0.05f; // entra rápido (o impacto é AGORA)
+        private const float DuckHoldSeconds = 0.18f;   // segura no fundo
+        private const float DuckReleaseSeconds = 0.5f; // sobe devagar (volta natural)
+        private Coroutine _musicFade;                  // fade de TROCA de faixa
+        private Coroutine _musicDuck;                  // duck por SFX grande
+        private bool _ducking;                         // duck em andamento (release reinicia o ciclo)
 
         /// <summary>Chamado pelo GameBootstrap (doc 12 §3.3) via IInitializable.</summary>
         public void Init()
@@ -108,6 +136,11 @@ namespace MutantArmy.Services
                 _pitchedSource = gameObject.AddComponent<AudioSource>();
                 _pitchedSource.playOnAwake = false;
             }
+            // Mixagem: SFX em cheio, música ambiente mais baixa (padrão runner — o punch vem do
+            // SFX). Idempotente: re-Init reaplica os mesmos volumes.
+            if (_sfxSource != null) _sfxSource.volume = SfxVolume;
+            if (_pitchedSource != null) _pitchedSource.volume = SfxVolume;
+            if (_musicSource != null) _musicSource.volume = MusicBaseVolume;
             // Preferências (sfxOn/musicOn) vêm do save vivo do blackboard (Save roda antes
             // na ordem §3.3); sem bootstrap (teste), o bind fica a cargo do teste.
             if (GameBootstrap.Current != null)
@@ -222,30 +255,101 @@ namespace MutantArmy.Services
         }
 
         // Troca a faixa SÓ se for diferente da que já está tocando (não corta o loop atual).
+        // Crossfade simples (não hard-cut): abaixa o volume da faixa atual, troca o clip e sobe
+        // de novo — a emenda entre jingles curtos fica menos abrupta. Sem cena ativa (teste sem
+        // GameObject habilitado), degrada para a troca direta (corrotina exige isActiveAndEnabled).
         private void PlayMusicTrack(AudioClip track)
         {
             if (_musicSource == null || track == null) return;
             if (_musicSource.clip == track && _musicSource.isPlaying) return;
+
+            if (!isActiveAndEnabled)
+            {
+                SwapMusicClip(track);   // teste/headless: troca seca, sem corrotina de fade
+                return;
+            }
+            if (_musicFade != null) StopCoroutine(_musicFade);
+            _musicFade = StartCoroutine(CrossfadeRoutine(track));
+        }
+
+        // Swap direto do clip mantendo o teto de volume atual (respeita um duck em andamento).
+        private void SwapMusicClip(AudioClip track)
+        {
             _musicSource.clip = track;
             _musicSource.loop = true;
             _musicSource.mute = !_musicOn;
+            _musicSource.volume = _ducking ? DuckVolume : MusicBaseVolume;
             _musicSource.Play();
+        }
+
+        private IEnumerator CrossfadeRoutine(AudioClip track)
+        {
+            // Fade-out da faixa atual (se houver), troca, fade-in. Tudo em tempo REAL (atravessa
+            // slow motion e timeScale dos testes). O teto do fade-in respeita um duck ativo.
+            float startVol = _musicSource.volume;
+            if (_musicSource.isPlaying && _musicSource.clip != null)
+            {
+                float t = 0f;
+                while (t < MusicFadeSeconds)
+                {
+                    t += Time.unscaledDeltaTime;
+                    _musicSource.volume = Mathf.Lerp(startVol, 0f, t / MusicFadeSeconds);
+                    yield return null;
+                }
+            }
+            SwapMusicClip(track);
+            // Teto do fade-in respeita um duck que iniciou ANTES do crossfade; mas se um duck
+            // começar DURANTE este fade, ele assume o volume — não sobrescrevemos no fim.
+            float ceiling = _ducking ? DuckVolume : MusicBaseVolume;
+            _musicSource.volume = 0f;
+            float u = 0f;
+            while (u < MusicFadeSeconds)
+            {
+                if (_musicDuck != null) break;   // duck assumiu o controle do volume
+                u += Time.unscaledDeltaTime;
+                _musicSource.volume = Mathf.Lerp(0f, ceiling, u / MusicFadeSeconds);
+                yield return null;
+            }
+            if (_musicDuck == null) _musicSource.volume = ceiling;
+            _musicFade = null;
         }
 
         public void StopMusic()
         {
             _currentMusicWorld = -1;
-            if (_musicSource != null) _musicSource.Stop();
+            if (_musicFade != null) { StopCoroutine(_musicFade); _musicFade = null; }
+            if (_musicSource != null) { _musicSource.Stop(); _musicSource.volume = MusicBaseVolume; }
         }
 
         // ---- Música por mundo: resolvida na entrada em Running (troca ao mudar de mundo) ----
 
         private void HandleStateEntered(GameState state)
         {
+            // Menu/meta: música calma de fundo (jingle CC0 em loop — ver pendência da Lacuna L7).
+            // Volta ao menu depois da corrida REINICIA a faixa de menu (sai de mundo p/ menu).
+            if (state == GameState.MainMenu)
+            {
+                PlayMenuMusic();
+                return;
+            }
             // Só na entrada da corrida; BossFight herda a faixa (mesma fase/mundo).
             if (state != GameState.Running) return;
             _lastCrowdCount = -1;   // nova corrida: não soa pop pela diferença com a fase anterior
             UpdateWorldMusic();
+        }
+
+        /// <summary>
+        /// Música de fundo das telas de menu/meta. Troca SÓ quando saímos de uma faixa de mundo
+        /// para o menu (cache <see cref="MenuMusicWorld"/>) — reentrar no menu não corta o loop.
+        /// </summary>
+        public void PlayMenuMusic()
+        {
+            AudioClip track = _catalog != null ? _catalog.menuMusic : null;
+            if (track == null) return;   // sem faixa de menu: silêncio honesto
+            if (_currentMusicWorld == MenuMusicWorld && _musicSource != null && _musicSource.isPlaying)
+                return;
+            _currentMusicWorld = MenuMusicWorld;
+            PlayMusicTrack(track);
         }
 
         /// <summary>
@@ -287,6 +391,51 @@ namespace MutantArmy.Services
             }
             _pitchedSource.pitch = 1f + UnityEngine.Random.Range(-PitchVariance, PitchVariance);
             _pitchedSource.PlayOneShot(clip);
+        }
+
+        // ---- Ducking: SFX grande abaixa a música por um instante (impacto "respira") ----
+
+        /// <summary>
+        /// Mergulha a música por um instante para um SFX grande (morte de boss, combos, fanfarra,
+        /// fim de fase) ganhar destaque, depois ela volta. Tempo REAL — atravessa o slow motion da
+        /// morte cinematográfica e o timeScale 8-10x dos testes. No-op sem música ou fora de cena.
+        /// </summary>
+        private void DuckMusic()
+        {
+            if (_musicSource == null || !_musicOn || !isActiveAndEnabled) return;
+            if (!_musicSource.isPlaying) return;
+            // O duck SEMPRE roda sua própria corrotina (dono único do volume durante a janela).
+            // Se um crossfade estiver em andamento, ele detecta _musicDuck != null e cede o
+            // controle — nunca duas corrotinas brigando pelo mesmo volume.
+            if (_musicDuck != null) StopCoroutine(_musicDuck);
+            _musicDuck = StartCoroutine(DuckRoutine());
+        }
+
+        private IEnumerator DuckRoutine()
+        {
+            _ducking = true;
+            float from = _musicSource.volume;
+            // Ataque rápido até o fundo do duck.
+            float t = 0f;
+            while (t < DuckAttackSeconds)
+            {
+                t += Time.unscaledDeltaTime;
+                _musicSource.volume = Mathf.Lerp(from, DuckVolume, t / DuckAttackSeconds);
+                yield return null;
+            }
+            _musicSource.volume = DuckVolume;
+            yield return new WaitForSecondsRealtime(DuckHoldSeconds);
+            // Release lento de volta ao teto base.
+            float r = 0f;
+            while (r < DuckReleaseSeconds)
+            {
+                r += Time.unscaledDeltaTime;
+                _musicSource.volume = Mathf.Lerp(DuckVolume, MusicBaseVolume, r / DuckReleaseSeconds);
+                yield return null;
+            }
+            _musicSource.volume = MusicBaseVolume;
+            _ducking = false;
+            _musicDuck = null;
         }
 
         // ---- UI (botões chamam via blackboard/glue — UI não referencia Services §2.3) ----
@@ -351,7 +500,10 @@ namespace MutantArmy.Services
         }
 
         private void HandleSupplyOverflow(SupplyOverflow o)
-            => PlaySfx(FirstOf(_catalog != null ? _catalog.supplyFanfare : null, _supplyFanfareClip));
+        {
+            PlaySfx(FirstOf(_catalog != null ? _catalog.supplyFanfare : null, _supplyFanfareClip));
+            DuckMusic();   // fanfarra de prêmio (CANON §3.2) ganha o palco por um instante
+        }
 
         private void HandleMutationGained(MutationConfigSO m)
             => PlaySfx(FirstOf(_catalog != null ? _catalog.mutation : null, _mutationClip));
@@ -382,6 +534,7 @@ namespace MutantArmy.Services
                 ? FirstOf(_catalog != null ? _catalog.victoryJingle : null, _victoryClip)
                 : FirstOf(_catalog != null ? _catalog.defeatJingle : null, _defeatClip);
             PlaySfx(jingle);
+            DuckMusic();   // jingle de fim de fase no primeiro plano (vitória/derrota)
         }
 
         private void HandleCurrencyChanged(CurrencyChange c)
@@ -443,7 +596,10 @@ namespace MutantArmy.Services
             if (_catalog == null || _catalog.comboSting == null) return;
             _pendingComboStings++;
             if (_comboCascade == null && isActiveAndEnabled)
+            {
                 _comboCascade = StartCoroutine(ComboCascadeRoutine());
+                DuckMusic();   // 1× no início da cascata (não por sting — não pumpa a música)
+            }
         }
 
         private IEnumerator ComboCascadeRoutine()
@@ -470,9 +626,13 @@ namespace MutantArmy.Services
         }
 
         // Morte do boss (1× por luta): camada de peso da sequência cinematográfica —
-        // PlayOneShot não é afetado pelo slow motion do golpe final.
+        // PlayOneShot não é afetado pelo slow motion do golpe final. Ducking forte: a música
+        // mergulha para a explosão + chuva de combos da morte cinematográfica respirarem.
         private void HandleBossDied(BossDied d)
-            => PlaySfx(_catalog != null ? _catalog.bossDeath : null);
+        {
+            PlaySfx(_catalog != null ? _catalog.bossDeath : null);
+            DuckMusic();
+        }
 
         // Inimigo de pista morto: pop com pitch random, rate-limited (hordas caem em rajada).
         private void HandleTrackEnemyKilled(TrackEnemyKilled k)
@@ -486,7 +646,10 @@ namespace MutantArmy.Services
 
         // Wave limpa: chuva de moedas — fanfarra curta, 1× por wave (sem rate-limit).
         private void HandleEnemyWaveCleared(EnemyWaveCleared w)
-            => PlaySfx(_catalog != null ? _catalog.coinBurst : null);
+        {
+            PlaySfx(_catalog != null ? _catalog.coinBurst : null);
+            DuckMusic();   // chuva de moedas em destaque
+        }
 
         // Veredito de portal (BOA ESCOLHA!/armadilha): sting CURTO em camada sobre o som do
         // portal (gatePositive/gateNegative continuam no OnGateConsumed — são o "whoosh",
@@ -507,6 +670,9 @@ namespace MutantArmy.Services
 
         // Zona de risco: sucesso = fanfarra "x10!", falha = impacto seco (1× por zona).
         private void HandleRiskResolved(bool success, Vector3 worldPosition)
-            => PlaySfx(_catalog != null ? (success ? _catalog.riskWin : _catalog.riskLose) : null);
+        {
+            PlaySfx(_catalog != null ? (success ? _catalog.riskWin : _catalog.riskLose) : null);
+            if (success) DuckMusic();   // só o triunfo "x10!" ganha o palco; a falha some sozinha
+        }
     }
 }

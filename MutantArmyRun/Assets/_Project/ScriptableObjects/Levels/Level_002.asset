@@ -33,7 +33,10 @@ MonoBehaviour:
     leftGate: {fileID: 11400000, guid: 9b7ea4758f63f434abd773b87d301872, type: 2}
     rightGate: {fileID: 11400000, guid: b076fdd235389054aa34b310df31a68f, type: 2}
   obstacles: []
-  enemies: []
+  enemies:
+  - trackPosition: 80
+    enemy: {fileID: 11400000, guid: 975771ca079979c45ab78a93659d93ab, type: 2}
+    count: 5
   boss: {fileID: 11400000, guid: f014fe0b697b9644b9b67dde425ba453, type: 2}
   bossHpMultiplier: 0.3
   winReward: {fileID: 0}

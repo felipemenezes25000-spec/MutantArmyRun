@@ -36,10 +36,14 @@ t-*.xml
 r2-*.log
 rebuild-*.log
 final-*.xml
-# logs/resultados temporarios de batchmode e testes (missao Nota 10)
+# logs/resultados temporarios de batchmode e testes (missao Nota 10 + polimento)
 *-compile.log
 w5-*.log
 w5-*.xml
 fix-*.log
 fix-*.xml
 wave*.log
+pv-*.log
+pf-*.log
+pf-*.xml
+uv-*.log
