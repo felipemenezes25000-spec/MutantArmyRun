@@ -14,7 +14,8 @@ namespace MutantArmy.Tests
     /// Bootstrap mínimo do loop de jogo para PlayMode, montado por código numa cena
     /// aditiva descartável. Espelha os DOIS composition roots reais (doc 12 §3.3):
     /// GameBootstrap (GameManager → Save → Economy) e GameSceneBootstrap
-    /// (Level → Crowd → Gate → Boss → Combat → Risk → Anchor), chamando os MESMOS
+    /// (Level → Enemies → Crowd → Gate → Boss → Combat → Combo → Risk → Anchor —
+    /// ordem do ProjectSetup.CreateGameScene, missão Nota 10), chamando os MESMOS
     /// Init() na MESMA ordem. Fica de fora só o que é apresentação null-safe nos
     /// managers (CrowdRenderer/VFX/UI) — é isso que mantém o rig 100% batchmode
     /// -nographics: nenhum assert visual, nenhuma chamada de render.
@@ -26,10 +27,12 @@ namespace MutantArmy.Tests
         public EconomySystem Economy { get; private set; }
         public CrowdAnchor Anchor { get; private set; }
         public LevelManager Level { get; private set; }
+        public TrackEnemyManager Enemies { get; private set; }
         public CrowdManager Crowd { get; private set; }
         public GateManager Gates { get; private set; }
         public BossManager Boss { get; private set; }
         public CombatSystem Combat { get; private set; }
+        public ComboSystem Combo { get; private set; }
         public RiskResolver Risk { get; private set; }
         public AutoPilot Pilot { get; private set; }
 
@@ -64,6 +67,12 @@ namespace MutantArmy.Tests
             Level = NewManager<LevelManager>("LevelManager");
             Level.Init();
 
+            // Inimigos de pista (missão Nota 10): APÓS Level e ANTES de Crowd/Combat, como no
+            // ProjectSetup.CreateGameScene. Zero wiring: os [SerializeField] dele são tuning
+            // com defaults válidos e as views nascem de primitivos (greybox batchmode-safe).
+            Enemies = NewManager<TrackEnemyManager>("TrackEnemyManager");
+            Enemies.Init();
+
             Crowd = NewManager<CrowdManager>("CrowdManager");
             SetPrivateField(Crowd, "_chart", chart);
             SetPrivateField(Crowd, "_defaultUnit", defaultUnit);
@@ -79,6 +88,12 @@ namespace MutantArmy.Tests
             Combat = NewManager<CombatSystem>("CombatSystem");
             SetPrivateField(Combat, "_chart", chart);
             Combat.Init();
+
+            // Combos (missão Nota 10): APÓS Combat, como no ProjectSetup — na morte do boss
+            // ele fotografa CrowdManager/BossManager/CombatSystem (contrato W2-C §5).
+            // Sem campos serializados: deps chegam por singleton/bus em runtime.
+            Combo = NewManager<ComboSystem>("ComboSystem");
+            Combo.Init();
 
             Risk = NewManager<RiskResolver>("RiskResolver");
             Risk.Init();

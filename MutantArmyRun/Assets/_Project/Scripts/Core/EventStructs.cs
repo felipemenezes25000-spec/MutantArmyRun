@@ -80,6 +80,10 @@ namespace MutantArmy.Core
         public float durationSeconds;
         public long coinsAwarded;     // TOTAL creditado na fase = recompensa de vitória + runCoins (delta exibido)
         public int xpAwarded;         // TOTAL de XP ganho na fase (delta exibido)
+        // Campos da missão Nota 10 — sempre no FIM (ctors antigos preservados, default 0/None):
+        public int comboCount;        // combos conquistados na fase (ComboMath.Evaluate)
+        public int comboBonusCoins;   // bônus total em moedas dos combos (já dentro de coinsAwarded)
+        public FailReason failReason; // motivo de derrota rico (FailReasonResolver; None em vitória)
 
         public LevelResult(int levelIndex, bool won, int survivors, float damageDealt,
                            int runCoins, int runXp, float durationSeconds)
@@ -91,6 +95,15 @@ namespace MutantArmy.Core
         public LevelResult(int levelIndex, bool won, int survivors, float damageDealt,
                            int runCoins, int runXp, float durationSeconds,
                            long coinsAwarded, int xpAwarded)
+            : this(levelIndex, won, survivors, damageDealt, runCoins, runXp, durationSeconds,
+                   coinsAwarded, xpAwarded, comboCount: 0, comboBonusCoins: 0, failReason: FailReason.None)
+        {
+        }
+
+        public LevelResult(int levelIndex, bool won, int survivors, float damageDealt,
+                           int runCoins, int runXp, float durationSeconds,
+                           long coinsAwarded, int xpAwarded,
+                           int comboCount, int comboBonusCoins, FailReason failReason)
         {
             this.levelIndex = levelIndex;
             this.won = won;
@@ -101,6 +114,9 @@ namespace MutantArmy.Core
             this.durationSeconds = durationSeconds;
             this.coinsAwarded = coinsAwarded;
             this.xpAwarded = xpAwarded;
+            this.comboCount = comboCount;
+            this.comboBonusCoins = comboBonusCoins;
+            this.failReason = failReason;
         }
     }
 
@@ -149,6 +165,130 @@ namespace MutantArmy.Core
             this.type = type;
             this.amount = amount;
             this.source = source;
+        }
+    }
+
+    // ---------------------------------------------------------------- Payloads da missão Nota 10
+
+    /// <summary>
+    /// Golpe elemental no boss já CLASSIFICADO (WeaknessJudge sobre o multiplicador do
+    /// ElementChart) — alimenta o texto FRAQUEZA!/RESISTIU!/IMUNE! e o ComboSystem.
+    /// Rate-limited NA ORIGEM (≥0,5 s entre Raises): o boss apanha todo frame, o feedback não.
+    /// </summary>
+    public struct BossElementalHit
+    {
+        public ElementType element;       // elemento do golpe
+        public ElementRelation relation;  // Weakness/Resisted/Immune/Neutral
+        public float damage;              // dano efetivo após multiplicadores
+        public Vector3 position;          // onde ancorar o texto flutuante
+
+        public BossElementalHit(ElementType element, ElementRelation relation, float damage, Vector3 position)
+        {
+            this.element = element;
+            this.relation = relation;
+            this.damage = damage;
+            this.position = position;
+        }
+    }
+
+    /// <summary>Combo conquistado na corrida (ComboMath) — UI celebra, Economy credita o bônus.</summary>
+    public struct ComboEarned
+    {
+        public ComboKind kind;
+        public int bonusCoins;            // ComboMath.BonusCoins(kind), já resolvido na origem
+
+        public ComboEarned(ComboKind kind, int bonusCoins)
+        {
+            this.kind = kind;
+            this.bonusCoins = bonusCoins;
+        }
+    }
+
+    /// <summary>
+    /// Telegraph do ataque especial do boss (janela de leitura ANTES do golpe, CANON §6):
+    /// HUD pisca o aviso, AudioManager toca o sting — o golpe em si vem depois de seconds.
+    /// </summary>
+    public struct BossSpecialTelegraph
+    {
+        public float seconds;             // duração da janela de aviso
+        public Vector3 position;          // epicentro previsto do especial
+        public string bossId;
+
+        public BossSpecialTelegraph(float seconds, Vector3 position, string bossId)
+        {
+            this.seconds = seconds;
+            this.position = position;
+            this.bossId = bossId;
+        }
+    }
+
+    /// <summary>
+    /// Morte do boss — gatilho do álbum (BossCollectionSystem.RegisterKill), da morte
+    /// cinematográfica (slow motion + shake) e do combo BossBreaker (fightSeconds ≤ 8).
+    /// </summary>
+    public struct BossDied
+    {
+        public string bossId;
+        public Vector3 position;          // onde tocar a explosão final
+        public bool wasRare;              // variante rara (RareBossMath) → recompensa ×3
+        public float fightSeconds;        // duração da luta (recorde de tempo do álbum)
+
+        public BossDied(string bossId, Vector3 position, bool wasRare, float fightSeconds)
+        {
+            this.bossId = bossId;
+            this.position = position;
+            this.wasRare = wasRare;
+            this.fightSeconds = fightSeconds;
+        }
+    }
+
+    /// <summary>
+    /// Morte de inimigo DE PISTA (TrackEnemyManager) — NÃO confundir com UnitDeath
+    /// (typeId byte = índice SoA do exército do JOGADOR). coins é o drop creditado na RunWallet.
+    /// </summary>
+    public struct TrackEnemyKilled
+    {
+        public TrackEnemyKind kind;
+        public Vector3 position;          // onde tocar VFX/moeda voando
+        public int coins;                 // rewardCoins do EnemyConfigSO
+
+        public TrackEnemyKilled(TrackEnemyKind kind, Vector3 position, int coins)
+        {
+            this.kind = kind;
+            this.position = position;
+            this.coins = coins;
+        }
+    }
+
+    /// <summary>Wave de inimigos de pista limpa — fanfarra curta + dado para missões/analytics.</summary>
+    public struct EnemyWaveCleared
+    {
+        public int enemiesKilled;
+        public Vector3 position;          // centro da wave (âncora da fanfarra)
+
+        public EnemyWaveCleared(int enemiesKilled, Vector3 position)
+        {
+            this.enemiesKilled = enemiesKilled;
+            this.position = position;
+        }
+    }
+
+    /// <summary>
+    /// "BOSS RARO APARECEU!" — rolado por RareBossMath no BossScout (ANTES da fase, com RNG
+    /// derivado da seed) para o cartão avisar e a recompensa multiplicar. Surpresa justa,
+    /// nunca punição: HP ×1.5, recompensa ×3 (missão §4.2).
+    /// </summary>
+    public struct RareBossAnnounce
+    {
+        public string bossId;
+        public float hpMultiplier;        // RareBossMath.HpMultiplier
+        public float rewardMultiplier;    // RareBossMath.RewardMultiplier
+
+        public RareBossAnnounce(string bossId, float hpMultiplier, float rewardMultiplier)
+        {
+            this.bossId = bossId;
+            this.hpMultiplier = hpMultiplier;
+            this.rewardMultiplier = rewardMultiplier;
         }
     }
 }

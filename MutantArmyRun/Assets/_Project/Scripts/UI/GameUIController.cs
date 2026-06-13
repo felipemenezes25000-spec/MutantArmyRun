@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -34,6 +35,11 @@ namespace MutantArmy.UI
         private const string MainSceneName = "Main";   // const: sem string mágica (doc 12 §3.3)
 
         private int _unitsLostThisRun;
+        // Acumuladores da corrida p/ a tela de vitória (missão Nota 10): os eventos chegam
+        // ANTES do OnLevelFinished (combos/boss morto disparam na morte do boss, antes de
+        // Victory) — contrato de 1 frame respeitado ("dados prontos → tela mostra").
+        private readonly List<ComboEarned> _runCombos = new List<ComboEarned>(8);
+        private bool _rareBossDownThisRun;
         private LevelResult _lastResult;
         private bool _hasResult;
         private bool _paused;
@@ -42,6 +48,8 @@ namespace MutantArmy.UI
         {
             GameEvents.OnLevelFinished += HandleLevelFinished;
             GameEvents.OnUnitDied += HandleUnitDied;
+            GameEvents.OnComboEarned += HandleComboEarned;
+            GameEvents.OnBossDied += HandleBossDied;
 
             GameManager gm = GameManager.Instance;
             if (gm != null)
@@ -76,6 +84,8 @@ namespace MutantArmy.UI
         {
             GameEvents.OnLevelFinished -= HandleLevelFinished;   // bus estático: sempre limpar (doc 12 §3.2)
             GameEvents.OnUnitDied -= HandleUnitDied;
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnBossDied -= HandleBossDied;
 
             GameManager gm = GameManager.Instance;
             if (gm != null)
@@ -106,6 +116,8 @@ namespace MutantArmy.UI
         private void HandleLevelStarted(int levelIndex)
         {
             _unitsLostThisRun = 0;
+            _runCombos.Clear();             // acumuladores POR corrida: nada vaza para a próxima fase
+            _rareBossDownThisRun = false;
             _hasResult = false;
             CloseResult();   // re-start vindo de fora (cheat/AutoPilot) não deixa tela órfã
             ForceClosePause();   // nova fase nunca herda pausa da anterior
@@ -114,6 +126,18 @@ namespace MutantArmy.UI
         private void HandleUnitDied(UnitDeath death)
         {
             _unitsLostThisRun++;
+        }
+
+        // 1 evento por combo conquistado (ComboSystem dispara na morte do boss, ANTES de
+        // Victory) — a lista vira as linhas "+25 PORTAIS PERFEITOS!" da tela de vitória.
+        private void HandleComboEarned(ComboEarned combo)
+        {
+            _runCombos.Add(combo);
+        }
+
+        private void HandleBossDied(BossDied died)
+        {
+            if (died.wasRare) _rareBossDownThisRun = true;   // badge "BOSS RARO DERROTADO! x3"
         }
 
         private void HandleStateEntered(GameState s)
@@ -162,14 +186,27 @@ namespace MutantArmy.UI
             long coinsDelta = r.won ? r.coinsAwarded : 0L;
             long doubleBase = r.won ? r.runCoins : 0L;
             bool perfect = r.won && _unitsLostThisRun == 0;
-            // motivo da derrota (doc 09 §4.5): o GameManager o registrou (CrowdManager no wipe).
-            string defeatReason = r.won ? null : DefeatReasonText();
+            // Derrota que ENSINA (missão Nota 10): o motivo rico chega no próprio resultado
+            // (LevelResult.failReason, via FailReasonResolver no Gameplay) e vira dica curta;
+            // sem motivo resolvido (None), cai no texto legado do GameManager (doc 09 §4.5).
+            string defeatReason = r.won ? null : DefeatHintText(r.failReason);
             _resultScreen.Bind(r.won, coinsDelta, r.xpAwarded, r.survivors, (long)r.damageDealt, perfect,
                                doubleBase, defeatReason);
 
             GameBootstrap root = GameBootstrap.Current;
             bool doubleReady = root != null && root.RewardedAdReady != null && root.RewardedAdReady();
             _resultScreen.SetDoubleAvailable(doubleReady);   // sem fill o botão SOME (doc 12 §7.3)
+
+            // Extras de vitória "só mais uma" (missão Nota 10): a ordem dos Binds define a
+            // coreografia do reveal — badge de raro → linhas de combo → teaser do próximo boss.
+            if (r.won)
+            {
+                _resultScreen.SetRareBossDefeated(_rareBossDownThisRun);
+                _resultScreen.BindCombos(_runCombos);
+                bool isWorldBoss;
+                BossConfigSO nextBoss = ResolveNextBoss(r.levelIndex, out isWorldBoss);
+                _resultScreen.BindNextBoss(nextBoss, isWorldBoss);
+            }
 
             if (UIManager.Instance != null) UIManager.Instance.Push(_resultScreen);
             else _resultScreen.Show();
@@ -322,7 +359,31 @@ namespace MutantArmy.UI
             SceneManager.LoadSceneAsync(MainSceneName, LoadSceneMode.Single);
         }
 
-        // Texto PT-BR do motivo da derrota (doc 09 §4.5) lido do GameManager.
+        /// <summary>
+        /// Dica curta PT-BR por motivo RICO de derrota (missão Nota 10): a derrota ENSINA o
+        /// próximo passo — tom de conselho, nunca de bronca. FailReason.None (motivo não
+        /// resolvido pelo Gameplay) cai no texto legado do GameManager.
+        /// </summary>
+        public static string DefeatHintText(FailReason reason)
+        {
+            switch (reason)
+            {
+                case FailReason.WrongElement: return "Esse boss resiste ao seu elemento. Veja a fraqueza no Scout!";
+                case FailReason.HitByLaser: return "Escudeiros reduzem o laser!";
+                case FailReason.TooManyLossesOnTrack: return "Você perdeu muitas tropas na pista.";
+                case FailReason.ArmyTooSmall: return "Pegue mais portais de tropas!";
+                case FailReason.BossResistedDamage: return "Explore a fraqueza do boss!";
+                case FailReason.NoTankUnits: return "Escudeiros seguram o dano!";
+                case FailReason.NoAreaDamage: return "Magos limpam hordas!";
+                case FailReason.IgnoredHealers: return "Destrua os curadores primeiro!";
+                case FailReason.HitByLava: return "Desvie das áreas de perigo!";
+                case FailReason.LowUpgradePower: return "Melhore suas tropas no menu!";
+                default: return DefeatReasonText();   // None: derrota sem motivo rico resolvido
+            }
+        }
+
+        // Texto PT-BR legado do motivo da derrota (doc 09 §4.5) lido do GameManager —
+        // rede de segurança quando o FailReasonResolver não publicou motivo rico.
         private static string DefeatReasonText()
         {
             GameManager gm = GameManager.Instance;
@@ -333,6 +394,22 @@ namespace MutantArmy.UI
                 case DefeatReason.BossWon: return "O boss venceu";
                 default: return "Exército eliminado";   // fallback seguro: derrota sem motivo gravado
             }
+        }
+
+        // Próximo boss do teaser de vitória: MESMO resolvedor do botão PRÓXIMA FASE
+        // (NextLevelAfter + GetLevel — endless incluído). Boss de MUNDO = a fase seguinte
+        // termina no worldBoss do próprio WorldConfigSO (fase 10 de cada mundo).
+        private static BossConfigSO ResolveNextBoss(int currentLevelIndex, out bool isWorldBoss)
+        {
+            isWorldBoss = false;
+            GameSettingsSO settings = GameSettingsSO.Load();
+            if (settings == null) return null;
+
+            LevelConfigSO next = settings.GetLevel(settings.NextLevelAfter(currentLevelIndex, won: true));
+            if (next == null || next.boss == null) return null;
+
+            isWorldBoss = next.world != null && next.world.worldBoss == next.boss;
+            return next.boss;
         }
 
         private void CloseResult()

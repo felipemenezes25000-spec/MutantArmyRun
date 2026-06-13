@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "MutantArmy.Domain",
-        "MutantArmy.Core"
+        "MutantArmy.Core",
+        "MutantArmy.Gameplay"
     ],
     "includePlatforms": [
         "Editor"

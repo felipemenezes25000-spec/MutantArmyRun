@@ -85,8 +85,8 @@ namespace MutantArmy.Editor
             CreateEventSystem();
 
             // ---- [Services]: composition root + managers persistentes (doc 12 §3.3) ----
-            // Ordem canônica: Save → RemoteConfig → Analytics → Ads/IAP → Economy →
-            // Upgrade → Unit → Reward → Audio → UI (+ GameManager).
+            // Ordem canônica: Save → BossCollection → RemoteConfig → Analytics → Ads/IAP →
+            // Economy → Upgrade → Unit → Reward → Audio → UI (+ GameManager).
             var services = new GameObject("[Services]");
             var bootstrap = services.AddComponent<GameBootstrap>();
 
@@ -98,6 +98,10 @@ namespace MutantArmy.Editor
             services.AddComponent<NullAdsProvider>();
 
             var save = AddManager<SaveSystem>(services, "SaveSystem");
+            // Álbum de bosses (missão Nota 10): 1º do array _managersInOrder = init logo APÓS
+            // o SaveSystem (que é campo dedicado e roda antes do array) — os recordes leem
+            // SaveData.bossCollection e nada mais, então nenhum outro manager o precede.
+            var bossCollection = AddManager<BossCollectionSystem>(services, "BossCollectionSystem");
             var remoteConfig = AddManager<RemoteConfigManager>(services, "RemoteConfigManager");
             var analytics = AddManager<AnalyticsManager>(services, "AnalyticsManager");
             var ads = AddManager<AdsManager>(services, "AdsManager");
@@ -149,7 +153,7 @@ namespace MutantArmy.Editor
             WireSerializedField(bootstrap, "_saveService", save);
             WireSerializedArray(bootstrap, "_managersInOrder", new Component[]
             {
-                remoteConfig, analytics, ads, iap, economy, upgrade, unit, reward, mission, audio, ui
+                bossCollection, remoteConfig, analytics, ads, iap, economy, upgrade, unit, reward, mission, audio, ui
             });
 
             // Splash: orçamento de boot de 2,5 s — gradiente do skin + logo (doc 12 §2.2).
@@ -273,10 +277,14 @@ namespace MutantArmy.Editor
             // Líder/âncora da multidão (segue o drag lateral, doc 12 §4.2).
             var anchor = new GameObject("CrowdAnchor").AddComponent<CrowdAnchor>();
 
-            // ---- [GameSystems]: managers de gameplay na ordem Level→Crowd→Gate→Boss→Combat (doc 12 §3.3) ----
+            // ---- [GameSystems]: managers de gameplay na ordem Level→Enemies→Crowd→Gate→Boss→Combat→Combo (doc 12 §3.3) ----
             var systems = new GameObject("[GameSystems]");
             var sceneBootstrap = systems.AddComponent<GameSceneBootstrap>();
             var level = AddManager<LevelManager>(systems, "LevelManager");
+            // Inimigos de pista (missão Nota 10): APÓS Level e ANTES de Combat — ordem do
+            // composition root é CONTRATO (§3.3). O LevelManager chama SpawnFromLevel no
+            // BeginRun (null-safe), mas o Init precisa ter rodado antes da 1ª corrida.
+            var enemies = AddManager<TrackEnemyManager>(systems, "TrackEnemyManager");
             var crowd = AddManager<CrowdManager>(systems, "CrowdManager");
             // Sem CrowdRenderer a multidão é INVISÍVEL (Submit é no-op sem Instance);
             // sem RiskResolver o portal de Risco vira no-op (doc 12 §4.3/§6.2).
@@ -284,6 +292,9 @@ namespace MutantArmy.Editor
             var gate = AddManager<GateManager>(systems, "GateManager");
             var boss = AddManager<BossManager>(systems, "BossManager");
             var combat = AddManager<CombatSystem>(systems, "CombatSystem");
+            // Combos (missão Nota 10): APÓS Combat — na morte do boss ele fotografa
+            // CrowdManager/BossManager/CombatSystem (contrato W2-C §5).
+            var combo = AddManager<ComboSystem>(systems, "ComboSystem");
             var vfx = AddManager<VFXManager>(systems, "VFXManager");
             var risk = AddManager<RiskResolver>(systems, "RiskResolver");
 
@@ -314,7 +325,7 @@ namespace MutantArmy.Editor
             // dele cria o trigger-proxy do exército.
             WireSerializedArray(sceneBootstrap, "_managersInOrder", new Component[]
             {
-                level, crowd, crowdRenderer, gate, boss, combat, vfx, risk, anchor
+                level, enemies, crowd, crowdRenderer, gate, boss, combat, combo, vfx, risk, anchor
             });
 
             // ---- HUD da corrida (doc 09 §4.2): elementos REAIS ligados ao HudController ----
@@ -335,11 +346,18 @@ namespace MutantArmy.Editor
             feedbackLabel.gameObject.SetActive(false);   // o controller ativa por evento
             WireSerializedField(feedbackController, "_label", feedbackLabel);
 
+            // ---- HUD do boss (missão Nota 10): barra de HP + nome + fraqueza + aviso ----
+            BuildBossHud((RectTransform)hudCanvas.transform);
+
             // ---- SCR-04/05 ResultScreen + glue (GameUIController) ----
             ResultScreen resultScreen = BuildResultScreen((RectTransform)hudCanvas.transform);
             var gameUi = hudCanvas.AddComponent<GameUIController>();
             WireSerializedField(gameUi, "_resultScreen", resultScreen);
             WireSerializedField(gameUi, "_feedback", feedbackController);
+
+            // Ordem de irmãos é ordem de render no mesmo canvas: FeedbackText por ÚLTIMO —
+            // os popups de combo pós-vitória aparecem SOBRE a ResultScreen (missão Nota 10).
+            feedback.transform.SetAsLastSibling();
 
             string path = ScenesFolder + "/Game.unity";
             EditorSceneManager.SaveScene(scene, path);
@@ -403,6 +421,99 @@ namespace MutantArmy.Editor
             WireSerializedArray(controller, "_mutationSlotTexts", mutationSlots);
         }
 
+        /// <summary>
+        /// HUD do boss (missão Nota 10): GameObject "BossHud" full-stretch sob o HudCanvas com
+        /// o BossHudController e a hierarquia polida — barra 700×46 topo-centro com fundo
+        /// escuro e fill ANCORADO (_hpFillRect: anchorMax.x = HP normalizado, mesma técnica do
+        /// fallback do controller), nome do boss acima, fraqueza ativa abaixo e o aviso de
+        /// especial central com CanvasGroup próprio (pisca sem mexer no resto). O GO fica
+        /// SEMPRE ativo (os handlers de evento vivem nele); mostrar/esconder é alpha do
+        /// _rootGroup — contrato do BossHudController.
+        /// </summary>
+        private static void BuildBossHud(RectTransform hudCanvas)
+        {
+            var go = new GameObject("BossHud", typeof(RectTransform));
+            var root = (RectTransform)go.transform;
+            root.SetParent(hudCanvas, false);
+            StretchFull(root);
+
+            var controller = go.AddComponent<BossHudController>();
+
+            var rootGroup = go.AddComponent<CanvasGroup>();
+            rootGroup.alpha = 0f;                   // nasce invisível; StateEntered(BossFight) faz o fade
+            rootGroup.interactable = false;
+            rootGroup.blocksRaycasts = false;       // AutoPilot/jogador tocam por baixo intactos
+
+            // Nome do boss acima da barra ("[RARO]" e a cor roxa entram pelo controller).
+            TMP_Text bossName = CreateTmpLabel(root, "BossName", string.Empty, 40f,
+                TextAlignmentOptions.Center, Anchors.TopCenter, new Vector2(0f, -322f), new Vector2(760f, 44f));
+
+            // Barra 700×46 topo-centro, abaixo do bloco do HudController (Supply termina em -310).
+            Image barBg = CreateImage(root, "HpBarBg",
+                UiSkin.BarBackground,
+                UiSkin.BarBackground != null ? new Color(0.10f, 0.11f, 0.16f, 0.95f)
+                                             : new Color(0.08f, 0.09f, 0.13f, 0.85f),
+                Anchors.TopCenter, new Vector2(0f, -372f), new Vector2(700f, 46f));
+
+            // Fill ancorado: o controller escreve anchorMax.x; a COR por fase
+            // (verde→amarelo→vermelho) entra por _hpFillImage (type != Filled → caminho do rect).
+            var fillGo = new GameObject("HpBarFill", typeof(RectTransform), typeof(Image));
+            var fillRect = (RectTransform)fillGo.transform;
+            fillRect.SetParent(barBg.transform, false);
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = new Vector2(4f, 4f);
+            fillRect.offsetMax = new Vector2(-4f, -4f);
+            var fillImage = fillGo.GetComponent<Image>();
+            fillImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            fillImage.type = Image.Type.Sliced;
+            fillImage.color = new Color(0.35f, 0.90f, 0.40f);   // verde da fase 0 (controller re-tinta)
+            fillImage.raycastTarget = false;
+
+            // Marcadores dos limiares de fase 0.5/0.25 (CONTRACT §1 item 14), sobre o fill.
+            CreateBossHudMarker((RectTransform)barBg.transform, "Marker50", 0.5f);
+            CreateBossHudMarker((RectTransform)barBg.transform, "Marker25", 0.25f);
+
+            // Fraqueza ativa abaixo da barra — texto E cor vêm do controller (nome informa,
+            // cor reforça, doc 09 P7).
+            TMP_Text weakness = CreateTmpLabel(root, "WeaknessTag", string.Empty, 28f,
+                TextAlignmentOptions.Center, Anchors.TopCenter, new Vector2(0f, -428f), new Vector2(760f, 34f));
+
+            // Aviso do especial: central e piscante (CanvasGroup próprio, animado pelo controller
+            // durante toda a janela do telegraph — unscaled, convive com slow-mo).
+            TMP_Text warning = CreateTmpLabel(root, "SpecialWarning", "!! ATAQUE ESPECIAL !!", 44f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 470f), new Vector2(860f, 56f),
+                new Color(1.00f, 0.35f, 0.20f));
+            var warningGroup = warning.gameObject.AddComponent<CanvasGroup>();
+            warningGroup.alpha = 0f;
+            warningGroup.interactable = false;
+            warningGroup.blocksRaycasts = false;
+
+            WireSerializedField(controller, "_rootGroup", rootGroup);
+            WireSerializedField(controller, "_bossNameText", bossName);
+            WireSerializedField(controller, "_weaknessText", weakness);
+            WireSerializedField(controller, "_hpFillImage", fillImage);
+            WireSerializedField(controller, "_hpFillRect", fillRect);
+            WireSerializedField(controller, "_warningText", warning);
+            WireSerializedField(controller, "_warningGroup", warningGroup);
+        }
+
+        /// <summary>Risco vertical nos limiares de fase da barra do boss (0.5/0.25).</summary>
+        private static void CreateBossHudMarker(RectTransform bar, string name, float normalizedX)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(bar, false);
+            rect.anchorMin = new Vector2(normalizedX, 0f);
+            rect.anchorMax = new Vector2(normalizedX, 1f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(3f, -8f);   // 4 px de respiro vertical dentro do trilho
+            var img = go.GetComponent<Image>();
+            img.color = new Color(0f, 0f, 0f, 0.65f);
+            img.raycastTarget = false;
+        }
+
         private static ResultScreen BuildResultScreen(RectTransform parent)
         {
             GameObject panel = CreatePanel(parent, "ResultScreen", new Color(0f, 0f, 0f, 0.85f));
@@ -438,6 +549,12 @@ namespace MutantArmy.Editor
                 TextAlignmentOptions.Center, Anchors.Middle, new Vector2(20f, 0f), new Vector2(420f, 76f), Amber);
             perfectGo.SetActive(false);
 
+            // Dica da derrota (missão Nota 10): MESMO slot do selo PERFECT — nunca coexistem
+            // (PERFECT é só vitória, motivo é só derrota; o Bind controla os dois).
+            TMP_Text reason = CreateTmpLabel(card.transform, "ReasonText", string.Empty, 34f,
+                TextAlignmentOptions.Center, Anchors.Middle, new Vector2(0f, 450f), new Vector2(820f, 110f), TextSoft);
+            reason.gameObject.SetActive(false);
+
             // O número principal é o DELTA, nunca o total da carteira (doc 12 §4.13) —
             // ENORME, dourado, com a moeda do lado.
             bool hasCoinIcon = AddIcon(card.transform, "CoinIcon", UiSkin.IconCoin, new Vector2(-230f, 320f), 96f) != null;
@@ -460,10 +577,12 @@ namespace MutantArmy.Editor
             if (AddIcon(doubleButton.transform, "VideoIcon", UiSkin.IconVideo, new Vector2(-245f, 0f), 58f) != null)
                 ((RectTransform)doubleLabel.transform).anchoredPosition = new Vector2(30f, 0f);
 
-            // PRÓXIMA FASE: o CTA principal — dourado, o maior do cartão.
+            // PRÓXIMA FASE: o CTA principal — dourado, o maior do cartão. O rótulo é wireado
+            // (_nextButtonLabel): a tela troca para "TENTAR DE NOVO" na derrota.
+            TMP_Text nextLabel;
             Button nextButton = CreateButton(card.transform, "NextButton", "PRÓXIMA FASE", 56f,
                 UiSkin.ButtonGold, Amber,
-                Anchors.Middle, new Vector2(0f, -295f), new Vector2(660f, 170f), out _);
+                Anchors.Middle, new Vector2(0f, -295f), new Vector2(660f, 170f), out nextLabel);
 
             TMP_Text homeLabel;
             Button homeButton = CreateButton(card.transform, "HomeButton", "MENU", 38f,
@@ -471,6 +590,54 @@ namespace MutantArmy.Editor
                 Anchors.Middle, new Vector2(0f, -490f), new Vector2(400f, 100f), out homeLabel);
             if (AddIcon(homeButton.transform, "HomeIcon", UiSkin.IconHome, new Vector2(-140f, 0f), 44f) != null)
                 ((RectTransform)homeLabel.transform).anchoredPosition = new Vector2(22f, 0f);
+
+            // ---- Extras da missão Nota 10 (a ResultScreen segue passiva: BindCombos/
+            // BindNextBoss/SetRareBossDefeated preenchem; aqui só nasce a hierarquia) ----
+
+            // Pilha de combos ACIMA do cartão (faixa livre y 650..960): grade 2×3 — o mesmo
+            // layout do fallback da tela, agora via GridLayoutGroup (as linhas nascem em
+            // runtime com LayoutElement compatível: célula 450×62, 6 ComboKind no máximo).
+            var combosGo = new GameObject("CombosContent", typeof(RectTransform));
+            var combosRect = (RectTransform)combosGo.transform;
+            combosRect.SetParent(panel.transform, false);
+            PlaceRect(combosRect, Anchors.Middle, new Vector2(0f, 878f), new Vector2(940f, 230f));
+            combosRect.pivot = new Vector2(0.5f, 1f);   // cresce para baixo a partir do topo da faixa
+            var combosGrid = combosGo.AddComponent<GridLayoutGroup>();
+            combosGrid.cellSize = new Vector2(450f, 62f);
+            combosGrid.spacing = new Vector2(20f, 8f);
+            combosGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            combosGrid.constraintCount = 2;
+            combosGrid.childAlignment = TextAnchor.UpperCenter;
+
+            // Badge "BOSS RARO DERROTADO! x3" acima da pilha de combos (RareBossMath ×3).
+            Image rareBg = CreateImage(panel.transform, "RareBossBadge",
+                UiSkin.BadgeFlat, Gold,
+                Anchors.Middle, new Vector2(0f, 925f), new Vector2(640f, 62f));
+            CreateTmpLabel(rareBg.transform, "Label", "BOSS RARO DERROTADO! x3", 34f,
+                TextAlignmentOptions.Center, Anchors.Middle, Vector2.zero, new Vector2(640f, 62f),
+                new Color(0.25f, 0.13f, 0.02f));
+            rareBg.gameObject.AddComponent<CanvasGroup>();   // reveal em stagger usa o group
+            rareBg.gameObject.SetActive(false);
+
+            // Teaser do PRÓXIMO boss ABAIXO do cartão (faixa livre y -670..-960): silhueta
+            // (scoutCardArt em tinte escuro, aplicado pelo BindNextBoss) + nome/fraqueza.
+            Image teaserBg = CreateImage(panel.transform, "NextBossTeaser",
+                UiSkin.BadgeFlat, UiSkin.BadgeFlat != null ? CardNavy : ChipBg,
+                Anchors.Middle, new Vector2(0f, -805f), new Vector2(920f, 180f));
+            teaserBg.gameObject.AddComponent<CanvasGroup>();
+
+            var silGo = new GameObject("Silhouette", typeof(RectTransform), typeof(Image));
+            var silRect = (RectTransform)silGo.transform;
+            silRect.SetParent(teaserBg.transform, false);
+            PlaceRect(silRect, Anchors.Middle, new Vector2(-340f, 0f), new Vector2(150f, 150f));
+            var silhouette = silGo.GetComponent<Image>();
+            silhouette.preserveAspect = true;
+            silhouette.raycastTarget = false;
+            silhouette.enabled = false;     // só liga quando o BindNextBoss tiver arte
+
+            TMP_Text nextBossText = CreateTmpLabel(teaserBg.transform, "Text", string.Empty, 40f,
+                TextAlignmentOptions.Left, Anchors.Middle, new Vector2(70f, 0f), new Vector2(700f, 170f));
+            teaserBg.gameObject.SetActive(false);
 
             WireSerializedField(screen, "_headerBg", headerBg);
             WireSerializedField(screen, "_titleText", title);
@@ -483,6 +650,15 @@ namespace MutantArmy.Editor
             WireSerializedField(screen, "_doubleButtonLabel", doubleLabel);
             WireSerializedField(screen, "_nextButton", nextButton);
             WireSerializedField(screen, "_homeButton", homeButton);
+
+            // Campos da missão Nota 10 (nomes EXATOS da ResultScreen — typo = LogError).
+            WireSerializedField(screen, "_reasonText", reason);
+            WireSerializedField(screen, "_combosContent", combosRect);
+            WireSerializedField(screen, "_rareBadge", rareBg.gameObject);
+            WireSerializedField(screen, "_nextBossPanel", teaserBg.gameObject);
+            WireSerializedField(screen, "_nextBossSilhouette", silhouette);
+            WireSerializedField(screen, "_nextBossText", nextBossText);
+            WireSerializedField(screen, "_nextButtonLabel", nextLabel);
 
             DeactivateUiRoot(panel);   // nasce oculta; UIManager.Push/Show ativa
             return screen;

@@ -18,6 +18,12 @@ namespace MutantArmy.Gameplay
     /// sobe e inclina para baixo para o golem aparecer INTEIRO e imponente no terço
     /// superior-central, com a frente do exército no terço inferior. A transição (entrada
     /// e saída) é uma mistura suave framerate-independente — nunca um corte seco.
+    ///
+    /// MORTE/DESTAQUE (missão Nota 10): <see cref="PunchFocus"/> é um zoom TEMPORÁRIO num
+    /// ponto arbitrário (morte do boss, núcleo exposto) implementado como CAMADA decadente
+    /// por cima do enquadramento corrente — não é um 3º estado do blend binário: o peso sobe
+    /// e desce com exponencial em tempo unscaled e a câmera SEMPRE volta ao enquadramento
+    /// vigente (corrida ou boss), mesmo com troca de estado no meio.
     /// </summary>
     public class CameraRig : MonoBehaviour
     {
@@ -35,6 +41,13 @@ namespace MutantArmy.Gameplay
         [SerializeField] private Vector3 _bossOffset = new Vector3(0f, 11f, -15f);
         [SerializeField] private float _bossBlendSeconds = 0.8f;             // transição entrada/saída ≈0,6–1,0 s
 
+        // ---- PunchFocus (missão Nota 10): zoom TEMPORÁRIO num ponto do mundo ----
+        // Camada decadente POR CIMA do enquadramento corrente (corrida OU boss) — não é um
+        // 3º estado: o peso sobe/desce com blend exponencial e morre sozinho, então troca de
+        // estado no meio (ClearBossFraming, restart) nunca deixa a câmera presa.
+        [SerializeField] private float _punchCloseFactor = 0.45f;   // 1 = parado · 0 = colado no ponto
+        [SerializeField] private float _punchMinHeight = 2.5f;      // nunca mergulha abaixo do ponto
+
         private Vector3 _lastCentroid;   // cache anti-NaN do frame anterior
         private Quaternion _runRotation; // orientação de corrida autorada na cena (volta no fim do boss)
 
@@ -43,6 +56,13 @@ namespace MutantArmy.Gameplay
         private Vector3 _bossFocus;      // ponto-alvo do olhar: meio entre exército e boss
         private bool _hasBossFocus;
         private float _bossBlend;        // 0 = corrida · 1 = enquadramento de boss (sobe/desce suave)
+
+        // estado do PunchFocus — relógio UNSCALED: o zoom de morte acontece DURANTE o slow-mo
+        private Vector3 _punchPoint;
+        private float _punchStrength;    // 0..1 — quanto da aproximação máxima aplicar
+        private float _punchUntil;       // Time.unscaledTime em que o peso começa a cair
+        private float _punchBlendK = 8f; // k do blend exponencial (derivado de seconds no Punch)
+        private float _punchWeight;      // 0 = enquadramento corrente · 1 = close no ponto
 
         private void Awake()
         {
@@ -73,6 +93,29 @@ namespace MutantArmy.Gameplay
             _bossActive = false;
         }
 
+        /// <summary>
+        /// Zoom/aproximação TEMPORÁRIA a um ponto do mundo (morte do boss, núcleo exposto —
+        /// missão Nota 10). <paramref name="strength"/> 0..1 dosa quanto da aproximação máxima
+        /// aplicar; <paramref name="seconds"/> é a janela de sustain (clamp 0,1–3 s). O peso
+        /// sobe e desce com blend EXPONENCIAL em tempo unscaled (o close de morte roda dentro
+        /// do slow-mo canônico) e a restauração ao enquadramento corrente — corrida OU boss —
+        /// é garantida porque o punch é camada decadente, não estado: ClearBossFraming e o
+        /// soft reset continuam funcionando por baixo dele.
+        /// </summary>
+        public void PunchFocus(Vector3 worldPoint, float strength, float seconds)
+        {
+            // entrada inválida (NaN/Inf de view ainda não posicionada) nunca entra no rig
+            if (float.IsNaN(worldPoint.x) || float.IsNaN(worldPoint.y) || float.IsNaN(worldPoint.z)) return;
+            if (float.IsInfinity(worldPoint.x) || float.IsInfinity(worldPoint.y) || float.IsInfinity(worldPoint.z)) return;
+
+            _punchPoint = worldPoint;
+            _punchStrength = Mathf.Clamp01(strength);
+            seconds = Mathf.Clamp(seconds, 0.1f, 3f);
+            _punchUntil = Time.unscaledTime + seconds;
+            // entrada/saída em ~35% da janela (4 constantes de tempo ≈ 98% do caminho)
+            _punchBlendK = 4f / Mathf.Max(0.12f, seconds * 0.35f);
+        }
+
         private void LateUpdate()   // SEMPRE depois da sim do crowd (doc 12 §4.2)
         {
             CrowdManager crowd = CrowdManager.Instance;
@@ -98,20 +141,53 @@ namespace MutantArmy.Gameplay
                 desired = Vector3.Lerp(runTarget, bossTarget, _bossBlend);
             }
 
-            float t = 1f - Mathf.Exp(-_damping * Time.deltaTime);
+            // PunchFocus: peso sobe enquanto a janela vive e DECAI sozinho depois — tudo em
+            // tempo UNSCALED (o close de morte roda dentro do slow-mo canônico do golpe final)
+            float punchTarget = Time.unscaledTime < _punchUntil ? 1f : 0f;
+            float punchT = 1f - Mathf.Exp(-_punchBlendK * Time.unscaledDeltaTime);
+            _punchWeight = Mathf.Clamp01(Mathf.Lerp(_punchWeight, punchTarget, punchT));
+            if (_punchWeight > 0.001f)
+            {
+                // close = anda pela RETA ponto→câmera (mantém o ângulo de leitura), com piso
+                // de altura para nunca mergulhar no chão da arena
+                Vector3 closeUp = _punchPoint + (desired - _punchPoint) * _punchCloseFactor;
+                closeUp.y = Mathf.Max(closeUp.y, _punchPoint.y + _punchMinHeight);
+                desired = Vector3.Lerp(desired, closeUp, _punchWeight * _punchStrength);
+            }
+
+            // durante o punch o follow corre em tempo real (Lerp do dt): o zoom de morte não
+            // fica 0,3× mais lento por causa do slow-mo; sem punch, comportamento idêntico
+            float followDt = Mathf.Lerp(Time.deltaTime, Time.unscaledDeltaTime, _punchWeight);
+            float t = 1f - Mathf.Exp(-_damping * followDt);
             transform.position = Vector3.Lerp(transform.position, desired, t);
 
             // leve ângulo para baixo no clímax: mira o foco (entre exército e boss) para o
             // golem ler INTEIRO no terço superior. O alvo de rotação MISTURA o LookAt do boss
             // com a orientação de corrida autorada por _bossBlend — ao sair, volta suave ao
-            // pitch de corrida em vez de travar inclinada.
-            if (_bossBlend > 0.001f && _hasBossFocus)
+            // pitch de corrida em vez de travar inclinada. O PunchFocus entra como camada
+            // final: olha para o ponto na proporção do peso e devolve sozinho ao decair.
+            bool bossLooking = _bossBlend > 0.001f && _hasBossFocus;
+            bool punchLooking = _punchWeight > 0.001f;
+            if (bossLooking || punchLooking)
             {
-                Vector3 toFocus = _bossFocus - transform.position;
-                Quaternion bossLook = toFocus.sqrMagnitude > 1e-4f
-                    ? Quaternion.LookRotation(toFocus.normalized, Vector3.up)
-                    : _runRotation;
-                Quaternion targetRot = Quaternion.Slerp(_runRotation, bossLook, _bossBlend);
+                Quaternion targetRot = _runRotation;
+                if (bossLooking)
+                {
+                    Vector3 toFocus = _bossFocus - transform.position;
+                    Quaternion bossLook = toFocus.sqrMagnitude > 1e-4f
+                        ? Quaternion.LookRotation(toFocus.normalized, Vector3.up)
+                        : _runRotation;
+                    targetRot = Quaternion.Slerp(_runRotation, bossLook, _bossBlend);
+                }
+                if (punchLooking)
+                {
+                    Vector3 toPunch = _punchPoint - transform.position;
+                    if (toPunch.sqrMagnitude > 1e-4f)
+                    {
+                        Quaternion punchLook = Quaternion.LookRotation(toPunch.normalized, Vector3.up);
+                        targetRot = Quaternion.Slerp(targetRot, punchLook, _punchWeight * _punchStrength);
+                    }
+                }
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, t);
             }
         }

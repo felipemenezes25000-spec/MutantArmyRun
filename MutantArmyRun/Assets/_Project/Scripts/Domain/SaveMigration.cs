@@ -9,7 +9,7 @@ namespace MutantArmy.Domain
     /// </summary>
     public static class SaveMigration
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
 
         public static void Migrate(SaveData d)
         {
@@ -45,6 +45,15 @@ namespace MutantArmy.Domain
             {
                 if (d.dailyMissions == null) d.dailyMissions = new List<MissionProgress>();
                 d.schemaVersion = 4;
+            }
+
+            // ---- v5: missão Nota 10 (álbum de bosses + tutorial por passos) após a v4 ----
+            // bossCollection null (save v1–v4 sem o campo no JSON) vira lista vazia;
+            // tutorialStepMask nasce 0 (nenhum passo visto) — int já desserializa como 0.
+            if (d.schemaVersion < 5)
+            {
+                if (d.bossCollection == null) d.bossCollection = new List<BossCollectionMath.BossRecord>();
+                d.schemaVersion = 5;
             }
 
             // Versão futura (app antigo lendo save de app novo): não rebaixar nem tocar nos dados.

@@ -29,6 +29,20 @@ namespace MutantArmy.Gameplay
         }
 
         /// <summary>
+        /// Cancela uma zona de risco pendente (soft reset / drain de fase). Sem isto, uma zona
+        /// armada perto do fim da pista (jogador entra em BossFight/Defeat antes dos 1,5 s)
+        /// resolveria DEPOIS, mutando o exército da arena ou — pior — o exército recém-criado da
+        /// PRÓXIMA corrida na mesma cena (estado residual, viola CONTRACT §1.3/§1.5). Chamado pelo
+        /// LevelManager.DrainAll, que roda em todo BeginRun/ResetRun.
+        /// </summary>
+        public void Cancel()
+        {
+            _activeGate = null;
+            _zone.Set(0f);
+            if (_zoneVisual != null) _zoneVisual.SetActive(false);
+        }
+
+        /// <summary>
         /// Seed derivada da fase, injetada pelo LevelManager. RNG separado do RNG da pista:
         /// compartilhar o mesmo System.Random quebraria o determinismo dos segmentos.
         /// </summary>
@@ -70,14 +84,24 @@ namespace MutantArmy.Gameplay
             if (IsTitanSacrifice(gate))
             {
                 crowd.SacrificeForTitan(gate.unitToAdd);
+                // Veredito do sacrifício é DETERMINÍSTICO e sempre o lado bom (o Titã chega):
+                // fanfarra de sucesso (missão Nota 10 — JuiceEvents é a ponte p/ UI/Audio, §2.3).
+                JuiceEvents.RaiseRiskResolved(true, crowd.Centroid);
                 return;
             }
 
             // Zona de Perigo "x10 se sobreviver": Domain decide — sucesso → ×rewardMult; falha →
             // ×failPenalty com piso 1. Mesma semântica de TOTAL-ALVO, reconciliada no funil único.
+            int before = crowd.Count;
             int target = RiskGate.Resolve(
-                _rng, gate.riskSuccessChance, gate.riskRewardMult, gate.riskFailPenalty, crowd.Count);
+                _rng, gate.riskSuccessChance, gate.riskRewardMult, gate.riskFailPenalty, before);
+            // RiskGate devolve só o TOTAL-alvo; o veredito é reconstruído comparando com o
+            // resultado que o lado do PRÊMIO produziria (cobre o piso de 1 do GateMath, em que
+            // "target > before" mentiria para exércitos minúsculos). Empate de multiplicadores
+            // (config degenerada) lê como sucesso — nunca punição (CANON §3.4, portais honestos).
+            bool success = target == GateMath.Apply(GateType.Multiply, gate.riskRewardMult, before);
             crowd.ReconcileTo(target, gate.unitToAdd);
+            JuiceEvents.RaiseRiskResolved(success, crowd.Centroid);   // "x10!" ou impacto seco (missão Nota 10)
         }
 
         // Detecção content-light e SEGURA: o sacrifício só dispara quando a tropa-alvo é, de fato,

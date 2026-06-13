@@ -6,7 +6,9 @@ using UnityEngine;
 namespace MutantArmy.Services
 {
     /// <summary>
-    /// Orquestração de ads (doc 12 §4.8). O SDK mora atrás do IAdsProvider (Null no MVP);
+    /// Orquestração de ads (doc 12 §4.8). O SDK mora atrás do IAdsProvider (Null no MVP;
+    /// MockAdsProvider simula ads em dev para testar DOBRAR/REVIVE — troca de componente
+    /// no prefab [Services], decisão de wiring da Onda 4);
     /// a POLÍTICA de interstitial mora no Domain (InterstitialPolicy) — este manager só
     /// junta estado + parâmetros de Remote Config e delega.
     ///

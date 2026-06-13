@@ -68,6 +68,32 @@ namespace MutantArmy.Services
         private float _lastCrowdPopTime = -1f;
         private int _lastCrowdCount = -1;
 
+        // Golpe elemental classificado (FRAQUEZA!/RESISTIU!): já é rate-limited ≥0,5 s na
+        // origem (CONTRACT §5) — segundo guarda aqui por robustez, padrão do bossHit.
+        private const float ElementalSfxMinInterval = 0.3f;
+        private float _lastElementalSfxTime = -1f;
+
+        // Inimigos de pista morrem em rajada (horda inteira no mesmo segmento): mesmo
+        // tratamento do pop de multidão — rate-limit curto, nunca metralhadora.
+        private const float EnemyPopMinInterval = 0.06f;
+        private float _lastEnemyPopTime = -1f;
+
+        // Veredito de portal (BOA ESCOLHA!/armadilha): 1 por par de portais, mas o guarda
+        // protege contra exércitos divididos consumindo 2 portais quase juntos.
+        private const float ChoiceSfxMinInterval = 0.1f;
+        private float _lastChoiceSfxTime = -1f;
+
+        // Telegraph do especial: 1 por golpe na origem; guarda evita alarme duplo em re-Raise.
+        private const float WarningSfxMinInterval = 0.4f;
+        private float _lastWarningSfxTime = -1f;
+
+        // Combos chegam TODOS no mesmo frame (avaliados na morte do boss, CONTRACT §5):
+        // cascata staggered (padrão PopCascadeRoutine) em vez de rate-limit que engoliria
+        // os stings — cada combo conquistado soa, um após o outro.
+        private const float ComboStingStagger = 0.16f;
+        private int _pendingComboStings;
+        private Coroutine _comboCascade;
+
         // Música por mundo: troca SÓ quando o worldIndex muda (mudar de fase no mesmo mundo
         // não reinicia a faixa). -1 = nenhuma faixa tocando ainda.
         private int _currentMusicWorld = -1;
@@ -97,6 +123,18 @@ namespace MutantArmy.Services
             GameEvents.OnCurrencyChanged += HandleCurrencyChanged;
             JuiceEvents.OnBossHitPulse += HandleBossHitPulse;
             JuiceEvents.OnObstacleHit += HandleObstacleHit;
+            // Eventos da missão Nota 10 (CONTRACT §5): boss elemental, combos, especiais,
+            // inimigos de pista e vereditos de portal/risco — todos catálogo-driven (clip
+            // vazio = no-op silencioso, jogo intacto sem os assets).
+            GameEvents.OnBossElementalHit += HandleBossElementalHit;
+            GameEvents.OnComboEarned += HandleComboEarned;
+            GameEvents.OnBossSpecialWarning += HandleBossSpecialWarning;
+            GameEvents.OnBossDied += HandleBossDied;
+            GameEvents.OnTrackEnemyKilled += HandleTrackEnemyKilled;
+            GameEvents.OnEnemyWaveCleared += HandleEnemyWaveCleared;
+            JuiceEvents.OnGoodGateChoice += HandleGoodGateChoice;
+            JuiceEvents.OnBadGateChoice += HandleBadGateChoice;
+            JuiceEvents.OnRiskResolved += HandleRiskResolved;
 
             // Música por mundo (Services enxerga Core §2.3, igual ao AnalyticsManager): assina
             // a entrada em Running para resolver a faixa do mundo da fase atual.
@@ -123,6 +161,15 @@ namespace MutantArmy.Services
             GameEvents.OnCurrencyChanged -= HandleCurrencyChanged;
             JuiceEvents.OnBossHitPulse -= HandleBossHitPulse;
             JuiceEvents.OnObstacleHit -= HandleObstacleHit;
+            GameEvents.OnBossElementalHit -= HandleBossElementalHit;
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnBossSpecialWarning -= HandleBossSpecialWarning;
+            GameEvents.OnBossDied -= HandleBossDied;
+            GameEvents.OnTrackEnemyKilled -= HandleTrackEnemyKilled;
+            GameEvents.OnEnemyWaveCleared -= HandleEnemyWaveCleared;
+            JuiceEvents.OnGoodGateChoice -= HandleGoodGateChoice;
+            JuiceEvents.OnBadGateChoice -= HandleBadGateChoice;
+            JuiceEvents.OnRiskResolved -= HandleRiskResolved;
             if (GameManager.Instance != null)
                 GameManager.Instance.StateEntered -= HandleStateEntered;
         }
@@ -361,5 +408,105 @@ namespace MutantArmy.Services
             _lastObstacleSfxTime = Time.unscaledTime;
             PlayExplosion();
         }
+
+        // ---- Handlers da missão Nota 10 (CONTRACT §5) ----
+
+        // Golpe elemental classificado: FRAQUEZA! soa brilhante, RESISTIU!/IMUNE! soa seco.
+        // Neutral fica de fora — o pulso genérico (OnBossHitPulse) já cobre o hit comum.
+        // O JuiceController re-publica BossHitPulse DESTE MESMO hit (origens mutuamente
+        // exclusivas, polling vs evento): ao tocar o SFX dedicado, o carimbo em
+        // _lastBossHitSfxTime faz o rate-limit do bossHit genérico engolir o eco — nunca
+        // 2 SFX no mesmo golpe. Sem clip dedicado, o genérico segue valendo (fallback).
+        private void HandleBossElementalHit(BossElementalHit hit)
+        {
+            AudioClip clip = null;
+            if (_catalog != null)
+            {
+                if (hit.relation == ElementRelation.Weakness) clip = _catalog.weaknessHit;
+                else if (hit.relation == ElementRelation.Resisted || hit.relation == ElementRelation.Immune)
+                    clip = _catalog.resistedHit;
+            }
+            if (clip == null) return;
+            // Ordem invertida (re-Init em teste): se o bossHit genérico JÁ soou neste exato
+            // frame, este hit já foi sonorizado — não empilha o dedicado por cima.
+            if (Mathf.Approximately(_lastBossHitSfxTime, Time.unscaledTime)) return;
+            if (Time.unscaledTime - _lastElementalSfxTime < ElementalSfxMinInterval) return;
+            _lastElementalSfxTime = Time.unscaledTime;
+            _lastBossHitSfxTime = Time.unscaledTime;   // cala o bossHit genérico deste hit
+            PlaySfxPitched(clip);
+        }
+
+        // Combos chegam todos no mesmo frame (morte do boss): enfileira e toca em cascata
+        // staggered — cada conquista soa, nenhuma é engolida (padrão PopCascadeRoutine).
+        private void HandleComboEarned(ComboEarned combo)
+        {
+            if (_catalog == null || _catalog.comboSting == null) return;
+            _pendingComboStings++;
+            if (_comboCascade == null && isActiveAndEnabled)
+                _comboCascade = StartCoroutine(ComboCascadeRoutine());
+        }
+
+        private IEnumerator ComboCascadeRoutine()
+        {
+            // Tempo REAL: a cascata atravessa o slow motion da morte cinematográfica intacta.
+            while (_pendingComboStings > 0)
+            {
+                _pendingComboStings--;
+                PlaySfxPitched(_catalog != null ? _catalog.comboSting : null);
+                yield return new WaitForSecondsRealtime(ComboStingStagger);
+            }
+            _comboCascade = null;
+        }
+
+        // Telegraph do especial (janela de leitura ANTES do golpe, CANON §6): alarme SEM
+        // pitch random — leitura clara é mais importante que variedade.
+        private void HandleBossSpecialWarning(BossSpecialTelegraph t)
+        {
+            AudioClip clip = _catalog != null ? _catalog.specialWarning : null;
+            if (clip == null) return;
+            if (Time.unscaledTime - _lastWarningSfxTime < WarningSfxMinInterval) return;
+            _lastWarningSfxTime = Time.unscaledTime;
+            PlaySfx(clip);
+        }
+
+        // Morte do boss (1× por luta): camada de peso da sequência cinematográfica —
+        // PlayOneShot não é afetado pelo slow motion do golpe final.
+        private void HandleBossDied(BossDied d)
+            => PlaySfx(_catalog != null ? _catalog.bossDeath : null);
+
+        // Inimigo de pista morto: pop com pitch random, rate-limited (hordas caem em rajada).
+        private void HandleTrackEnemyKilled(TrackEnemyKilled k)
+        {
+            AudioClip clip = _catalog != null ? _catalog.enemyPop : null;
+            if (clip == null) return;
+            if (Time.unscaledTime - _lastEnemyPopTime < EnemyPopMinInterval) return;
+            _lastEnemyPopTime = Time.unscaledTime;
+            PlaySfxPitched(clip);
+        }
+
+        // Wave limpa: chuva de moedas — fanfarra curta, 1× por wave (sem rate-limit).
+        private void HandleEnemyWaveCleared(EnemyWaveCleared w)
+            => PlaySfx(_catalog != null ? _catalog.coinBurst : null);
+
+        // Veredito de portal (BOA ESCOLHA!/armadilha): sting CURTO em camada sobre o som do
+        // portal (gatePositive/gateNegative continuam no OnGateConsumed — são o "whoosh",
+        // este é o juízo). Mesmo guarda para os dois lados: nunca good+bad empilhados.
+        private void HandleGoodGateChoice(Vector3 worldPosition)
+            => PlayChoiceSfx(_catalog != null ? _catalog.goodChoice : null);
+
+        private void HandleBadGateChoice(Vector3 worldPosition)
+            => PlayChoiceSfx(_catalog != null ? _catalog.badChoice : null);
+
+        private void PlayChoiceSfx(AudioClip clip)
+        {
+            if (clip == null) return;
+            if (Time.unscaledTime - _lastChoiceSfxTime < ChoiceSfxMinInterval) return;
+            _lastChoiceSfxTime = Time.unscaledTime;
+            PlaySfxPitched(clip);
+        }
+
+        // Zona de risco: sucesso = fanfarra "x10!", falha = impacto seco (1× por zona).
+        private void HandleRiskResolved(bool success, Vector3 worldPosition)
+            => PlaySfx(_catalog != null ? (success ? _catalog.riskWin : _catalog.riskLose) : null);
     }
 }

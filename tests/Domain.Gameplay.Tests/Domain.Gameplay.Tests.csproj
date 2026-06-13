@@ -14,6 +14,7 @@
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\CombatAbilities.cs" Link="Domain\CombatAbilities.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\FormationMath.cs" Link="Domain\FormationMath.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\RiskGate.cs" Link="Domain\RiskGate.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\WeaknessJudge.cs" Link="Domain\WeaknessJudge.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />

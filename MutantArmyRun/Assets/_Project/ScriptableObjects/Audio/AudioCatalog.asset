@@ -21,6 +21,17 @@ MonoBehaviour:
   bossHit: {fileID: 8300000, guid: 87a9dc0aad2c19149b963a6ed8041723, type: 3}
   bossRoar: {fileID: 8300000, guid: f73081df16f57c846ae12ba1f7a887d7, type: 3}
   explosion: {fileID: 8300000, guid: 4869b7f6ec243d84389bffa16a51e4c9, type: 3}
+  weaknessHit: {fileID: 8300000, guid: f148eea22db6120439573fdbe66a032a, type: 3}
+  resistedHit: {fileID: 8300000, guid: 1e7c751e52c4e8948b5c1bcd9dc7487b, type: 3}
+  specialWarning: {fileID: 8300000, guid: d225e54a196594b48908643cd5659c2a, type: 3}
+  bossDeath: {fileID: 8300000, guid: 7f89674186aeff246a9fb28d24cf1c38, type: 3}
+  comboSting: {fileID: 8300000, guid: 02708a4644e9e1a40be9f4702b152057, type: 3}
+  coinBurst: {fileID: 8300000, guid: 192d5b872da6f714ea845b032419a7d7, type: 3}
+  enemyPop: {fileID: 8300000, guid: 86c07eb48955b0a4896830f427f22de2, type: 3}
+  goodChoice: {fileID: 8300000, guid: 93377f00b2619604799ad54d2011537e, type: 3}
+  badChoice: {fileID: 8300000, guid: 2fb068de8c33071469217e69ec080b67, type: 3}
+  riskWin: {fileID: 8300000, guid: 41cf0cd6c5bc1024fa4405b936d586ed, type: 3}
+  riskLose: {fileID: 8300000, guid: df26abd3620c9914a8aec330e224bf18, type: 3}
   mutation: {fileID: 8300000, guid: 2a66325eadd1a814192f3cdee352c889, type: 3}
   uiClick: {fileID: 8300000, guid: 9160b45fd98bee14980cb69135fffc46, type: 3}
   uiConfirm: {fileID: 8300000, guid: 11ad9c3d89943a54a8fd2bbb0a8ef483, type: 3}

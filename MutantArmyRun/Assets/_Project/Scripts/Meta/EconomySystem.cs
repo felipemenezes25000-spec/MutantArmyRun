@@ -22,6 +22,12 @@ namespace MutantArmy.Meta
 
         private readonly RunWallet _runWallet = new RunWallet();
 
+        // Variante RARA (missão Nota 10 §4.2): OnBossDied com wasRare arma a flag e a recompensa
+        // de VITÓRIA da fase multiplica ×3 (RareBossMath.RewardMultiplier) — tanto no crédito
+        // (GrantLevelReward) quanto na consulta de exibição (LevelRewardProvider), para o número
+        // grande da tela bater com o creditado. Reset por fase (LevelStarted).
+        private bool _rareBossKilledThisLevel;
+
         // Injetado pelo bootstrap: Meta não enxerga Services (doc 12 §2.3), então o acesso
         // ao Remote Config entra pela interface declarada no Core.
         private IRemoteConfigProvider _remoteConfig;
@@ -56,6 +62,17 @@ namespace MutantArmy.Meta
             GameEvents.OnSupplyOverflow -= HandleSupplyOverflow;
             GameEvents.OnSupplyOverflow += HandleSupplyOverflow;
 
+            // Missão Nota 10: bônus de combo e drop de inimigo de pista entram na RunWallet
+            // NA HORA (dentro da corrida) — o commit do ResolveEnd já os inclui, e por estarem
+            // em runCoins eles entram na base do "DOBRAR ×2" (decisão de design: recompensa
+            // generosa). Crédito 1×: o comboBonusCoins do LevelResult é só INFORMATIVO.
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnComboEarned += HandleComboEarned;
+            GameEvents.OnTrackEnemyKilled -= HandleTrackEnemyKilled;
+            GameEvents.OnTrackEnemyKilled += HandleTrackEnemyKilled;
+            GameEvents.OnBossDied -= HandleBossDied;
+            GameEvents.OnBossDied += HandleBossDied;
+
             // Auto-wiring nos hooks do fim de fase (doc 12 §4.1): commit do RunWallet e
             // recompensa de vitória — Meta enxerga Core, nunca o inverso.
             if (GameManager.Instance != null)
@@ -67,23 +84,34 @@ namespace MutantArmy.Meta
                 GameManager.Instance.LevelRewardGranter = GrantLevelReward;
                 // Só CONSULTA o valor da recompensa para a tela EXIBIR o total — o crédito
                 // segue exclusivamente por LevelRewardGranter (nunca duplica, doc 12 §4.6).
-                GameManager.Instance.LevelRewardProvider = GetLevelReward;
+                // Variante com bônus de boss raro: exibição e crédito veem o MESMO ×3.
+                GameManager.Instance.LevelRewardProvider = GetLevelRewardWithRareBonus;
 
                 // XP DE FASE (CANON §8): cada corrida concede XP de verdade. Creditada na
                 // RunWallet UMA vez no início da fase (LevelStarted); o ResolveEnd a lê via
                 // RunSnapshot e a comita SEMPRE (vitória ou derrota) — sem duplicar. O retry/
                 // próxima fase passa por StartLevel→LevelStarted de novo, já com a wallet zerada
                 // pelo commit anterior. -= antes de += para Init repetido não duplicar a inscrição.
-                GameManager.Instance.LevelStarted -= GrantPhaseXp;
-                GameManager.Instance.LevelStarted += GrantPhaseXp;
+                GameManager.Instance.LevelStarted -= HandleLevelStarted;
+                GameManager.Instance.LevelStarted += HandleLevelStarted;
             }
         }
 
         private void OnDestroy()
         {
             GameEvents.OnSupplyOverflow -= HandleSupplyOverflow;   // bus estático sobrevive a cenas (doc 12 §3.2)
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnTrackEnemyKilled -= HandleTrackEnemyKilled;
+            GameEvents.OnBossDied -= HandleBossDied;
             if (GameManager.Instance != null)
-                GameManager.Instance.LevelStarted -= GrantPhaseXp;
+                GameManager.Instance.LevelStarted -= HandleLevelStarted;
+        }
+
+        /// <summary>Início de fase: zera a flag de boss raro e credita a XP de fase na RunWallet.</summary>
+        private void HandleLevelStarted(int levelIndex)
+        {
+            _rareBossKilledThisLevel = false;   // a variante rara vale só para a fase em que morreu
+            GrantPhaseXp(levelIndex);
         }
 
         /// <summary>
@@ -108,6 +136,39 @@ namespace MutantArmy.Meta
         private void HandleSupplyOverflow(SupplyOverflow o)
             => Earn(CurrencyType.Coin, o.coinsGranted, "supply_overflow");
 
+        /// <summary>
+        /// Bônus de combo creditado 1× na RunWallet, AINDA dentro da corrida: o ComboSystem
+        /// dispara na morte do boss, ~1,2 s antes do Victory (sequência cinematográfica) —
+        /// o commit do ResolveEnd já o inclui em runCoins, e ele entra na base do DOBRAR ×2.
+        /// </summary>
+        private void HandleComboEarned(ComboEarned combo)
+            => EarnInRun(combo.bonusCoins, 0, ComboSource(combo.kind));
+
+        /// <summary>Drop de inimigo de pista (TrackEnemyManager) → RunWallet, na hora.</summary>
+        private void HandleTrackEnemyKilled(TrackEnemyKilled kill)
+            => EarnInRun(kill.coins, 0, "enemy_kill");
+
+        /// <summary>Boss da fase morreu na variante RARA → recompensa de vitória multiplica ×3.</summary>
+        private void HandleBossDied(BossDied died)
+        {
+            if (died.wasRare) _rareBossKilledThisLevel = true;
+        }
+
+        // Source estável por tipo de combo (analytics/HUD distinguem a origem sem alocação por Raise).
+        private static string ComboSource(ComboKind kind)
+        {
+            switch (kind)
+            {
+                case ComboKind.PerfectGate: return "combo_perfect_gate";
+                case ComboKind.WeaknessHit: return "combo_weakness_hit";
+                case ComboKind.BossBreaker: return "combo_boss_breaker";
+                case ComboKind.Clutch: return "combo_clutch";
+                case ComboKind.NoLoss: return "combo_no_loss";
+                case ComboKind.Overkill: return "combo_overkill";
+                default: return "combo_unknown";   // ComboKind novo (append-only) cai aqui até ganhar case
+            }
+        }
+
         private static IRemoteConfigProvider ResolveRemoteConfig()
         {
             // Provider resolvido no prefab [Services] — mesma regra do GameBootstrap (§3.3).
@@ -118,12 +179,21 @@ namespace MutantArmy.Meta
 
         /// <summary>Ganho DENTRO da corrida — acumula na RunWallet, nunca toca o save.</summary>
         public void EarnInRun(int coins, int xp = 0)
+            => EarnInRun(coins, xp, "run_earn");
+
+        /// <summary>
+        /// Ganho DENTRO da corrida com source explícito ("combo_*", "enemy_kill"): mesmo funil
+        /// da RunWallet, mas o CurrencyChange carrega a ORIGEM — analytics/HUD distinguem o
+        /// ganho sem cheirar o gameplay. ATENÇÃO: é delta temporário (vira persistente só no
+        /// "run_commit") — quem assina o bus não deve somar estes sources no saldo da carteira.
+        /// </summary>
+        public void EarnInRun(int coins, int xp, string source)
         {
             _runWallet.EarnCoins(coins);
             _runWallet.EarnXp(xp);
             // HUD da corrida atualiza por evento (doc 12 §3.2) — source distingue do saldo persistente.
             if (coins > 0)
-                GameEvents.RaiseCurrencyChanged(new CurrencyChange(CurrencyType.Coin, coins, "run_earn"));
+                GameEvents.RaiseCurrencyChanged(new CurrencyChange(CurrencyType.Coin, coins, source));
         }
 
         /// <summary>Chamado pelo GameManager.ResolveEnd (doc 12 §4.1) via hook RunCommitter.</summary>
@@ -154,9 +224,24 @@ namespace MutantArmy.Meta
             return EconomyMath.LevelReward(levelIndex, baseReward, growth, mult);
         }
 
+        /// <summary>
+        /// Recompensa de vitória JÁ com o multiplicador de boss raro da fase corrente
+        /// (RareBossMath.RewardMultiplier ×3 quando o boss morreu na variante rara — missão §4.2).
+        /// É o que o LevelRewardProvider expõe ao ResolveEnd: o coinsAwarded exibido na tela
+        /// bate com o crédito do GrantLevelReward, que usa a MESMA conta. GetLevelReward segue
+        /// puro para consultas fora da fase (mapa/loja nunca mostram o ×3 por engano).
+        /// </summary>
+        public int GetLevelRewardWithRareBonus(int levelIndex)
+        {
+            int baseReward = GetLevelReward(levelIndex);
+            return _rareBossKilledThisLevel
+                ? Mathf.RoundToInt(baseReward * RareBossMath.RewardMultiplier)
+                : baseReward;
+        }
+
         public void GrantLevelReward(int levelIndex)
         {
-            Earn(CurrencyType.Coin, GetLevelReward(levelIndex), "level_win");
+            Earn(CurrencyType.Coin, GetLevelRewardWithRareBonus(levelIndex), "level_win");
         }
 
         /// <summary>Funil único de GANHO persistente: muta o save, marca dirty, publica no bus.</summary>

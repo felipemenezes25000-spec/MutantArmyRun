@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MutantArmy.Domain;
 using UnityEngine;
 
 namespace MutantArmy.Core
@@ -37,6 +38,7 @@ namespace MutantArmy.Core
         // Fonte de mundos/bosses reais (catálogo desenhado): o gerador só recicla, nunca cria.
         private readonly IReadOnlyList<WorldConfigSO> _worlds;
         private readonly IReadOnlyList<BossConfigSO> _bosses;
+        private readonly IReadOnlyList<EnemyConfigSO> _enemies;   // catálogo de inimigos de pista (missão Nota 10)
         private readonly WorldConfigSO _fallbackWorld;
         private readonly BossConfigSO _fallbackBoss;
 
@@ -45,10 +47,15 @@ namespace MutantArmy.Core
 
         /// <param name="worlds">Mundos reais do catálogo (worldIndex 1..10), para reciclar atmosfera.</param>
         /// <param name="bosses">Bosses de mundo reais (10), para reciclar dados de fraqueza/HP.</param>
-        public EndlessLevelGenerator(IReadOnlyList<WorldConfigSO> worlds, IReadOnlyList<BossConfigSO> bosses)
+        /// <param name="enemies">Catálogo de EnemyConfigSO para popular inimigos de pista nas fases
+        /// endless (missão Nota 10). Opcional: null/vazio ⇒ fases sem inimigos (comportamento
+        /// anterior preservado) — o wiring do catálogo real entra pelo GameSettingsSO (Onda 4).</param>
+        public EndlessLevelGenerator(IReadOnlyList<WorldConfigSO> worlds, IReadOnlyList<BossConfigSO> bosses,
+                                     IReadOnlyList<EnemyConfigSO> enemies = null)
         {
             _worlds = worlds;
             _bosses = bosses;
+            _enemies = enemies;
             _fallbackWorld = PickWorld(FinalWorldIndex);
             _fallbackBoss = PickBoss();
         }
@@ -100,7 +107,111 @@ namespace MutantArmy.Core
             // Slots 100% autoBalance: o GateManager monta os pares contra o boss reciclado
             // com a MESMA seed da fase — rota ótima + armadilha geradas, infinitamente.
             level.gateSlots = BuildAutoSlots(5, EndlessTrackLength);
+
+            // Inimigos de pista procedurais (missão Nota 10): 2–4 grupos por fase, kinds
+            // liberados pela profundidade do endless. Sem catálogo ⇒ array vazio (idem antes).
+            level.enemies = BuildEnemySlots(levelIndex, lapsBeyond, level.gateSlots);
             return level;
+        }
+
+        // ------------------------------------------------------------- inimigos procedurais
+
+        private const float EnemyGateSafetyMeters = 8f;   // espelho da zona pós-portal do LevelManager
+
+        /// <summary>
+        /// Gera 2–4 EnemySlot determinísticos para a fase endless. RNG DERIVADO do índice
+        /// (primo próprio, 48271·n+11): roda na GERAÇÃO, fora da cadeia gates → obstáculos →
+        /// segmentos do LevelManager (CONTRACT §1.6) — e distinto do RNG de spawn do
+        /// TrackEnemyManager (seed*92821+7) para layout e lane não ficarem correlacionados.
+        /// </summary>
+        private EnemySlot[] BuildEnemySlots(int levelIndex, int lapsBeyond, GateSlot[] gates)
+        {
+            if (_enemies == null || _enemies.Count == 0) return new EnemySlot[0];
+
+            var rng = new System.Random(levelIndex * 48271 + 11);
+            int slotCount = 2 + rng.Next(3);   // 2..4 grupos por fase
+            var result = new List<EnemySlot>(slotCount);
+
+            // janela útil da pista: depois da largada, antes da zona de aproximação da arena
+            float first = 45f;
+            float last = EndlessTrackLength - 50f;
+            for (int i = 0; i < slotCount; i++)
+            {
+                float t = slotCount > 1 ? i / (float)(slotCount - 1) : 0.5f;
+                float z = Mathf.Lerp(first, last, t) + (float)(rng.NextDouble() * 2.0 - 1.0) * 8f;
+                z = PushOutOfGateSafetyZone(z, gates);
+
+                TrackEnemyKind kind = PickKind(rng, lapsBeyond);
+                int count = CountFor(kind, rng, lapsBeyond);
+                EnemyConfigSO enemy = PickEnemy(kind, rng);
+                if (enemy == null) continue;   // catálogo sem este kind: pula o grupo, fase segue válida
+
+                result.Add(new EnemySlot { trackPosition = z, enemy = enemy, count = count });
+            }
+            return result.ToArray();
+        }
+
+        // Zona de segurança pós-portal (doc 12 §4.11): inimigo colado na saída do gate pune a
+        // escolha certa — empurra o grupo para depois da janela (espaçamento dos gates ≫ 9 m).
+        private static float PushOutOfGateSafetyZone(float z, GateSlot[] gates)
+        {
+            if (gates == null) return z;
+            for (int i = 0; i < gates.Length; i++)
+            {
+                GateSlot g = gates[i];
+                if (g == null) continue;
+                if (z > g.trackPosition && z <= g.trackPosition + EnemyGateSafetyMeters)
+                    return g.trackPosition + EnemyGateSafetyMeters + 1f;
+            }
+            return z;
+        }
+
+        // Profundidade libera kinds (variedade crescente, surpresa justa): voltas iniciais só
+        // horda/tanque; 2ª volta adiciona atirador; da 3ª em diante o curador entra no sorteio.
+        // Horda tem peso dobrado — é o "pão" da corrida; os outros são tempero.
+        private static TrackEnemyKind PickKind(System.Random rng, int lapsBeyond)
+        {
+            int poolSize = lapsBeyond <= 0 ? 3 : lapsBeyond == 1 ? 4 : 5;
+            int roll = rng.Next(poolSize);
+            switch (roll)
+            {
+                case 2: return TrackEnemyKind.Tank;
+                case 3: return TrackEnemyKind.Ranged;
+                case 4: return TrackEnemyKind.Healer;
+                default: return TrackEnemyKind.WeakHorde;   // 0 e 1: peso dobrado
+            }
+        }
+
+        // Tamanho do grupo por papel: horda numerosa (cresce com a profundidade, teto 12),
+        // tanque/curador raros, atirador em trio aproximado.
+        private static int CountFor(TrackEnemyKind kind, System.Random rng, int lapsBeyond)
+        {
+            switch (kind)
+            {
+                case TrackEnemyKind.Tank: return 1 + rng.Next(2);                       // 1..2
+                case TrackEnemyKind.Ranged: return 2 + rng.Next(3);                     // 2..4
+                case TrackEnemyKind.Healer: return 1 + rng.Next(2);                     // 1..2
+                default: return Mathf.Min(12, 6 + rng.Next(5) + lapsBeyond);            // 6..10 + profundidade
+            }
+        }
+
+        // Resolve o EnemyConfigSO do kind no catálogo: prefere os do mundo final (o endless É
+        // a Dimensão Final), senão qualquer um do kind; null se o catálogo não cobre o kind.
+        private EnemyConfigSO PickEnemy(TrackEnemyKind kind, System.Random rng)
+        {
+            List<EnemyConfigSO> candidates = null;
+            List<EnemyConfigSO> preferred = null;
+            for (int i = 0; i < _enemies.Count; i++)
+            {
+                EnemyConfigSO e = _enemies[i];
+                if (e == null || e.kind != kind) continue;
+                (candidates ?? (candidates = new List<EnemyConfigSO>())).Add(e);
+                if (e.worldIndex == FinalWorldIndex)
+                    (preferred ?? (preferred = new List<EnemyConfigSO>())).Add(e);
+            }
+            List<EnemyConfigSO> pool = preferred ?? candidates;
+            if (pool == null) return null;
+            return pool[rng.Next(pool.Count)];
         }
 
         private static GateSlot[] BuildAutoSlots(int count, float trackLength)

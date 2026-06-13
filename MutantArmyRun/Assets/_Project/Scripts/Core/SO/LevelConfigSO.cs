@@ -22,6 +22,18 @@ namespace MutantArmy.Core
     }
 
     /// <summary>
+    /// Slot de inimigos de pista (missão Nota 10): grupo de count inimigos do mesmo config
+    /// na posição dada — mesmo padrão de GateSlot/ObstacleSlot (dado, não prefab na cena).
+    /// </summary>
+    [Serializable]
+    public class EnemySlot
+    {
+        public float trackPosition;
+        public EnemyConfigSO enemy;
+        public int count = 3;
+    }
+
+    /// <summary>
     /// Config de fase (doc 12 §5.1). A cena Game é única para as 20+ fases: nível = este
     /// asset, nunca 1 cena por nível (doc 12 §2.2). SO é READ-ONLY em runtime.
     /// </summary>
@@ -34,6 +46,7 @@ namespace MutantArmy.Core
         public float trackLength = 220f;       // ≈45–75 s a 4 m/s base
         public GateSlot[] gateSlots;           // posição + par de portais (ou autoBalance)
         public ObstacleSlot[] obstacles;
+        public EnemySlot[] enemies = new EnemySlot[0];   // inimigos de pista (vazio = fase sem inimigos; aditivo, missão Nota 10)
         public BossConfigSO boss;              // TODA fase termina em boss (CANON §6)
         public float bossHpMultiplier = 1f;    // escala da variante regional
         public RewardConfigSO winReward;

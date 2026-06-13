@@ -30,7 +30,10 @@ namespace MutantArmy.Gameplay
         [SerializeField] private ParticleSystem _gateBurstPrefab;      // burst no consumo de portal (tintado)
         [SerializeField] private ParticleSystem _popBurstPrefab;       // pop pequeno da cascata de multiplicação
         [SerializeField] private ParticleSystem _confettiPrefab;       // vitória: 2 emissores laterais
-        [SerializeField] private Renderer _telegraphRenderer;          // anel vermelho pulsante (alpha via MPB)
+        [SerializeField] private Renderer _telegraphRenderer;          // anel pulsante (cor/alpha via MPB)
+        // Chuva de moedas da morte do boss (missão Nota 10) — a Onda 4 preenche via
+        // JuiceFactory ("MAR Tools/Build Juice"); até lá o PlayCoinBurst degrada (ver método).
+        [SerializeField] private ParticleSystem _coinBurstPrefab;
 
         private struct ActiveVfx
         {
@@ -46,10 +49,14 @@ namespace MutantArmy.Gameplay
         private float _baseFixedDelta = 0.02f;
         private readonly Countdown _slowMo = new Countdown();      // Domain; tickado com tempo UNSCALED
         private bool _slowMoActive;
+        private float _slowMoScale = 1f;                           // valor que ESTE manager escreveu
         private readonly Countdown _telegraphTimer = new Countdown();
         private bool _telegraphActive;
         private float _telegraphArea = 1f;
+        private Color _telegraphColor = TelegraphDefaultColor;     // identidade por golpe (laser ciano…)
         private MaterialPropertyBlock _telegraphMpb;
+        private static readonly Color TelegraphDefaultColor = new Color(1f, 0.15f, 0.10f);
+        private static readonly Color CoinGold = new Color(1f, 0.84f, 0.25f);
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
 
@@ -64,28 +71,69 @@ namespace MutantArmy.Gameplay
         {
             // timeScale é GLOBAL: trocar de cena (botão MENU) no meio do slow-mo do golpe
             // final deixaria menu e próxima corrida presos a 0,3× — restaura sempre.
+            if (_slowMoActive) RestoreTimeScale();
+        }
+
+        /// <summary>
+        /// Slow motion canônico do golpe final: SlowMotion(0.3f, 0.8f). Chamadas ANINHADAS/
+        /// repetidas (morte cinematográfica empilha slow-mos) são seguras: nunca encurtam a
+        /// janela ativa e vence a escala mais PROFUNDA — uma única restauração ao fim, jamais
+        /// timescale travado. ÚNICO dono permitido do slow-mo (CONTRACT §1.10).
+        /// </summary>
+        public void SlowMotion(float scale, float seconds)
+        {
+            if (seconds <= 0f)
+            {
+                if (_slowMoActive) RestoreTimeScale();
+                return;
+            }
+
+            scale = Mathf.Clamp(scale, 0.05f, 1f);
             if (_slowMoActive)
             {
-                Time.timeScale = 1f;
-                Time.fixedDeltaTime = _baseFixedDelta;
+                scale = Mathf.Min(scale, _slowMoScale);            // aninhado: fica o mais dramático
+                seconds = Mathf.Max(seconds, _slowMo.Remaining);   // …e a janela nunca encurta
+            }
+            _slowMo.Set(seconds);
+            _slowMoScale = scale;
+            _slowMoActive = true;
+
+            // A pausa da UI (Time.timeScale = 0, GameUIController/PauseOverlay) tem precedência:
+            // não atropela o 0 — a janela corre em unscaled e a restauração também não solta a
+            // pausa (ver RestoreTimeScale). Degrada, nunca trava.
+            if (Time.timeScale > 0f)
+            {
+                Time.timeScale = scale;
+                Time.fixedDeltaTime = _baseFixedDelta * scale;   // física acompanha (doc 12 §3.1)
             }
         }
 
-        /// <summary>Slow motion canônico do golpe final: SlowMotion(0.3f, 0.8f).</summary>
-        public void SlowMotion(float scale, float seconds)
+        // Devolve o relógio SÓ se ainda formos os donos do valor atual: a pausa da UI escreve
+        // 0 e restaura 1 por conta própria — escrever 1 aqui destravaria um jogo pausado.
+        private void RestoreTimeScale()
         {
-            Time.timeScale = Mathf.Clamp(scale, 0.05f, 1f);
-            Time.fixedDeltaTime = _baseFixedDelta * Time.timeScale;   // física acompanha (doc 12 §3.1)
-            _slowMo.Set(seconds);
-            _slowMoActive = true;
+            _slowMoActive = false;
+            if (Mathf.Approximately(Time.timeScale, _slowMoScale)) Time.timeScale = 1f;
+            Time.fixedDeltaTime = _baseFixedDelta;
         }
 
-        /// <summary>Telegraph do especial do boss (doc 12 §4.5): decal na área, pelo windup.</summary>
+        /// <summary>Telegraph do especial do boss (doc 12 §4.5): decal na área, pelo windup (cor padrão).</summary>
         public void ShowTelegraph(float area, float seconds)
+        {
+            ShowTelegraph(area, seconds, TelegraphDefaultColor);
+        }
+
+        /// <summary>
+        /// Telegraph com IDENTIDADE por golpe (missão Nota 10): o chamador (BossManager/
+        /// behaviors, W2-A) escolhe a cor — laser ciano, chão de fogo laranja, veneno verde…
+        /// A assinatura antiga continua válida e cai no vermelho canônico.
+        /// </summary>
+        public void ShowTelegraph(float area, float seconds, Color color)
         {
             _telegraphTimer.Set(seconds);
             _telegraphActive = true;
             _telegraphArea = Mathf.Max(0.5f, area);
+            _telegraphColor = color;
             if (_telegraphDecal == null) return;
             // o especial mira a massa do exército: decal no centróide, escala = área de efeito
             _telegraphDecal.position = CrowdManager.Instance != null
@@ -134,6 +182,35 @@ namespace MutantArmy.Gameplay
             Play(_despawnBurstPrefab, position, priority: 1);
         }
 
+        /// <summary>
+        /// Chuva de moedas da celebração (morte do boss / risco pago — missão Nota 10).
+        /// <paramref name="intensity"/> = nº de emissores simultâneos (clamp 1..3 — orçamento
+        /// global §6.3 continua mandando). Prioridade MÁXIMA: celebração nunca sofre drop.
+        /// Sem prefab dedicado (a Onda 4 preenche _coinBurstPrefab via JuiceFactory) degrada
+        /// em cascata: fanfarra de moeda existente → burst genérico tintado DOURADO → no-op.
+        /// </summary>
+        public void PlayCoinBurst(Vector3 position, int intensity)
+        {
+            ParticleSystem prefab = _coinBurstPrefab != null ? _coinBurstPrefab : _coinFanfarePrefab;
+            Color? tint = null;
+            if (prefab == null)
+            {
+                prefab = _gateBurstPrefab;   // fallback final: o burst genérico vira "moeda" pelo dourado
+                tint = CoinGold;
+            }
+            if (prefab == null) return;      // scaffold sem nenhuma arte: silencioso (greybox-friendly)
+
+            int emitters = Mathf.Clamp(intensity, 1, 3);
+            for (int i = 0; i < emitters; i++)
+            {
+                // leque curto ao redor do ponto: leitura de "chuva", nunca 1 sistema por moeda
+                Vector3 offset = emitters == 1
+                    ? Vector3.zero
+                    : Quaternion.Euler(0f, (360f / emitters) * i, 0f) * new Vector3(0.9f, 0.35f * i, 0f);
+                Play(prefab, position + offset, priority: 3, tint);
+            }
+        }
+
         /// <summary>Toca um sistema pooled respeitando o orçamento. Retorna false no drop silencioso.</summary>
         public bool Play(ParticleSystem prefab, Vector3 position, int priority)
         {
@@ -163,12 +240,7 @@ namespace MutantArmy.Gameplay
             if (_slowMoActive)
             {
                 _slowMo.Tick(Time.unscaledDeltaTime);   // unscaled: o próprio slow-mo não se alonga
-                if (_slowMo.Done)
-                {
-                    _slowMoActive = false;
-                    Time.timeScale = 1f;
-                    Time.fixedDeltaTime = _baseFixedDelta;
-                }
+                if (_slowMo.Done) RestoreTimeScale();
             }
 
             if (_telegraphActive)
@@ -201,6 +273,7 @@ namespace MutantArmy.Gameplay
 
         // Anel do telegraph pulsa em escala (±12%) e alpha (0.35–0.85) — urgência crescente
         // ao fim do windup. MPB: nunca instancia material em runtime (doc 12 §6.4).
+        // A COR vem do chamador (identidade por golpe, missão Nota 10); só o alpha pulsa.
         private void PulseTelegraph()
         {
             if (_telegraphDecal == null) return;
@@ -212,7 +285,8 @@ namespace MutantArmy.Gameplay
 
             if (_telegraphRenderer == null) return;
             if (_telegraphMpb == null) _telegraphMpb = new MaterialPropertyBlock();
-            var color = new Color(1f, 0.15f, 0.10f, Mathf.Lerp(0.35f, 0.85f, (wave + 1f) * 0.5f));
+            var color = new Color(_telegraphColor.r, _telegraphColor.g, _telegraphColor.b,
+                                  Mathf.Lerp(0.35f, 0.85f, (wave + 1f) * 0.5f));
             _telegraphMpb.SetColor(BaseColorId, color);
             _telegraphMpb.SetColor(ColorId, color);
             _telegraphRenderer.SetPropertyBlock(_telegraphMpb);

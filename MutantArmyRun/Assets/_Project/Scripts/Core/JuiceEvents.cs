@@ -24,5 +24,21 @@ namespace MutantArmy.Core
         public static event Action<Vector3> OnObstacleHit;
 
         public static void RaiseObstacleHit(Vector3 worldPosition) => OnObstacleHit?.Invoke(worldPosition);
+
+        /// <summary>
+        /// Veredito instantâneo da escolha de portal ("BOA ESCOLHA!" / portal armadilha) —
+        /// classificado pelo GateManager contra o boss da fase (rota ótima vs armadilha).
+        /// Cosmético: o registro de dados continua no GameEvents.OnGateConsumed.
+        /// </summary>
+        public static event Action<Vector3> OnGoodGateChoice;
+        public static event Action<Vector3> OnBadGateChoice;
+
+        public static void RaiseGoodGateChoice(Vector3 worldPosition) => OnGoodGateChoice?.Invoke(worldPosition);
+        public static void RaiseBadGateChoice(Vector3 worldPosition) => OnBadGateChoice?.Invoke(worldPosition);
+
+        /// <summary>Resultado da zona de risco (RiskResolver): sucesso = fanfarra "x10!", falha = impacto seco.</summary>
+        public static event Action<bool, Vector3> OnRiskResolved;
+
+        public static void RaiseRiskResolved(bool success, Vector3 worldPosition) => OnRiskResolved?.Invoke(success, worldPosition);
     }
 }

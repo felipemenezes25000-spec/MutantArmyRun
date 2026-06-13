@@ -8,14 +8,16 @@ namespace MutantArmy.Editor
 {
     /// <summary>
     /// MAR Tools/Create MVP Content — gera por código os assets canônicos do jogo:
-    /// 26 GateConfigSO (taxonomia ampliada, CANON §10 + doc 04: matemáticos, classe,
+    /// 27 GateConfigSO (taxonomia ampliada, CANON §10 + doc 04: matemáticos, classe,
     /// elemento, mutação, risco) · 19 UnitConfigSO (roster completo CANON §5; os 5 do MVP
     /// intactos) · 9 MutationConfigSO (CANON §3.3) · 19 BossConfigSO (CANON §6: 10 arquétipos
     /// regionais + 10 bosses únicos de mundo, com os 5 do MVP preservados na sobreposição) ·
+    /// 40 EnemyConfigSO (missão Nota 10: 4 papéis de inimigo de pista × 10 mundos) ·
     /// ElementChartSO default (CANON §4) · 4 RarityConfigSO (CANON §8) · 4 UpgradeConfigSO
-    /// (trilhas MVP, CANON §9) · 3 RewardConfigSO (CANON §8/§16) · 10 WorldConfigSO (CANON §7,
+    /// (trilhas MVP, CANON §9) · 4 RewardConfigSO (CANON §8/§16) · 10 WorldConfigSO (CANON §7,
     /// worldIndex 1–10) · 100 LevelConfigSO (10 mundos × 10 fases) com seeds determinísticas,
-    /// curva de dificuldade por fase/mundo e pares manuais curados nas fases-chave (doc 06 §8).
+    /// curva de dificuldade por fase/mundo, pares manuais curados nas fases-chave (doc 06 §8)
+    /// e inimigos de pista (F1–F3 limpas; F4/F5 curadas; 6+ distribuição determinística).
     /// Acima da fase 100 o GameSettingsSO gera fases proceduralmente (endless infinito, CANON §7).
     /// Idempotente: re-rodar atualiza os assets existentes.
     /// NOTA p/ runtime: o GateManager carrega TODOS os GateConfigSO da pasta no _autoBalancePool —
@@ -41,8 +43,9 @@ namespace MutantArmy.Editor
         {
             // MVP (CANON §10) — preservados; vários ainda referenciados por slots manuais.
             public GateConfigSO AddTen, AddTwentyFive, TimesTwo, TimesThree, Half, ClassArcher, ElementFire, RiskTen;
-            // Matemáticos extra (taxonomia ampliada, doc 04).
-            public GateConfigSO AddFifty, TimesFive, MinusTen, Div2Alt;
+            // Matemáticos extra (taxonomia ampliada, doc 04). AddFifteen é o degrau do tutorial
+            // F2 (+15 vs x2 — missão Nota 10).
+            public GateConfigSO AddFifteen, AddFifty, TimesFive, MinusTen, Div2Alt;
             // Classe (transformar o exército inteiro — gateType ClassConvert).
             public GateConfigSO ClassMage, ClassKnight, ClassNinja, ClassGiant;
             // Elemento (gateType Element — ciano).
@@ -73,7 +76,31 @@ namespace MutantArmy.Editor
 
         private sealed class RewardSet
         {
-            public RewardConfigSO WorldBoss, BossDefault, Level10;
+            public RewardConfigSO WorldBoss, BossDefault, Level10, Level5;
+        }
+
+        // Catálogo de inimigos de pista (missão Nota 10): 4 papéis (TrackEnemyKind) por mundo,
+        // indexados por worldIndex 1..10 — mesmo idioma do BossSet.Arquetype/Final.
+        private sealed class EnemySet
+        {
+            public readonly EnemyConfigSO[] Horde = new EnemyConfigSO[11];
+            public readonly EnemyConfigSO[] Tank = new EnemyConfigSO[11];
+            public readonly EnemyConfigSO[] Ranged = new EnemyConfigSO[11];
+            public readonly EnemyConfigSO[] Healer = new EnemyConfigSO[11];
+
+            /// <summary>Catálogo plano em ordem ESTÁVEL (mundo → papel) — determinístico para o GameSettings.</summary>
+            public EnemyConfigSO[] ToOrderedArray()
+            {
+                var list = new List<EnemyConfigSO>(40);
+                for (int w = 1; w <= 10; w++)
+                {
+                    if (Horde[w] != null) list.Add(Horde[w]);
+                    if (Tank[w] != null) list.Add(Tank[w]);
+                    if (Ranged[w] != null) list.Add(Ranged[w]);
+                    if (Healer[w] != null) list.Add(Healer[w]);
+                }
+                return list.ToArray();
+            }
         }
 
         [MenuItem("MAR Tools/Create MVP Content")]
@@ -88,6 +115,7 @@ namespace MutantArmy.Editor
             EnsureFolder(Root + "/Rewards");
             EnsureFolder(Root + "/Worlds");
             EnsureFolder(Root + "/Levels");
+            EnsureFolder(Root + "/Enemies");
 
             UnitSet units = CreateUnits();
             MutationSet mutations = CreateMutations();
@@ -96,16 +124,18 @@ namespace MutantArmy.Editor
             CreateRarities();
             CreateUpgrades();
             RewardSet rewards = CreateRewards(units);
-            BossSet bosses = CreateBosses(rewards);
-            List<LevelConfigSO> allLevels = CreateWorldsAndLevels(bosses, gates, rewards);
-            CreateGameSettings(allLevels);
+            BossSet bosses = CreateBosses(rewards, units);
+            EnemySet enemies = CreateEnemies();
+            List<LevelConfigSO> allLevels = CreateWorldsAndLevels(bosses, gates, rewards, enemies);
+            CreateGameSettings(allLevels, enemies);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("MAR Tools: conteúdo criado/atualizado — 25 portais, 19 tropas, 9 mutações, 19 bosses " +
+            Debug.Log("MAR Tools: conteúdo criado/atualizado — 27 portais, 19 tropas, 9 mutações, 19 bosses " +
                       "(10 arquétipos regionais + 10 bosses de mundo, com sobreposição dos 5 do MVP), " +
-                      "chart elemental, 4 raridades, 4 trilhas de upgrade, 3 recompensas, 10 mundos, " +
-                      "100 fases (+ endless procedural além da 100) e o catálogo Resources/GameSettings.asset.");
+                      "40 inimigos de pista (4 papéis × 10 mundos), chart elemental, 4 raridades, " +
+                      "4 trilhas de upgrade, 4 recompensas, 10 mundos, 100 fases (+ endless procedural " +
+                      "além da 100) e o catálogo Resources/GameSettings.asset.");
         }
 
         // ------------------------------------------------------------------ Units (CANON §5 · doc 03 §3.1/§4)
@@ -321,6 +351,11 @@ namespace MutantArmy.Editor
             // só reconcilia o total (spawnType é o piso quando precisa criar). ----
             set.AddTen = ConfigureGate("Gate_Add10", "gate_add_10", GateType.AddFlat, 10f, "+10", GateColor.Positive);
             set.AddTen.unitToAdd = units.Soldier;
+            // +15 (missão Nota 10): degrau intermediário do tutorial F2 (+15 vs x2). Gate novo
+            // entra AUTOMATICAMENTE no _autoBalancePool no próximo Setup Project — positivo
+            // e seguro no sorteio (mesma família do +10/+25).
+            set.AddFifteen = ConfigureGate("Gate_Add15", "gate_add_15", GateType.AddFlat, 15f, "+15", GateColor.Positive);
+            set.AddFifteen.unitToAdd = units.Soldier;
             set.AddTwentyFive = ConfigureGate("Gate_Add25", "gate_add_25", GateType.AddFlat, 25f, "+25", GateColor.Positive);
             set.AddTwentyFive.unitToAdd = units.Soldier;
             set.AddFifty = ConfigureGate("Gate_Add50", "gate_add_50", GateType.AddFlat, 50f, "+50", GateColor.Positive);
@@ -418,7 +453,7 @@ namespace MutantArmy.Editor
 
         private static IEnumerable<GateConfigSO> AllGates(GateSet s)
         {
-            yield return s.AddTen; yield return s.AddTwentyFive; yield return s.AddFifty;
+            yield return s.AddTen; yield return s.AddFifteen; yield return s.AddTwentyFive; yield return s.AddFifty;
             yield return s.TimesTwo; yield return s.TimesThree; yield return s.TimesFive;
             yield return s.MinusTen; yield return s.Half;
             yield return s.ClassArcher; yield return s.ClassMage; yield return s.ClassKnight;
@@ -624,6 +659,12 @@ namespace MutantArmy.Editor
                 chest: ChestType.Epic, cardDropChance: 0f, shardAmount: 0,
                 cardPool: new UnitConfigSO[0]);
 
+            // Missão Nota 10: fase global 5 = primeiro BAÚ (comum) da jornada — fecha os
+            // "primeiros 5 minutos" com recompensa tangível pela primeira decisão real.
+            set.Level5 = ConfigureReward("Reward_Level5", coins: 0, gems: 0, playerXp: 0,
+                chest: ChestType.Common, cardDropChance: 0f, shardAmount: 0,
+                cardPool: new UnitConfigSO[0]);
+
             return set;
         }
 
@@ -648,7 +689,7 @@ namespace MutantArmy.Editor
 
         private static readonly ElementType[] NoElements = new ElementType[0];
 
-        private static BossSet CreateBosses(RewardSet rewards)
+        private static BossSet CreateBosses(RewardSet rewards, UnitSet units)
         {
             var set = new BossSet();
 
@@ -677,6 +718,20 @@ namespace MutantArmy.Editor
                 new[] { ElementType.Fire, ElementType.Light }, new[] { ElementType.Poison },
                 BodyType.Undead, 2800f, 10f, 2.0f, 1.2f, 35f, 2.5f, 3.5f,
                 rewards.WorldBoss);
+
+            // arenaWaves do ZUMBI TITÃ (CANON §6 / missão Nota 10): o beat "invoca hordas na
+            // arena" nasce AQUI. A regra geral preserva arenaWaves != null como curadoria
+            // manual (ConfigureBoss só inicializa quando null), mas as waves do Titã são
+            // DONO-FACTORY: sobrescritas SEMPRE (idempotente — 2× CreateAll = mesmo resultado),
+            // para a fonte da verdade não escorregar para um .asset editado à mão.
+            // Soldado como tipo placeholder até existirem unidades-zumbi dedicadas.
+            set.Titan.arenaWaves = new[]
+            {
+                new ArenaWaveEvent { time = 3f,  enemyType = units.Soldier, count = 4 },
+                new ArenaWaveEvent { time = 8f,  enemyType = units.Soldier, count = 6 },
+                new ArenaWaveEvent { time = 14f, enemyType = units.Soldier, count = 8 }
+            };
+            EditorUtility.SetDirty(set.Titan);
 
             set.Scorpion = ConfigureBoss("Boss_M3_ScorpionMech", "m3_final_scorpion_mech", "Robô Escorpião",
                 new[] { ElementType.Lightning }, new[] { ElementType.Poison },
@@ -794,9 +849,125 @@ namespace MutantArmy.Editor
             boss.specialBaseCooldown = specialCooldown;
             // CANON §8: sem killReward o RewardSystem.GrantBossReward é no-op — gema nenhuma entraria.
             boss.killReward = killReward;
+            // arenaWaves != null sobrevive ao factory (curadoria manual — CONTRACT regra 7);
+            // exceção: as waves do Zumbi Titã são dono-factory e sobrescritas em CreateBosses.
             if (boss.arenaWaves == null) boss.arenaWaves = new ArenaWaveEvent[0];
             EditorUtility.SetDirty(boss);
             return boss;
+        }
+
+        // ------------------------------------------------------------------ Inimigos de pista (missão Nota 10 · CONTRACT §2)
+
+        // Tema de inimigos por mundo: 4 nomes (papel → nome amigável PT-BR da missão) +
+        // elemento/corpo temáticos. O papel de cada nome foi escolhido pela leitura natural:
+        // horda = o "raso" numeroso; tanque = o parrudo; atirador = quem ataca à distância;
+        // curador = o suporte (reparo/regeneração) do tema.
+        private sealed class EnemyTheme
+        {
+            public readonly int World;
+            public readonly string Horde, Tank, Ranged, Healer;
+            public readonly ElementType Element;
+            public readonly BodyType Body;
+
+            public EnemyTheme(int world, string horde, string tank, string ranged, string healer,
+                              ElementType element, BodyType body)
+            {
+                World = world; Horde = horde; Tank = tank; Ranged = ranged; Healer = healer;
+                Element = element; Body = body;
+            }
+        }
+
+        private static readonly EnemyTheme[] EnemyThemes =
+        {
+            new EnemyTheme(1,  "Espantalho Vivo", "Javali Mutante",   "Corvos",           "Golem Pequeno",     ElementType.None,      BodyType.Organic),
+            new EnemyTheme(2,  "Zumbi Comum",     "Policial Zumbi",   "Cachorro Zumbi",   "Braço Rastejante",  ElementType.None,      BodyType.Undead),
+            new EnemyTheme(3,  "Mini Escorpião",  "Robô Sucata",      "Torreta",          "Drone",             ElementType.Lightning, BodyType.Machine),
+            new EnemyTheme(4,  "Planta Pequena",  "Slime",            "Cogumelo Tóxico",  "Cipó",              ElementType.Poison,    BodyType.Organic),
+            new EnemyTheme(5,  "Morcego de Lava", "Golem Magma",      "Salamandra",       "Pedra Viva",        ElementType.Fire,      BodyType.Organic),
+            new EnemyTheme(6,  "Lobo Boreal",     "Yeti Pequeno",     "Cristal Vivo",     "Espírito de Neve",  ElementType.Ice,       BodyType.Organic),
+            new EnemyTheme(7,  "Cavaleiro",       "Catapulta Viva",   "Arqueiro Inimigo", "Escudeiro Inimigo", ElementType.Metal,     BodyType.Machine),
+            new EnemyTheme(8,  "Parasita",        "Mutante Instável", "Sentinela Plasma", "Ovo Alien",         ElementType.Alien,     BodyType.Organic),
+            new EnemyTheme(9,  "Drone Enxame",    "Pistão Vivo",      "Mecha Pequeno",    "Aranha Soldadora",  ElementType.Lightning, BodyType.Machine),
+            new EnemyTheme(10, "Clone",           "Espelho",          "Fenda Viva",       "Sombra",            ElementType.Shadow,    BodyType.Organic)
+        };
+
+        // Rampa de stats por mundo (~+35% composto por mundo): o jogador entra mais forte
+        // (meta/portais), o conteúdo acompanha — mesma filosofia do BossHpMultiplier.
+        private const float EnemyWorldRamp = 1.35f;
+
+        /// <summary>
+        /// 40 EnemyConfigSO (4 papéis × 10 mundos), idempotentes (LoadOrCreate + Configure).
+        /// Baseline (mundo 1): horda HP6/DPS1 (numerosa, "pão" de atropelar), tanque HP80/DPS4
+        /// (parede), atirador HP15/DPS3/range14 (ataca ANTES do contato), curador HP6/heal 4/s
+        /// (frágil de propósito — alvo prioritário). prefab fica null (load-or-keep): o
+        /// TrackEnemyManager cobre com primitivo tintado por kind (greybox-friendly).
+        /// </summary>
+        private static EnemySet CreateEnemies()
+        {
+            var set = new EnemySet();
+            foreach (EnemyTheme t in EnemyThemes)
+            {
+                float ramp = Mathf.Pow(EnemyWorldRamp, t.World - 1);
+                int w = t.World;
+
+                set.Horde[w] = ConfigureEnemy("Enemy_M" + w.ToString("00") + "_Horde",
+                    "m" + w + "_horde", t.Horde, TrackEnemyKind.WeakHorde, w,
+                    hp: Round1(6f * ramp), dps: Round1(1f * ramp),
+                    rewardCoins: w <= 5 ? 1 : 2,                       // 1–2 moedas (missão)
+                    element: t.Element, body: t.Body);
+
+                set.Tank[w] = ConfigureEnemy("Enemy_M" + w.ToString("00") + "_Tank",
+                    "m" + w + "_tank", t.Tank, TrackEnemyKind.Tank, w,
+                    hp: Round1(80f * ramp), dps: Round1(4f * ramp),
+                    rewardCoins: 5 + (w - 1) / 2,
+                    element: t.Element, body: t.Body);
+
+                set.Ranged[w] = ConfigureEnemy("Enemy_M" + w.ToString("00") + "_Ranged",
+                    "m" + w + "_ranged", t.Ranged, TrackEnemyKind.Ranged, w,
+                    hp: Round1(15f * ramp), dps: Round1(3f * ramp),
+                    rewardCoins: 3 + (w - 1) / 3,
+                    element: t.Element, body: t.Body,
+                    attackRange: 14f);                                 // CONTRACT §2: Ranged usa >6
+
+                set.Healer[w] = ConfigureEnemy("Enemy_M" + w.ToString("00") + "_Healer",
+                    "m" + w + "_healer", t.Healer, TrackEnemyKind.Healer, w,
+                    hp: Round1(6f * ramp), dps: 0f,                    // suporte puro: não ataca
+                    rewardCoins: 4 + (w - 1) / 3,
+                    element: t.Element, body: t.Body,
+                    healPerSecond: Round1(4f * ramp));                 // cura acompanha a rampa
+            }
+            return set;
+        }
+
+        private static EnemyConfigSO ConfigureEnemy(string assetName, string enemyId, string displayName,
+                                                    TrackEnemyKind kind, int worldIndex,
+                                                    float hp, float dps, int rewardCoins,
+                                                    ElementType element, BodyType body,
+                                                    float attackRange = 2f, float healPerSecond = 0f)
+        {
+            var enemy = LoadOrCreate<EnemyConfigSO>(Root + "/Enemies/" + assetName + ".asset");
+            enemy.enemyId = enemyId;
+            enemy.displayName = displayName;    // nome amigável PT-BR (missão) — a UI exibe este campo
+            enemy.kind = kind;
+            enemy.maxHp = hp;
+            enemy.dps = dps;
+            enemy.moveSpeed = 0f;               // estacionário: a pista corre até ele (TrackEnemyManager)
+            enemy.element = element;
+            enemy.bodyType = body;
+            enemy.rewardCoins = rewardCoins;
+            enemy.worldIndex = worldIndex;
+            enemy.attackRange = attackRange;
+            enemy.healPerSecond = healPerSecond;
+            // prefab NÃO é tocado (load-or-keep): visual dedicado/curadoria manual sobrevive;
+            // null = primitivo tintado por kind no TrackEnemyManager.
+            EditorUtility.SetDirty(enemy);
+            return enemy;
+        }
+
+        /// <summary>Arredonda para 1 casa — YAML legível e determinístico (sem ruído de float).</summary>
+        private static float Round1(float v)
+        {
+            return Mathf.Round(v * 10f) / 10f;
         }
 
         // ------------------------------------------------------------------ Worlds + Levels (CANON §7/§8 · doc 06 §8)
@@ -839,7 +1010,8 @@ namespace MutantArmy.Editor
         private const int LevelsPerWorld = 10;
         private const int TotalLevels = WorldCount * LevelsPerWorld;   // 100
 
-        private static List<LevelConfigSO> CreateWorldsAndLevels(BossSet bosses, GateSet gates, RewardSet rewards)
+        private static List<LevelConfigSO> CreateWorldsAndLevels(BossSet bosses, GateSet gates, RewardSet rewards,
+                                                                 EnemySet enemies)
         {
             var all = new List<LevelConfigSO>(TotalLevels);
 
@@ -862,10 +1034,18 @@ namespace MutantArmy.Editor
                     level.trackLength = TrackLengthForFase(globalIndex, fase);
                     // Fases 1–9: arquétipo regional (escalado); fase 10: boss único do mundo.
                     level.boss = fase == LevelsPerWorld ? bosses.Final[def.Index] : bosses.Arquetype[def.Index];
-                    level.bossHpMultiplier = BossHpMultiplier(def.Index, fase);
+                    // F3 global (missão Nota 10): o boss "uau" que ensina FRAQUEZA é o GIGANTE
+                    // DE MADEIRA (asset final do W1, fraco a Fogo) bem enfraquecido — imponente
+                    // de ver, e o portal de FOGO da fase derrete ele.
+                    if (globalIndex == 3) level.boss = bosses.Final[1];
+                    level.bossHpMultiplier = TutorialBossHpOverride(globalIndex)
+                                             ?? BossHpMultiplier(def.Index, fase);
                     // CANON §16: fase 10 de cada mundo = baú épico + 50 gemas (marco de mundo);
                     // as demais pagam moedas via EconomySystem.GrantLevelReward (curva §8).
                     level.winReward = fase == LevelsPerWorld ? rewards.Level10 : null;
+                    // F5 global (missão Nota 10): primeiro BAÚ comum da jornada — a primeira
+                    // decisão real (supply) termina em recompensa tangível.
+                    if (globalIndex == 5) level.winReward = rewards.Level5;
                     level.startingUnits = 1;        // fase sempre começa com 1 + bônus de meta
 
                     // Fase global 1 = onboarding impossível de perder (CANON §16). As demais
@@ -884,6 +1064,13 @@ namespace MutantArmy.Editor
                     level.obstacles = BuildObstacleSlots(globalIndex, def.Index, fase,
                                                          level.trackLength, level.gateSlots);
 
+                    // Inimigos de pista (missão Nota 10): F1–F3 limpas (tutorial protegido),
+                    // F4/F5 curadas à mão, fases 6+ com distribuição determinística por RNG
+                    // DERIVADO próprio — NUNCA mexe na cadeia gates → obstáculos → segmentos
+                    // do RNG principal da fase (CONTRACT §1.6).
+                    level.enemies = BuildEnemySlotsForLevel(globalIndex, def.Index, fase,
+                                                            level.trackLength, level.gateSlots, enemies);
+
                     EditorUtility.SetDirty(level);
                     worldLevels.Add(level);
                     all.Add(level);
@@ -901,13 +1088,17 @@ namespace MutantArmy.Editor
         /// Resources (bootstrap, doc 12 §2.1). É como o botão Jogar (Main) e o "próxima
         /// fase" (ResultScreen) resolvem LevelConfigSO em runtime.
         /// </summary>
-        private static void CreateGameSettings(List<LevelConfigSO> levels)
+        private static void CreateGameSettings(List<LevelConfigSO> levels, EnemySet enemies)
         {
             EnsureFolder("Assets/_Project/Resources");
             var settings = LoadOrCreate<GameSettingsSO>(
                 "Assets/_Project/Resources/" + GameSettingsSO.ResourcesName + ".asset");
             levels.Sort((a, b) => a.levelIndex.CompareTo(b.levelIndex));
             settings.levels = levels.ToArray();
+            // Catálogo de inimigos (missão Nota 10): o GameSettingsSO repassa este array ao
+            // EndlessLevelGenerator (EnsureEndless) — fases >100 ganham inimigos procedurais.
+            // Ordem estável (mundo → papel) = determinismo do sorteio do endless.
+            settings.enemies = enemies.ToOrderedArray();
             EditorUtility.SetDirty(settings);
         }
 
@@ -979,6 +1170,24 @@ namespace MutantArmy.Editor
             return faseCurve * worldRamp;
         }
 
+        /// <summary>
+        /// Overrides CURADOS de HP de boss do tutorial (fases globais 1–3, missão Nota 10);
+        /// null = fórmula geral. F1 0.20 (Golem 400 → 80 HP: impossível perder, vitória
+        /// instantânea de "uau"); F2 0.30 (→ 120 HP: um tico maior, ainda trivial); F3 0.12
+        /// sobre o GIGANTE DE MADEIRA (1600 → ~192 HP efetivo, na mesma banda dos 188 HP da
+        /// F3 antiga — luta de ~12 s quando o jogador pega o portal de FOGO).
+        /// </summary>
+        private static float? TutorialBossHpOverride(int globalIndex)
+        {
+            switch (globalIndex)
+            {
+                case 1: return 0.20f;
+                case 2: return 0.30f;
+                case 3: return 0.12f;
+                default: return null;
+            }
+        }
+
         private static int SlotCount(float trackLength)
         {
             if (trackLength <= 160f) return 3;
@@ -987,15 +1196,17 @@ namespace MutantArmy.Editor
         }
 
         /// <summary>
-        /// Fase 1 (CANON §16): impossível perder — pares manuais só com x2 e +10,
-        /// os dois portais introduzidos no onboarding (doc 06 §8).
+        /// Fase 1 (CANON §16 + missão Nota 10): impossível perder e ensina CRESCIMENTO puro —
+        /// só somas honestas (+10 vs +25; 2º par com lados trocados para o jogador LER, não
+        /// decorar lado). Sem obstáculos/inimigos e só AddFlat positivo: mantém o PlayMode
+        /// GameScene_Fase1_VitoriaCompleta vencível por AutoPilot.
         /// </summary>
         private static GateSlot[] BuildOnboardingSlots(float trackLength, GateSet gates)
         {
             return new[]
             {
-                ManualSlot(45f, trackLength, gates.AddTen, gates.TimesTwo),
-                ManualSlot(95f, trackLength, gates.TimesTwo, gates.AddTen)
+                ManualSlot(45f, trackLength, gates.AddTen, gates.AddTwentyFive),
+                ManualSlot(95f, trackLength, gates.AddTwentyFive, gates.AddTen)
             };
         }
 
@@ -1014,8 +1225,8 @@ namespace MutantArmy.Editor
         /// <summary>
         /// Pares MANUAIS marcantes para fases-chave de CADA mundo (CANON §16 + briefing
         /// "quantidade vs qualidade"). Retorna null para fases sem curadoria — elas caem no
-        /// autoBalance vs o boss. As fases de FTUE do mundo 1 (2,3,4,6) mantêm a curadoria
-        /// original do MVP; os demais mundos recebem 1–2 marquees TEMÁTICOS por mundo, sempre
+        /// autoBalance vs o boss. As fases de FTUE do mundo 1 (2,3,4,5,6) carregam a curadoria
+        /// da missão Nota 10; os demais mundos recebem 1–2 marquees TEMÁTICOS por mundo, sempre
         /// expondo a rota ótima de elemento (fraqueza do boss) vs uma armadilha plausível (número
         /// maior; ou o elemento IMUNE quando o boss tem imunidade). Posições terminam antes da
         /// zona de segurança (trackLength − 45).
@@ -1024,33 +1235,53 @@ namespace MutantArmy.Editor
         {
             float p1 = 35f, p2 = trackLength * 0.45f, p3 = trackLength * 0.66f, p4 = trackLength - 45f;
 
-            // ---- Mundo 1: curadoria de FTUE original do MVP (não mexer no onboarding) ----
+            // ---- Mundo 1: curadoria de FTUE da missão Nota 10 (os primeiros 5 minutos) ----
             if (def.Index == 1)
             {
                 switch (fase)
                 {
-                    // Fase 2 (CANON §16): PRIMEIRA escolha estratégica real — quantidade vs qualidade.
+                    // Fase 2 (missão Nota 10): ensina o MULTIPLICADOR na ordem certa. Começando
+                    // com 1 unidade, x2 cedo seria péssimo (1→2) — então primeiro CRESCER
+                    // (+15 vs +10 → 16), e só então a lição: com 16 unidades, x2 (32) vence
+                    // +15 (31) POR POUCO — multiplicador só compensa com exército grande.
+                    // O 3º par consolida (x2 64 vs +10 42).
                     case 2:
                         return new[]
                         {
-                            ManualSlot(p1, trackLength, g.TimesThree, g.ClassArcher),
-                            ManualSlot(p4, trackLength, g.AddTwentyFive, g.ClassMage)
+                            ManualSlot(35f, trackLength, g.AddFifteen, g.AddTen),
+                            ManualSlot(120f, trackLength, g.AddFifteen, g.TimesTwo),
+                            ManualSlot(170f, trackLength, g.TimesTwo, g.AddTen)
                         };
-                    // Fase 3 (boss "uau" FRACO A FOGO): rota ótima Fogo vs armadilha x5 sem elemento.
+                    // Fase 3 (a MAIS IMPORTANTE — ensina FRAQUEZA): boss = Gigante de Madeira
+                    // (fraco a FOGO, hpMult curado em TutorialBossHpOverride). O par do meio é
+                    // a armadilha clássica: x5 parece imbatível, mas FOGO derrete o boss pela
+                    // fraqueza — feedback FRAQUEZA! sela a lição.
                     case 3:
                         return new[]
                         {
-                            ManualSlot(p1, trackLength, g.TimesTwo, g.AddTwentyFive),
-                            ManualSlot(p3, trackLength, g.ElementFire, g.TimesFive),
-                            ManualSlot(p4, trackLength, g.MutWings, g.AddFifty)
+                            ManualSlot(35f, trackLength, g.AddTwentyFive, g.AddTen),
+                            ManualSlot(145f, trackLength, g.ElementFire, g.TimesFive),
+                            ManualSlot(175f, trackLength, g.AddTwentyFive, g.MutWings)
                         };
-                    // Fase 4: introduz o RISCO honesto + 1ª escolha de mutação dupla.
+                    // Fase 4: introduz o RISCO honesto + 1ª escolha de mutação dupla
+                    // (+ primeiras hordas de pista — ver BuildEnemySlotsForLevel).
                     case 4:
                         return new[]
                         {
                             ManualSlot(p1, trackLength, g.TimesThree, g.ElementFire),
                             ManualSlot(p3, trackLength, g.MutArmor, g.MutSpeed),
                             ManualSlot(p4, trackLength, g.RiskTen, g.AddFifty)
+                        };
+                    // Fase 5 (decisão real / SUPPLY): quantidade vs QUALIDADE no coração da
+                    // fase (+50 soldados vs VIRAR MAGO — menos corpos, muito mais poder por
+                    // supply), multiplicador vs elemento certo, e defesa vs número no fim.
+                    case 5:
+                        return new[]
+                        {
+                            ManualSlot(30f, trackLength, g.AddTwentyFive, g.AddTen),
+                            ManualSlot(80f, trackLength, g.AddFifty, g.ClassMage),
+                            ManualSlot(130f, trackLength, g.TimesTwo, g.ElementFire),
+                            ManualSlot(180f, trackLength, g.AddTwentyFive, g.MutArmor)
                         };
                     // Fase 6: qualidade pesada antes de fechar a primeira leva do mundo.
                     case 6:
@@ -1226,6 +1457,133 @@ namespace MutantArmy.Editor
                 if (back >= first && !TooCloseToGate(back, gates)) return back;
             }
             return z;
+        }
+
+        // ------------------------------------------------------------------ Inimigos por fase (missão Nota 10)
+
+        // Primo PRÓPRIO do layout de inimigos da factory (CONTRACT §1.6: RNG derivado por
+        // sistema). Distinto do TrackEnemyManager (92821+7, lane/jitter em runtime), do
+        // RiskResolver (486187739+1) e do roll de boss raro (48611+3) — layout e visual
+        // nunca ficam correlacionados. 28657 é primo (e primo de Fibonacci).
+        private const int EnemyLayoutPrime = 28657;
+        private const int EnemyLayoutSalt = 5;
+
+        /// <summary>
+        /// EnemySlot[] da fase. Curadoria do tutorial: F1–F3 SEM inimigos (pista limpa —
+        /// CANON §16; PlayMode Fase1 vencível), F4 = 2 hordas fracas (o prazer de atropelar),
+        /// F5 = 1 tanque solitário (variedade leve). Fases globais 6+: 2–4 grupos
+        /// determinísticos com kinds do MUNDO da fase, intensidade crescendo com a fase,
+        /// posições fora da vizinhança dos portais (clearance 9 m ≥ ±8 m da missão) e da
+        /// zona de segurança da arena. Fase 10 (boss de mundo): só 1–2 hordas de aquecimento.
+        /// </summary>
+        private static EnemySlot[] BuildEnemySlotsForLevel(int globalIndex, int worldIndex, int fase,
+                                                           float trackLength, GateSlot[] gateSlots,
+                                                           EnemySet enemies)
+        {
+            if (globalIndex <= 3) return new EnemySlot[0];
+
+            if (globalIndex == 4)
+                return new[]
+                {
+                    EnemyGroup(60f, enemies.Horde[1], 6),
+                    EnemyGroup(130f, enemies.Horde[1], 8)
+                };
+
+            if (globalIndex == 5)
+                return new[] { EnemyGroup(150f, enemies.Tank[1], 1) };
+
+            // RNG derivado da MESMA seed determinística da fase, com primo próprio — roda na
+            // GERAÇÃO (factory), nunca na cadeia de RNG do LevelManager.
+            var rng = new System.Random(LevelSeed(globalIndex) * EnemyLayoutPrime + EnemyLayoutSalt);
+
+            float first = 45f;
+            float last = trackLength - 50f;   // antes da zona de aproximação da arena
+            if (last <= first) return new EnemySlot[0];
+
+            // Fase 10: a estrela é o boss único do mundo — só aquecimento de horda no caminho.
+            if (fase == LevelsPerWorld)
+            {
+                int warmups = 1 + rng.Next(2);   // 1..2
+                var warm = new List<EnemySlot>(warmups);
+                for (int i = 0; i < warmups; i++)
+                {
+                    float t = warmups > 1 ? i / (float)(warmups - 1) : 0.5f;
+                    float z = Mathf.Lerp(first, trackLength * 0.6f, t) + Jitter(rng, 6f);
+                    if (TooCloseToGate(z, gateSlots)) z = NudgeAwayFromGates(z, first, last, gateSlots);
+                    if (TooCloseToGate(z, gateSlots)) continue;   // ainda colado: pula, fase segue válida
+                    warm.Add(EnemyGroup(z, enemies.Horde[worldIndex], 6 + rng.Next(4)));
+                }
+                return warm.ToArray();
+            }
+
+            // Fases 1–9 dos mundos (globais 6+): intensidade cresce com a fase dentro do mundo.
+            int slotCount = Mathf.Clamp(2 + (fase - 1) / 4 + rng.Next(2), 2, 4);
+            var result = new List<EnemySlot>(slotCount);
+            for (int i = 0; i < slotCount; i++)
+            {
+                float t = slotCount > 1 ? i / (float)(slotCount - 1) : 0.5f;
+                float z = Mathf.Lerp(first, last, t) + Jitter(rng, 6f);
+                if (TooCloseToGate(z, gateSlots)) z = NudgeAwayFromGates(z, first, last, gateSlots);
+                if (TooCloseToGate(z, gateSlots)) continue;
+
+                // 1º grupo é SEMPRE horda (atropelar primeiro, decidir depois); os demais
+                // sorteiam no pool liberado pela fase (variedade sobe junto da dificuldade).
+                TrackEnemyKind kind = i == 0 ? TrackEnemyKind.WeakHorde : PickEnemyKind(rng, fase);
+                EnemyConfigSO config = EnemyOfKind(enemies, worldIndex, kind);
+                if (config == null) continue;   // catálogo sem o papel: pula o grupo
+
+                result.Add(EnemyGroup(z, config, GroupCountFor(kind, fase, rng)));
+            }
+            return result.ToArray();
+        }
+
+        private static EnemySlot EnemyGroup(float z, EnemyConfigSO enemy, int count)
+        {
+            return new EnemySlot { trackPosition = z, enemy = enemy, count = count };
+        }
+
+        private static float Jitter(System.Random rng, float amplitude)
+        {
+            return (float)(rng.NextDouble() * 2.0 - 1.0) * amplitude;
+        }
+
+        // Pool de papéis liberado pela fase no mundo (surpresa justa, dificuldade gradual):
+        // fases 1–2 só horda/tanque; 3–5 adicionam o atirador; 6+ liberam o curador.
+        // Horda tem peso DOBRADO (índices 0 e 1) — é o "pão" da corrida.
+        private static TrackEnemyKind PickEnemyKind(System.Random rng, int fase)
+        {
+            int poolSize = fase <= 2 ? 3 : fase <= 5 ? 4 : 5;
+            switch (rng.Next(poolSize))
+            {
+                case 2: return TrackEnemyKind.Tank;
+                case 3: return TrackEnemyKind.Ranged;
+                case 4: return TrackEnemyKind.Healer;
+                default: return TrackEnemyKind.WeakHorde;
+            }
+        }
+
+        // Tamanho do grupo por papel: horda numerosa (cresce com a fase, teto 12 — pooling do
+        // TrackEnemyManager dimensionado p/ isso); tanque/curador raros; atirador em dupla/trio.
+        private static int GroupCountFor(TrackEnemyKind kind, int fase, System.Random rng)
+        {
+            switch (kind)
+            {
+                case TrackEnemyKind.Tank: return 1 + rng.Next(2);                      // 1..2
+                case TrackEnemyKind.Ranged: return 2 + rng.Next(2);                    // 2..3
+                case TrackEnemyKind.Healer: return 1 + rng.Next(2);                    // 1..2
+                default: return Mathf.Min(12, 5 + fase / 2 + rng.Next(4));             // 5..12
+            }
+        }
+
+        private static EnemyConfigSO EnemyOfKind(EnemySet enemies, int worldIndex, TrackEnemyKind kind)
+        {
+            switch (kind)
+            {
+                case TrackEnemyKind.Tank: return enemies.Tank[worldIndex];
+                case TrackEnemyKind.Ranged: return enemies.Ranged[worldIndex];
+                case TrackEnemyKind.Healer: return enemies.Healer[worldIndex];
+                default: return enemies.Horde[worldIndex];
+            }
         }
 
         // ------------------------------------------------------------------ infra

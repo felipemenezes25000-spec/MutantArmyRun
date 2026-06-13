@@ -148,6 +148,10 @@ namespace MutantArmy.Gameplay
             // ordem fixa de consumo do RNG (gates → obstáculos → segmentos) preserva o determinismo
             if (GateManager.Instance != null) GateManager.Instance.SpawnGates(level, _rng);
             SpawnObstacles(level);
+            // Inimigos de pista (missão Nota 10): o manager usa RNG DERIVADO da seed
+            // (seed*92821+7, CONTRACT §1.6) — NÃO consome o _rng principal, então a cadeia
+            // gates → obstáculos → segmentos e as 100 pistas desenhadas ficam intactas.
+            if (TrackEnemyManager.Instance != null) TrackEnemyManager.Instance.SpawnFromLevel(level);
             while (_furthestZ < _spawnAheadMeters) SpawnNextSegment();
 
             _lastProgressRaised = -1f;
@@ -398,6 +402,10 @@ namespace MutantArmy.Gameplay
                 if (_liveObstacles[i].go != null) ReleaseObstacle(_liveObstacles[i].go);
             _liveObstacles.Clear();
             if (GateManager.Instance != null) GateManager.Instance.ReleaseAll();
+            // soft reset dos inimigos de pista (CONTRACT §1.5): release total, nunca Destroy
+            if (TrackEnemyManager.Instance != null) TrackEnemyManager.Instance.DrainAll();
+            // zona de risco pendente não pode resolver na próxima corrida (estado residual, §1.3)
+            if (RiskResolver.Instance != null) RiskResolver.Instance.Cancel();
         }
     }
 }

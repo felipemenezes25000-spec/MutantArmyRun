@@ -27,6 +27,15 @@ namespace MutantArmy.Core
         // Balanceamento de boss (doc 12 §4.5)
         public const string BossHpGlobalMult = "boss_hp_global_mult";       // 1.0
 
+        // Missão Nota 10 — tuning de variante rara, combos e inimigos de pista. Os defaults
+        // espelham o que o Gameplay serializou (BossManager._rareBossChance 0.06 etc.). ENTREGA
+        // ao Gameplay é por parâmetro/hook (Gameplay não enxerga Services, §2.3): a ponte
+        // RC → campos serializados entra no wiring da Onda 4 — até lá os SOs/managers valem.
+        public const string RareBossChance = "rare_boss_chance";            // 0.06
+        public const string ComboBonusMult = "combo_bonus_mult";            // 1.0
+        public const string EnemyHpMult = "enemy_hp_mult";                  // 1.0
+        public const string EnemyDamageMult = "enemy_damage_mult";          // 1.0
+
         private const string BossHpMultPrefix = "boss_hp_mult_";
 
         /// <summary>Chave por boss: "boss_hp_mult_&lt;bossId&gt;" (doc 12 §4.5/§5.2).</summary>

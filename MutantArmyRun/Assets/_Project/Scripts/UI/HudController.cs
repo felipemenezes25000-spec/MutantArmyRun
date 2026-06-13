@@ -111,9 +111,9 @@ namespace MutantArmy.UI
         {
             if (change.type != CurrencyType.Coin) return;
 
-            // RunCoins (carteira temporária) num contador PRÓPRIO: "run_earn" nunca
-            // entra no saldo persistente — o commit chega depois como "run_commit".
-            if (change.source == RunEarnSource)
+            // RunCoins (carteira temporária) num contador PRÓPRIO: ganhos DA CORRIDA nunca
+            // entram no saldo persistente — o commit chega depois como "run_commit".
+            if (IsRunEarnSource(change.source))
             {
                 _runCoins += change.amount;
                 if (_runCoins < 0) _runCoins = 0;
@@ -124,6 +124,17 @@ namespace MutantArmy.UI
             _coins += change.amount;
             if (_coins < 0) _coins = 0;
             RenderCoins();
+        }
+
+        // Fontes que são DELTA da RunWallet (não saldo): "run_earn" (portais/overflow),
+        // "enemy_kill" (inimigos de pista) e "combo_*" (bônus na morte do boss). Somá-las
+        // na carteira contaria o mesmo dinheiro 2× quando o "run_commit" chegar.
+        private static bool IsRunEarnSource(string source)
+        {
+            if (string.IsNullOrEmpty(source)) return false;
+            return source == RunEarnSource
+                || source == "enemy_kill"
+                || source.StartsWith("combo_", System.StringComparison.Ordinal);
         }
 
         // Fim de fase: a RunWallet foi comitada (ou descartada) — zera o contador da corrida.

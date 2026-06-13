@@ -90,6 +90,27 @@ namespace MutantArmy.Editor
                     Warn("BossConfigSO '" + boss.name + "' sem fraqueza — Boss Scout exibirá dica genérica.", boss);
             }
 
+            // Inimigos de pista (missão Nota 10 — CONTRACT §2): papéis com contrato de stats
+            // (Ranged ataca ANTES do contato; Healer precisa curar de verdade).
+            foreach (EnemyConfigSO enemy in FindAll<EnemyConfigSO>())
+            {
+                if (string.IsNullOrEmpty(enemy.enemyId))
+                    Error("EnemyConfigSO '" + enemy.name + "' sem enemyId.", enemy);
+                if (enemy.maxHp <= 0f)
+                    Error("EnemyConfigSO '" + enemy.name + "' com maxHp <= 0.", enemy);
+                if (enemy.dps < 0f)
+                    Error("EnemyConfigSO '" + enemy.name + "' com dps negativo.", enemy);
+                if (enemy.rewardCoins < 0)
+                    Error("EnemyConfigSO '" + enemy.name + "' com rewardCoins negativo.", enemy);
+                if (enemy.worldIndex < 1 || enemy.worldIndex > 10)
+                    Error("EnemyConfigSO '" + enemy.name + "' com worldIndex " + enemy.worldIndex +
+                          " fora de 1..10 (mundo temático).", enemy);
+                if (enemy.kind == TrackEnemyKind.Healer && enemy.healPerSecond <= 0f)
+                    Error("EnemyConfigSO '" + enemy.name + "' é Healer com healPerSecond <= 0 — curador que não cura.", enemy);
+                if (enemy.kind == TrackEnemyKind.Ranged && enemy.attackRange <= 6f)
+                    Error("EnemyConfigSO '" + enemy.name + "' é Ranged com attackRange <= 6 — atirador deve atacar ANTES do contato (CONTRACT §2).", enemy);
+            }
+
             foreach (LevelConfigSO level in FindAll<LevelConfigSO>())
             {
                 if (level.boss == null)
@@ -113,6 +134,24 @@ namespace MutantArmy.Editor
                             Error("LevelConfigSO '" + level.name + "' tem GateSlot manual sem par completo (esquerda/direita).", level);
                     }
                 }
+
+                // Inimigos de pista (missão Nota 10): slot precisa de config e de posição na pista.
+                if (level.enemies != null)
+                {
+                    foreach (EnemySlot slot in level.enemies)
+                    {
+                        if (slot == null) continue;
+                        if (slot.enemy == null)
+                            Error("LevelConfigSO '" + level.name + "' tem EnemySlot sem EnemyConfigSO — grupo fantasma.", level);
+                        if (slot.trackPosition <= 0f || slot.trackPosition >= level.trackLength)
+                            Error("LevelConfigSO '" + level.name + "' tem EnemySlot fora da pista (z=" +
+                                  slot.trackPosition + ", pista=" + level.trackLength + " m).", level);
+                        if (slot.count < 1)
+                            Error("LevelConfigSO '" + level.name + "' tem EnemySlot com count < 1.", level);
+                    }
+                }
+
+                ValidateTutorialRules(level, Error);
             }
 
             foreach (WorldConfigSO world in FindAll<WorldConfigSO>())
@@ -124,6 +163,73 @@ namespace MutantArmy.Editor
             }
 
             return errors;
+        }
+
+        /// <summary>
+        /// Regras de TUTORIAL das fases-chave (missão Nota 10; CANON §16) — protegem o desenho
+        /// dos primeiros 5 minutos contra regressão de conteúdo:
+        /// F1 (levelIndex 1): pista LIMPA (sem obstáculos/inimigos) e só pares manuais de soma
+        /// positiva (AddFlat &gt; 0) — mantém o PlayMode GameScene_Fase1_VitoriaCompleta vencível.
+        /// F3 (levelIndex 3): a fase que ensina FRAQUEZA — boss fraco a FOGO e pelo menos um
+        /// portal de elemento FOGO entre os slots.
+        /// </summary>
+        private static void ValidateTutorialRules(LevelConfigSO level, System.Action<string, Object> error)
+        {
+            if (level.levelIndex == 1)
+            {
+                if (level.obstacles != null && level.obstacles.Length > 0)
+                    error("Fase 1 '" + level.name + "' com obstáculos — onboarding deve ser impossível de perder (CANON §16).", level);
+                if (level.enemies != null && level.enemies.Length > 0)
+                    error("Fase 1 '" + level.name + "' com inimigos de pista — onboarding deve ser impossível de perder (CANON §16).", level);
+                if (level.gateSlots != null)
+                {
+                    foreach (GateSlot slot in level.gateSlots)
+                    {
+                        if (slot == null) continue;
+                        if (slot.autoBalance)
+                        {
+                            error("Fase 1 '" + level.name + "' com slot autoBalance — onboarding usa só pares manuais de soma (+N).", level);
+                            continue;
+                        }
+                        ValidateF1Gate(level, slot.leftGate, error);
+                        ValidateF1Gate(level, slot.rightGate, error);
+                    }
+                }
+            }
+
+            if (level.levelIndex == 3)
+            {
+                bool weakToFire = level.boss != null && level.boss.weaknesses != null &&
+                                  System.Array.IndexOf(level.boss.weaknesses, ElementType.Fire) >= 0;
+                if (!weakToFire)
+                    error("Fase 3 '" + level.name + "' precisa de boss FRACO A FOGO — é a fase que ensina fraqueza elemental (missão Nota 10).", level);
+
+                bool hasFireGate = false;
+                if (level.gateSlots != null)
+                {
+                    foreach (GateSlot slot in level.gateSlots)
+                    {
+                        if (slot == null) continue;
+                        if (IsFireElementGate(slot.leftGate) || IsFireElementGate(slot.rightGate))
+                            hasFireGate = true;
+                    }
+                }
+                if (!hasFireGate)
+                    error("Fase 3 '" + level.name + "' sem portal de ELEMENTO FOGO — o jogador não consegue explorar a fraqueza ensinada.", level);
+            }
+        }
+
+        private static void ValidateF1Gate(LevelConfigSO level, GateConfigSO gate, System.Action<string, Object> error)
+        {
+            if (gate == null) return;   // par incompleto já é erro na checagem geral de slots
+            if (gate.gateType != GateType.AddFlat || gate.value <= 0f)
+                error("Fase 1 '" + level.name + "' com portal '" + gate.name +
+                      "' que não é soma positiva (+N) — F1 ensina só CRESCIMENTO (missão Nota 10).", level);
+        }
+
+        private static bool IsFireElementGate(GateConfigSO gate)
+        {
+            return gate != null && gate.gateType == GateType.Element && gate.element == ElementType.Fire;
         }
 
         private static List<T> FindAll<T>() where T : ScriptableObject

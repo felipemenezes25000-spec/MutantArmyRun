@@ -109,13 +109,14 @@ namespace Domain.Persistence.Tests
         }
 
         [Fact]
-        public void SaveV1_AtravessaAteV4_ComCamposDeRetencaoNormalizados()
+        public void SaveV1_AtravessaOGateV4_ComCamposDeRetencaoNormalizados()
         {
-            // gates incrementais até o atual (v4): a lista de missões nasce vazia, contadores em 0.
+            // o efeito do gate v4 aparece mesmo partindo da v1: a lista de missões nasce
+            // vazia, contadores em 0 — e a migração segue até a versão ATUAL (>= 5).
             var d = SaveV1Legado();
             d.dailyMissions = null;   // campo inexistente na v1 → null no JSON
             SaveMigration.Migrate(d);
-            Assert.Equal(4, d.schemaVersion);
+            Assert.Equal(SaveMigration.CurrentVersion, d.schemaVersion);
             Assert.NotNull(d.dailyMissions);
             Assert.Empty(d.dailyMissions);
             Assert.Equal(0, d.chestPityCounter);
@@ -124,14 +125,71 @@ namespace Domain.Persistence.Tests
         }
 
         [Fact]
-        public void SaveV3_SoRecebeGateV4()
+        public void SaveV3_RecebeGatesV4EV5()
         {
-            // dados v3 preservados; só o gate v4 roda (lista de missões normalizada).
-            var d = new SaveData { schemaVersion = 3, coins = 777, dailyMissions = null };
+            // dados v3 preservados; gates v4 (missões) e v5 (álbum de bosses) rodam em sequência.
+            var d = new SaveData { schemaVersion = 3, coins = 777, dailyMissions = null, bossCollection = null };
             SaveMigration.Migrate(d);
-            Assert.Equal(4, d.schemaVersion);
+            Assert.Equal(SaveMigration.CurrentVersion, d.schemaVersion);
             Assert.Equal(777L, d.coins);
             Assert.NotNull(d.dailyMissions);
+            Assert.NotNull(d.bossCollection);
+        }
+
+        [Fact]
+        public void SaveV4_RecebeGateV5_ComAlbumNormalizado()
+        {
+            // save v4 real (missão Nota 10 não existia): bossCollection ausente no JSON → null;
+            // tutorialStepMask desserializa como 0 (nenhum passo de tutorial visto).
+            var d = new SaveData { schemaVersion = 4, coins = 555, bossCollection = null };
+            SaveMigration.Migrate(d);
+            Assert.Equal(5, d.schemaVersion);
+            Assert.Equal(555L, d.coins);
+            Assert.NotNull(d.bossCollection);
+            Assert.Empty(d.bossCollection);
+            Assert.Equal(0, d.tutorialStepMask);
+        }
+
+        [Fact]
+        public void SaveV4_GateV5_PreservaDadosDaV4()
+        {
+            // gate v5 é puramente aditivo: missões/pity da v4 atravessam intactos.
+            var d = new SaveData { schemaVersion = 4, chestPityCounter = 9, bossCollection = null };
+            d.dailyMissions.Add(new MissionProgress { missionId = "win_levels", progress = 2, target = 3 });
+            SaveMigration.Migrate(d);
+            Assert.Equal(5, d.schemaVersion);
+            Assert.Equal(9, d.chestPityCounter);
+            Assert.Single(d.dailyMissions);
+            Assert.Equal("win_levels", d.dailyMissions[0].missionId);
+        }
+
+        [Fact]
+        public void SaveV5_NaoReexecutaOGateV5()
+        {
+            // álbum populado de um save já v5 nunca é tocado pela migração (idempotência).
+            var d = new SaveData { schemaVersion = 5, tutorialStepMask = 7 };
+            d.bossCollection.Add(new BossCollectionMath.BossRecord { bossId = "golem_pedra", kills = 4 });
+            SaveMigration.Migrate(d);
+            Assert.Equal(SaveMigration.CurrentVersion, d.schemaVersion);
+            Assert.Single(d.bossCollection);
+            Assert.Equal(4, d.bossCollection[0].kills);
+            Assert.Equal(7, d.tutorialStepMask);
+        }
+
+        [Fact]
+        public void SaveV1_AtravessaAteV5_ComAlbumNormalizado()
+        {
+            // a cadeia COMPLETA v1→v5: efeito de todos os gates num único Migrate.
+            var d = SaveV1Legado();
+            d.dailyMissions = null;
+            d.bossCollection = null;
+            SaveMigration.Migrate(d);
+            Assert.Equal(5, d.schemaVersion);
+            Assert.Equal(60, d.supplyCap);                       // gate v2
+            Assert.Equal("soldier_default", d.equippedSkinId);   // gate v3
+            Assert.NotNull(d.dailyMissions);                     // gate v4
+            Assert.NotNull(d.bossCollection);                    // gate v5
+            Assert.Empty(d.bossCollection);
         }
 
         [Fact]

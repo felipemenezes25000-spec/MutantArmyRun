@@ -33,6 +33,12 @@ namespace MutantArmy.Gameplay
         private const float TickRate = 0.1f;   // 10 Hz
         private float _accum;
 
+        // Feedback FRAQUEZA!/RESISTIU! (missão Nota 10): rate-limit NA ORIGEM (contrato §5,
+        // ≥0,5 s entre Raises) — o boss apanha a 10 Hz, o feedback não. Tempo UNSCALED:
+        // o slow motion do golpe final não represa o último veredito.
+        private const float ElementalFeedbackInterval = 0.5f;
+        private float _lastElementalFeedbackTime = float.NegativeInfinity;
+
         // bônus de meta (BossDamage/CritChance) chegam por setter: Gameplay não enxerga
         // o UpgradeSystem (fronteira de asmdef, doc 12 §2.3)
         private float _bossDamageBonus;
@@ -95,6 +101,7 @@ namespace MutantArmy.Gameplay
             _turretCount = 0;
             _reviveTimer.Set(0f);
             _turretBuild.Set(0f);
+            _lastElementalFeedbackTime = float.NegativeInfinity;   // 1º veredito da nova luta sai na hora
         }
 
         private void Update()
@@ -119,6 +126,7 @@ namespace MutantArmy.Gameplay
                 // crowd → arena: waves vivas absorvem antes do boss
                 float dmg = ComputeCrowdDamage(boss, TickRate);
                 dmg += TurretDamage(TickRate);                  // torreta do Engenheiro: DPS "grátis" na arena
+                EmitElementalFeedback(bm, boss, dmg);           // FRAQUEZA!/RESISTIU! + hooks do behavior
                 float leftover = bm.DamageArenaEnemies(dmg);
                 if (leftover > 0f) bm.ApplyDamage(leftover);
                 TotalDamageDealt += dmg;
@@ -199,12 +207,38 @@ namespace MutantArmy.Gameplay
             return dps * dt;
         }
 
+        // Veredito elemental do tick (missão Nota 10): classifica a fração dominante do DPS
+        // (CrowdManager.DominantRelationVs → Domain.WeaknessJudge), publica o evento da UI
+        // (FRAQUEZA!/RESISTIU!) e chama os hooks do BossBehavior — tudo rate-limited ≥0,5 s.
+        private void EmitElementalFeedback(BossManager bm, BossRuntime boss, float dmg)
+        {
+            if (dmg <= 0f) return;
+            if (Time.unscaledTime - _lastElementalFeedbackTime < ElementalFeedbackInterval) return;
+            CrowdManager crowd = CrowdManager.Instance;
+            if (crowd == null) return;
+            _lastElementalFeedbackTime = Time.unscaledTime;
+
+            ElementRelation relation = crowd.DominantRelationVs(boss);
+            ElementType element = crowd.DominantElement();
+
+            bm.RegisterElementalHit(relation);   // contadores do LastFight + fail reason WrongElement
+            GameEvents.RaiseBossElementalHit(new BossElementalHit(
+                element, relation, dmg, bm.CurrentBossPosition));
+
+            BossBehavior behavior = bm.CurrentBehavior;
+            if (behavior == null) return;
+            if (relation == ElementRelation.Weakness) behavior.OnWeaknessHit(element);
+            else if (relation == ElementRelation.Resisted || relation == ElementRelation.Immune)
+                behavior.OnResistedHit(element);
+        }
+
         // boss + waves → crowd: dano agregado distribuído pelos índices das unidades
         private void TickIncomingDamage(BossManager bm, BossRuntime boss, float dt)
         {
             CrowdManager crowd = CrowdManager.Instance;
             if (crowd == null) return;
-            float incoming = (boss.Config.contactDps * boss.SlowFactor + bm.TotalArenaDps) * dt;
+            // contato EFETIVO = SO × multiplicador de behavior (desespero do Gigante) × lentidão de Gelo
+            float incoming = (boss.EffectiveContactDps * boss.SlowFactor + bm.TotalArenaDps) * dt;
             if (incoming > 0f) crowd.ApplyAggregateDamage(incoming);
         }
 

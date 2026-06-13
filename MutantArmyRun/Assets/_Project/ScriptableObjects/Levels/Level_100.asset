@@ -55,6 +55,13 @@ MonoBehaviour:
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
   - trackPosition: 231
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
+  enemies:
+  - trackPosition: 40.73295
+    enemy: {fileID: 11400000, guid: 48c107e6e02bddb41973b826f4823bca, type: 2}
+    count: 7
+  - trackPosition: 167.42882
+    enemy: {fileID: 11400000, guid: 48c107e6e02bddb41973b826f4823bca, type: 2}
+    count: 6
   boss: {fileID: 11400000, guid: 6ced2e55e0e680145883651519ac135f, type: 2}
   bossHpMultiplier: 1.72
   winReward: {fileID: 11400000, guid: 9ec962e0ca89e354baf2aee4b8ce8fbe, type: 2}

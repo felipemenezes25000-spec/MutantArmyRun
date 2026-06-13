@@ -474,6 +474,8 @@ namespace MutantArmy.UI
                 case MissionSystem.MissionWinLevels: return "Vença 3 fases";
                 case MissionSystem.MissionChooseGates: return "Atravesse 5 portais";
                 case MissionSystem.MissionDefeatBosses: return "Derrote 1 boss";
+                case MissionSystem.MissionHitWeakness: return "Acerte a fraqueza de 1 boss";
+                case MissionSystem.MissionEarnCombos: return "Faça 3 combos";
                 default: return id;
             }
         }

@@ -25,6 +25,11 @@ namespace MutantArmy.Core
                  "Acima do maior índice, as fases são geradas proceduralmente (endless infinito).")]
         public LevelConfigSO[] levels;
 
+        [Tooltip("Catálogo de inimigos de pista (missão Nota 10; 4 papéis × 10 mundos, ordem " +
+                 "mundo → papel). Repassado ao EndlessLevelGenerator para as fases >100 ganharem " +
+                 "inimigos procedurais. Vazio/null = endless sem inimigos (degrada, nunca quebra).")]
+        public EnemyConfigSO[] enemies;
+
         private static GameSettingsSO _cached;
         private static bool _warnedMissing;
 
@@ -90,7 +95,9 @@ namespace MutantArmy.Core
         private EndlessLevelGenerator EnsureEndless()
         {
             if (_endless != null) return _endless;
-            _endless = new EndlessLevelGenerator(CollectWorlds(), CollectBosses());
+            // O catálogo de inimigos entra como 3º parâmetro (missão Nota 10): fases endless
+            // ganham grupos procedurais dos mesmos EnemyConfigSO das fases desenhadas.
+            _endless = new EndlessLevelGenerator(CollectWorlds(), CollectBosses(), enemies);
             return _endless;
         }
 

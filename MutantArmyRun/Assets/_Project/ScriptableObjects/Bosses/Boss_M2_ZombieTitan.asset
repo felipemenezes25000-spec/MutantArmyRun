@@ -27,7 +27,16 @@ MonoBehaviour:
   specialAttackDamage: 35
   specialAttackArea: 2.5
   specialBaseCooldown: 3.5
-  arenaWaves: []
+  arenaWaves:
+  - time: 3
+    enemyType: {fileID: 11400000, guid: b62330503bdd9e643967758ddd46e014, type: 2}
+    count: 4
+  - time: 8
+    enemyType: {fileID: 11400000, guid: b62330503bdd9e643967758ddd46e014, type: 2}
+    count: 6
+  - time: 14
+    enemyType: {fileID: 11400000, guid: b62330503bdd9e643967758ddd46e014, type: 2}
+    count: 8
   prefab: {fileID: 8223450614564286288, guid: ad7d87bff3ae36749b530b4a2591ef98, type: 3}
   scoutCardArt: {fileID: 0}
   killReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}

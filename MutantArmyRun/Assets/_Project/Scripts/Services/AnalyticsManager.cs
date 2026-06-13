@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
 using MutantArmy.Core;
+using MutantArmy.Domain;
 using UnityEngine;
 
 namespace MutantArmy.Services
 {
     /// <summary>
     /// Fila local + açúcar tipado para a taxonomia COMPLETA do doc 11 (23 eventos
-    /// obrigatórios do BRIEF + 11 proprietários). O transporte mora no IAnalyticsProvider
+    /// obrigatórios do BRIEF + 11 proprietários) + 9 sensores da missão Nota 10
+    /// (boss_weakness_hit, boss_resisted_hit, boss_special_warning, boss_fight_start,
+    /// boss_defeated via bus, rare_boss_announced, combo_earned, enemy_killed,
+    /// enemy_wave_cleared, gate_best_choice — todos fiados por evento no Init).
+    /// O transporte mora no IAnalyticsProvider
     /// (Null no MVP — console em DEV; Firebase depois). Convenções do doc 11 §3:
     /// snake_case, booleans como int 0/1, e os parâmetros globais (session_id, level,
     /// world, app_version, seconds_in_session) anexados automaticamente a TODO evento.
@@ -56,10 +61,36 @@ namespace MutantArmy.Services
             // -= antes de += para Init repetido não duplicar a inscrição.
             GameEvents.OnGateConsumed -= HandleGateConsumed;
             GameEvents.OnGateConsumed += HandleGateConsumed;
+            // Fiação da missão Nota 10 (CONTRACT §5): tudo nasce no bus — boss elemental,
+            // combos, especiais, morte/raro de boss, inimigos de pista e fim de fase rico.
+            GameEvents.OnBossElementalHit -= HandleBossElementalHit;
+            GameEvents.OnBossElementalHit += HandleBossElementalHit;
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnComboEarned += HandleComboEarned;
+            GameEvents.OnBossSpecialWarning -= HandleBossSpecialWarning;
+            GameEvents.OnBossSpecialWarning += HandleBossSpecialWarning;
+            GameEvents.OnBossDied -= HandleBossDied;
+            GameEvents.OnBossDied += HandleBossDied;
+            GameEvents.OnRareBossAnnounced -= HandleRareBossAnnounced;
+            GameEvents.OnRareBossAnnounced += HandleRareBossAnnounced;
+            GameEvents.OnTrackEnemyKilled -= HandleTrackEnemyKilled;
+            GameEvents.OnTrackEnemyKilled += HandleTrackEnemyKilled;
+            GameEvents.OnEnemyWaveCleared -= HandleEnemyWaveCleared;
+            GameEvents.OnEnemyWaveCleared += HandleEnemyWaveCleared;
+            GameEvents.OnLevelFinished -= HandleLevelFinished;
+            GameEvents.OnLevelFinished += HandleLevelFinished;
+            // gate_best_choice: o veredito é cosmético (JuiceEvents), mas o agregado por
+            // jogador é sensor do funil de aprendizado — denominador é gate_selected.
+            JuiceEvents.OnGoodGateChoice -= HandleGoodGateChoice;
+            JuiceEvents.OnGoodGateChoice += HandleGoodGateChoice;
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.LevelStarted -= LogLevelStart;
                 GameManager.Instance.LevelStarted += LogLevelStart;
+                // boss_fight_start: a entrada em BossFight é o único sinal disponível daqui
+                // (o boss_start rico exige contexto do Gameplay — call site é da Onda 4+).
+                GameManager.Instance.StateEntered -= HandleStateEntered;
+                GameManager.Instance.StateEntered += HandleStateEntered;
             }
 
             if (_consentDenied) _preInitQueue.Clear();         // negado: descarta, não acumula
@@ -73,14 +104,75 @@ namespace MutantArmy.Services
         private void OnDestroy()
         {
             GameEvents.OnGateConsumed -= HandleGateConsumed;   // bus estático sobrevive a cenas (doc 12 §3.2)
+            GameEvents.OnBossElementalHit -= HandleBossElementalHit;
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnBossSpecialWarning -= HandleBossSpecialWarning;
+            GameEvents.OnBossDied -= HandleBossDied;
+            GameEvents.OnRareBossAnnounced -= HandleRareBossAnnounced;
+            GameEvents.OnTrackEnemyKilled -= HandleTrackEnemyKilled;
+            GameEvents.OnEnemyWaveCleared -= HandleEnemyWaveCleared;
+            GameEvents.OnLevelFinished -= HandleLevelFinished;
+            JuiceEvents.OnGoodGateChoice -= HandleGoodGateChoice;
             if (GameManager.Instance != null)
+            {
                 GameManager.Instance.LevelStarted -= LogLevelStart;
+                GameManager.Instance.StateEntered -= HandleStateEntered;
+            }
         }
 
         /// <summary>gate_selected(chosen, rejected) — mede rota ótima vs armadilha (doc 11 §4.3).</summary>
         private void HandleGateConsumed(GateResult r)
             => LogGateSelected(r.gate != null ? r.gate.gateId : "",
                                r.rejected != null ? r.rejected.gateId : "");
+
+        // ---- Handlers da missão Nota 10 (payloads do bus → açúcar tipado abaixo) ----
+
+        // Weakness → boss_weakness_hit; Resisted/Immune → boss_resisted_hit (immune é o caso
+        // extremo do mesmo aprendizado); Neutral não vira evento — seria ruído de hit comum.
+        private void HandleBossElementalHit(BossElementalHit h)
+        {
+            if (h.relation == ElementRelation.Weakness)
+                LogBossWeaknessHit(Snake(h.element.ToString()), Snake(h.relation.ToString()), h.damage);
+            else if (h.relation == ElementRelation.Resisted || h.relation == ElementRelation.Immune)
+                LogBossResistedHit(Snake(h.element.ToString()), Snake(h.relation.ToString()), h.damage);
+        }
+
+        private void HandleComboEarned(ComboEarned c)
+            => LogComboEarned(Snake(c.kind.ToString()), c.bonusCoins);
+
+        private void HandleBossSpecialWarning(BossSpecialTelegraph t)
+            => LogBossSpecialWarning(t.bossId, t.seconds);
+
+        // boss_defeated com o payload do bus (boss_id/was_rare/fight_seconds); o overload
+        // rico (units_lost/overkill_pct) segue disponível para um call site futuro com
+        // contexto completo do Gameplay.
+        private void HandleBossDied(BossDied d)
+            => LogBossDefeated(d.bossId, d.wasRare, d.fightSeconds);
+
+        private void HandleRareBossAnnounced(RareBossAnnounce a)
+            => LogRareBossAnnounced(a.bossId, a.hpMultiplier, a.rewardMultiplier);
+
+        private void HandleTrackEnemyKilled(TrackEnemyKilled k)
+            => LogEnemyKilled(Snake(k.kind.ToString()), k.coins);
+
+        private void HandleEnemyWaveCleared(EnemyWaveCleared w)
+            => LogEnemyWaveCleared(w.enemiesKilled);
+
+        // level_complete/level_fail nascem do LevelResult do fim de fase (doc 12 §4.1):
+        // combos e fail_reason ricos são preenchidos pelo GameManager nesta onda (W3-C).
+        private void HandleLevelFinished(LevelResult r)
+        {
+            if (r.won) LogLevelComplete(r);
+            else LogLevelFail(r);
+        }
+
+        private void HandleGoodGateChoice(Vector3 worldPosition)
+            => LogGateBestChoice();
+
+        private void HandleStateEntered(GameState state)
+        {
+            if (state == GameState.BossFight) LogBossFightStart();
+        }
 
         /// <summary>Parâmetros globais "level"/"world" — atualizados pelo fluxo de fase.</summary>
         public void SetLevelContext(int level, int world)
@@ -110,6 +202,28 @@ namespace MutantArmy.Services
 
         /// <summary>Booleans são logados como int 0/1 (limitação do SDK — doc 11 §3).</summary>
         private static int B(bool value) => value ? 1 : 0;
+
+        /// <summary>
+        /// PascalCase → snake_case para valores de enum na taxonomia (doc 11 §3):
+        /// "PerfectGate" → "perfect_gate". ATENÇÃO: renomear um membro de enum muda o valor
+        /// logado — os enums da missão são append-only (CONTRACT §1.3), então é estável.
+        /// </summary>
+        private static string Snake(string pascal)
+        {
+            if (string.IsNullOrEmpty(pascal)) return "";
+            var sb = new System.Text.StringBuilder(pascal.Length + 4);
+            for (int i = 0; i < pascal.Length; i++)
+            {
+                char c = pascal[i];
+                if (char.IsUpper(c))
+                {
+                    if (i > 0) sb.Append('_');
+                    sb.Append(char.ToLowerInvariant(c));
+                }
+                else sb.Append(c);
+            }
+            return sb.ToString();
+        }
 
         private static IAnalyticsProvider ResolveProvider()
         {
@@ -487,6 +601,108 @@ namespace MutantArmy.Services
                 ["offer_id"] = offerId,                 // starter_offer_299
                 ["trigger"] = trigger,                  // first_48h / first_defeat
                 ["hours_since_install"] = hoursSinceInstall,
+            });
+
+        // ================= Missão Nota 10 (sensores de boss/combo/inimigos — fiados no Init) =================
+
+        /// <summary>Hit na FRAQUEZA do boss (rate-limited ≥0,5 s na origem — amostra, não censo).</summary>
+        public void LogBossWeaknessHit(string element, string relation, float damage)
+            => Log("boss_weakness_hit", new Dictionary<string, object>
+            {
+                ["element"] = element,                  // fire / ice / lightning...
+                ["relation"] = relation,                // weakness
+                ["damage"] = damage,
+            });
+
+        /// <summary>Hit RESISTIDO/IMUNE — sensor do aprendizado elemental (exército errado).</summary>
+        public void LogBossResistedHit(string element, string relation, float damage)
+            => Log("boss_resisted_hit", new Dictionary<string, object>
+            {
+                ["element"] = element,
+                ["relation"] = relation,                // resisted / immune
+                ["damage"] = damage,
+            });
+
+        /// <summary>Telegraph do ataque especial exibido (janela de leitura, CANON §6).</summary>
+        public void LogBossSpecialWarning(string bossId, float telegraphSeconds)
+            => Log("boss_special_warning", new Dictionary<string, object>
+            {
+                ["boss_id"] = bossId,
+                ["telegraph_seconds"] = telegraphSeconds,
+            });
+
+        /// <summary>boss_defeated com o payload do bus (OnBossDied) — overload do rico acima.</summary>
+        public void LogBossDefeated(string bossId, bool wasRare, float fightSeconds)
+            => Log("boss_defeated", new Dictionary<string, object>
+            {
+                ["boss_id"] = bossId,
+                ["was_rare"] = B(wasRare),
+                ["fight_seconds"] = fightSeconds,
+            });
+
+        /// <summary>Entrada na arena do boss — denominador do funil boss_defeated/level_fail.</summary>
+        public void LogBossFightStart()
+            => Log("boss_fight_start");
+
+        /// <summary>Variante rara anunciada no BossScout (HP ×1.5, recompensa ×3 — missão §4.2).</summary>
+        public void LogRareBossAnnounced(string bossId, float hpMult, float rewardMult)
+            => Log("rare_boss_announced", new Dictionary<string, object>
+            {
+                ["boss_id"] = bossId,
+                ["hp_mult"] = hpMult,
+                ["reward_mult"] = rewardMult,
+            });
+
+        /// <summary>Combo conquistado (ComboMath) — mede quais conquistas o jogador alcança.</summary>
+        public void LogComboEarned(string comboKind, int bonusCoins)
+            => Log("combo_earned", new Dictionary<string, object>
+            {
+                ["combo_kind"] = comboKind,             // perfect_gate / weakness_hit / boss_breaker...
+                ["bonus_coins"] = bonusCoins,
+            });
+
+        /// <summary>Inimigo de PISTA morto (não é unidade do exército — doc 12 §4.11).</summary>
+        public void LogEnemyKilled(string enemyKind, int coins)
+            => Log("enemy_killed", new Dictionary<string, object>
+            {
+                ["enemy_kind"] = enemyKind,             // weak_horde / tank / ranged / healer
+                ["coins"] = coins,
+            });
+
+        public void LogEnemyWaveCleared(int enemiesKilled)
+            => Log("enemy_wave_cleared", new Dictionary<string, object>
+            {
+                ["enemies_killed"] = enemiesKilled,
+            });
+
+        /// <summary>Rota ótima escolhida (veredito do GateManager) — numerador do was_optimal.</summary>
+        public void LogGateBestChoice()
+            => Log("gate_best_choice");
+
+        /// <summary>
+        /// level_complete a partir do LevelResult do bus — overload do rico acima (que exige
+        /// contexto de Gameplay sem call site ainda). Globais level/world anexados no Send.
+        /// </summary>
+        public void LogLevelComplete(LevelResult r)
+            => Log("level_complete", new Dictionary<string, object>
+            {
+                ["level"] = r.levelIndex,
+                ["duration_sec"] = r.durationSeconds,
+                ["units_survived"] = r.survivors,
+                ["coins_earned"] = r.coinsAwarded,
+                ["xp_earned"] = r.xpAwarded,
+                ["combo_count"] = r.comboCount,
+                ["combo_bonus_coins"] = r.comboBonusCoins,
+            });
+
+        /// <summary>level_fail com o fail_reason RICO (FailReasonResolver) em snake_case.</summary>
+        public void LogLevelFail(LevelResult r)
+            => Log("level_fail", new Dictionary<string, object>
+            {
+                ["level"] = r.levelIndex,
+                ["fail_reason"] = Snake(r.failReason.ToString()),   // wrong_element / hit_by_lava...
+                ["duration_sec"] = r.durationSeconds,
+                ["xp_earned"] = r.xpAwarded,
             });
     }
 }

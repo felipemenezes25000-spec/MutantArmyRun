@@ -262,6 +262,41 @@ namespace MutantArmy.Gameplay
             return best;
         }
 
+        /// <summary>
+        /// Veredito público da escolha do par (missão Nota 10, contrato §5): TRUE quando o
+        /// escolhido é pelo menos tão bom quanto o rejeitado na ordem Trap &lt; Neutral &lt; Strong
+        /// (classificados pelo Classify privado contra o boss da fase atual) E não é armadilha.
+        /// Consumido pelo ComboSystem (Perfect Gate) e pelo feedback "BOA ESCOLHA!".
+        /// </summary>
+        public bool WasBestChoice(GateConfigSO chosen, GateConfigSO rejected)
+        {
+            if (chosen == null) return false;
+            BossConfigSO boss = CurrentBoss();
+            GateClass chosenClass = Classify(chosen, boss);
+            if (chosenClass == GateClass.Trap) return false;       // armadilha nunca é a melhor escolha
+            if (rejected == null) return true;                     // par degenerado: sem alternativa real
+            return RankOf(chosenClass) >= RankOf(Classify(rejected, boss));
+        }
+
+        // Boss da fase atual — GameManager vive no Boot; null-safe p/ cena Game aberta direto (§12).
+        private static BossConfigSO CurrentBoss()
+        {
+            GameManager gm = GameManager.Instance;
+            return gm != null && gm.CurrentLevel != null ? gm.CurrentLevel.boss : null;
+        }
+
+        // Ordem de MÉRITO da escolha: Trap(0) < Neutral(1) < Strong(2). Os ordinais do enum
+        // GateClass não seguem essa ordem (Neutral=0) — por isso o rank explícito.
+        private static int RankOf(GateClass c)
+        {
+            switch (c)
+            {
+                case GateClass.Strong: return 2;
+                case GateClass.Trap: return 0;
+                default: return 1;
+            }
+        }
+
         // Funil único do consumo: efeito puro → total-alvo → CrowdManager reconcilia (doc 12 §4.3).
         public void Consume(GateConfigSO gate, GateConfigSO rejected)
         {
@@ -292,6 +327,29 @@ namespace MutantArmy.Gameplay
             // Gameplay nunca chama Services direto. O rejected vai junto no payload:
             // gate_selected(chosen, rejected) mede rota ótima vs armadilha (doc 12 §4.3/§4.9).
             GameEvents.RaiseGateConsumed(new GateResult(gate, rejected, crowd.Count));
+
+            EmitChoiceFeedback(gate, rejected);
+        }
+
+        // Veredito cosmético instantâneo da escolha (missão Nota 10): "BOA ESCOLHA!" só quando o
+        // jogador leu o par certo (escolhido ESTRITAMENTE melhor que o rejeitado — elogio barato
+        // vira ruído); aviso só quando caiu na ARMADILHA tendo opção melhor na mesa. Pares de
+        // mérito igual não geram veredito. Âncora: posição do exército (CrowdAnchor) — o par já
+        // foi consumido/devolvido ao pool quando este código roda.
+        private void EmitChoiceFeedback(GateConfigSO chosen, GateConfigSO rejected)
+        {
+            if (chosen == null || rejected == null) return;
+            BossConfigSO boss = CurrentBoss();
+            GateClass chosenClass = Classify(chosen, boss);
+            int chosenRank = RankOf(chosenClass);
+            int rejectedRank = RankOf(Classify(rejected, boss));
+            Vector3 position = CrowdAnchor.Position;
+
+            // chosenRank > rejectedRank já implica chosen != Trap (rank de Trap é o piso 0).
+            if (chosenRank > rejectedRank)
+                JuiceEvents.RaiseGoodGateChoice(position);
+            else if (chosenClass == GateClass.Trap && rejectedRank > chosenRank)
+                JuiceEvents.RaiseBadGateChoice(position);
         }
 
         /// <summary>Soft reset (doc 12 §4.11): devolve todos os pares vivos ao pool.</summary>

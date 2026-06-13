@@ -11,6 +11,9 @@
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\Countdown.cs" Link="Domain\Countdown.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\RunWallet.cs" Link="Domain\RunWallet.cs" />
     <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\InterstitialPolicy.cs" Link="Domain\InterstitialPolicy.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\ComboMath.cs" Link="Domain\ComboMath.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\FailReasonResolver.cs" Link="Domain\FailReasonResolver.cs" />
+    <Compile Include="..\..\MutantArmyRun\Assets\_Project\Scripts\Domain\RareBossMath.cs" Link="Domain\RareBossMath.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />

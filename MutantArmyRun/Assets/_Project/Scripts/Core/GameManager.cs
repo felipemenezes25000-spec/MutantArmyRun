@@ -37,6 +37,14 @@ namespace MutantArmy.Core
         private GameStateStack _states;
         private bool _endSelectionDone;            // guard anti duplo-clique/duplo-evento no fim de fase
 
+        // ---- Acumuladores da missão Nota 10 (vida = 1 fase; reset em StartLevel) ----
+        // O GameManager assina o PRÓPRIO bus (Core→Core, nunca Gameplay): ComboEarned chega na
+        // morte do boss (~1,2 s ANTES do Victory — sequência cinematográfica do BossManager) e
+        // FailReasonResolved chega no wipe ANTES do Defeat — o ResolveEnd só consolida no result.
+        private int _runComboCount;
+        private int _runComboBonusCoins;
+        private FailReason _runFailReason = FailReason.None;
+
         // ---- Notificação de transições (assinada por Gameplay/Meta/UI) ----
         public event Action<GameState> StateEntered;
         public event Action<GameState> StateExited;
@@ -65,6 +73,31 @@ namespace MutantArmy.Core
         {
             Instance = this;
             _states = new GameStateStack();
+
+            // Bus estático sobrevive a cenas: -= antes de += (re-Init nunca duplica, §3.2).
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnComboEarned += HandleComboEarned;
+            GameEvents.OnFailReasonResolved -= HandleFailReasonResolved;
+            GameEvents.OnFailReasonResolved += HandleFailReasonResolved;
+        }
+
+        private void OnDestroy()
+        {
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnFailReasonResolved -= HandleFailReasonResolved;
+        }
+
+        // ---- Assinaturas do próprio bus (missão Nota 10): publicadores vivem no Gameplay ----
+
+        private void HandleComboEarned(ComboEarned combo)
+        {
+            _runComboCount++;
+            _runComboBonusCoins += combo.bonusCoins;
+        }
+
+        private void HandleFailReasonResolved(FailReason reason)
+        {
+            _runFailReason = reason;   // último veredito vence (Gameplay publica 1× por wipe)
         }
 
         public void StartLevel(LevelConfigSO level)
@@ -72,6 +105,9 @@ namespace MutantArmy.Core
             CurrentLevel = level;
             _endSelectionDone = false;
             LastDefeatReason = DefeatReason.None;   // nova fase: motivo de derrota zerado
+            _runComboCount = 0;                     // acumuladores da missão Nota 10: vida = 1 fase
+            _runComboBonusCoins = 0;
+            _runFailReason = FailReason.None;
             LevelStarted?.Invoke(level.levelIndex);
             ChangeState(GameState.BossScout);      // cartão de ~2 s ANTES da corrida (CANON §3.1)
         }
@@ -89,9 +125,27 @@ namespace MutantArmy.Core
         public void RestartLevelFromAnyState(LevelConfigSO level)
         {
             if (level == null) return;
+            ExitStatesBeforeReset();               // cleanup dos donos (BossManager solta a view, etc.)
             _states = new GameStateStack();        // volta à base (Boot) — espelha uma cena nova
             ChangeState(GameState.MainMenu);       // Boot→MainMenu (legal)
             StartLevel(level);                     // MainMenu→BossScout→… (legal)
+        }
+
+        /// <summary>
+        /// Abandono mid-run (PAUSA→MENU/REINICIAR) zera a pilha SEM passar por ChangeState, então
+        /// o ExitState(BossFight/Running) normal nunca dispara e os donos do estado (BossManager
+        /// soltando a view pooled do boss, CameraRig limpando o enquadramento) ficam sem cleanup —
+        /// boss-fantasma vivo e câmera travada na nova corrida (mesma cena, soft reset). Aqui
+        /// drenamos a pilha de cima p/ baixo disparando StateExited de cada nível ANTES de recriá-la,
+        /// para que cada assinante faça sua limpeza. Os 3 assinantes de StateExited são idempotentes
+        /// (BossManager.ReleaseView, BossHudController.Hide, UIManager só age em ReviveOffer).
+        /// </summary>
+        private void ExitStatesBeforeReset()
+        {
+            if (_states == null) return;
+            while (_states.Depth > 1)              // overlays (ex.: ReviveOffer sobre BossFight)
+                ExitState(_states.Pop());
+            ExitState(_states.Current);            // estado base da corrida (BossFight/Running/…)
         }
 
         /// <summary>
@@ -104,6 +158,7 @@ namespace MutantArmy.Core
         /// </summary>
         public void GoToMainMenuFromAnyState()
         {
+            ExitStatesBeforeReset();               // mesmo cleanup do restart (solta a view do boss, etc.)
             _states = new GameStateStack();        // volta à base (Boot)
             ChangeState(GameState.MainMenu);       // Boot→MainMenu (legal)
         }
@@ -208,6 +263,16 @@ namespace MutantArmy.Core
             int levelReward = won && LevelRewardProvider != null ? LevelRewardProvider(levelIndex) : 0;
             result.coinsAwarded = won ? (long)levelReward + runCoins : 0L;
             result.xpAwarded = runXp;
+
+            // Missão Nota 10: combos e fail reason já chegaram pelo bus ANTES desta resolução
+            // (ComboEarned na morte do boss; FailReasonResolved no wipe) — mesmo padrão dos
+            // campos *Awarded acima: preencher AQUI, antes do RaiseLevelFinished. O bônus de
+            // combo NÃO é creditado neste passo: ele entrou na RunWallet (EconomySystem)
+            // durante a luta e já veio dentro de runCoins — comboBonusCoins é INFORMATIVO,
+            // a tela detalha "dos quais X vieram de combos" sem pagar 2×.
+            result.comboCount = _runComboCount;
+            result.comboBonusCoins = _runComboBonusCoins;
+            result.failReason = won ? FailReason.None : _runFailReason;   // vitória NUNCA carrega motivo
 
             if (RunCommitter != null) RunCommitter(won);                       // RunWallet → carteira (§4.6); XP sempre
             if (won && LevelRewardGranter != null) LevelRewardGranter(levelIndex);

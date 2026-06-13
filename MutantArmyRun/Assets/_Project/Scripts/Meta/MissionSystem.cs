@@ -25,6 +25,10 @@ namespace MutantArmy.Meta
         public const string MissionWinLevels = "win_levels";
         public const string MissionChooseGates = "choose_gates";
         public const string MissionDefeatBosses = "defeat_bosses";
+        // Missão Nota 10: ids ligados às mecânicas novas de boss/combo (OnBossElementalHit /
+        // OnComboEarned). Ids são persistidos no save — NUNCA renomear (mesma regra do trackId).
+        public const string MissionHitWeakness = "hit_weakness";
+        public const string MissionEarnCombos = "earn_combos";
 
         private IRemoteConfigProvider _remoteConfig;
         private const string WorldMultKey = "chest_coin_mult_world";   // Mb (doc 07 §9); fallback 1.0
@@ -52,12 +56,18 @@ namespace MutantArmy.Meta
             GameEvents.OnLevelFinished += HandleLevelFinished;
             GameEvents.OnGateConsumed -= HandleGateConsumed;
             GameEvents.OnGateConsumed += HandleGateConsumed;
+            GameEvents.OnBossElementalHit -= HandleBossElementalHit;
+            GameEvents.OnBossElementalHit += HandleBossElementalHit;
+            GameEvents.OnComboEarned -= HandleComboEarned;
+            GameEvents.OnComboEarned += HandleComboEarned;
         }
 
         private void OnDestroy()
         {
             GameEvents.OnLevelFinished -= HandleLevelFinished;
             GameEvents.OnGateConsumed -= HandleGateConsumed;
+            GameEvents.OnBossElementalHit -= HandleBossElementalHit;
+            GameEvents.OnComboEarned -= HandleComboEarned;
         }
 
         private static IRemoteConfigProvider ResolveRemoteConfig()
@@ -85,7 +95,11 @@ namespace MutantArmy.Meta
             {
                 new MissionProgress { missionId = MissionWinLevels, progress = 0, target = 3, claimed = false },
                 new MissionProgress { missionId = MissionChooseGates, progress = 0, target = 5, claimed = false },
-                new MissionProgress { missionId = MissionDefeatBosses, progress = 0, target = 1, claimed = false }
+                new MissionProgress { missionId = MissionDefeatBosses, progress = 0, target = 1, claimed = false },
+                // Missão Nota 10: alvos curtos — fraqueza fecha na 1ª leitura certa do elemento;
+                // 3 combos cabem numa boa sessão (até 6 por vitória, ComboMath.Evaluate).
+                new MissionProgress { missionId = MissionHitWeakness, progress = 0, target = 1, claimed = false },
+                new MissionProgress { missionId = MissionEarnCombos, progress = 0, target = 3, claimed = false }
             };
             d.lastMissionResetUnix = now;
             SaveSystem.Instance.MarkDirty();
@@ -107,6 +121,19 @@ namespace MutantArmy.Meta
         private void HandleGateConsumed(GateResult g)
         {
             Advance(MissionChooseGates, 1);
+        }
+
+        // Golpe de FRAQUEZA no boss (já classificado e rate-limited ≥0,5 s na origem):
+        // alvo 1 — fechar na primeira leitura certa do elemento; Advance clampa o excedente.
+        private void HandleBossElementalHit(BossElementalHit hit)
+        {
+            if (hit.relation == ElementRelation.Weakness) Advance(MissionHitWeakness, 1);
+        }
+
+        // 1 evento por combo conquistado (ComboSystem dispara na morte do boss, antes do Victory).
+        private void HandleComboEarned(ComboEarned combo)
+        {
+            Advance(MissionEarnCombos, 1);
         }
 
         /// <summary>Avança o progresso de uma missão (clamp no alvo); persiste e notifica se mudou.</summary>

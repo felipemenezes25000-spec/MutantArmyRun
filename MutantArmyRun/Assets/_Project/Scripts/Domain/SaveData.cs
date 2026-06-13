@@ -61,6 +61,13 @@ namespace MutantArmy.Domain
         public List<MissionProgress> dailyMissions = new List<MissionProgress>();
         public int chestPityCounter;                        // pacotes desde o último Lendário (pity, doc 07 §4)
 
+        // Missão Nota 10 (v5, aditivo): álbum de bosses + tutorial contextual.
+        // bossCollection guarda recordes por boss (BossCollectionMath.RegisterKill);
+        // tutorialStepMask é bitmask dos passos do TutorialDirector já vistos (bit ligado =
+        // dica nunca reaparece — mesmo contrato "uma vez só" do tutorialSeen, agora por passo).
+        public List<BossCollectionMath.BossRecord> bossCollection = new List<BossCollectionMath.BossRecord>();
+        public int tutorialStepMask;
+
         // Configurações e consentimento
         public bool sfxOn = true, musicOn = true, hapticsOn = true;
         public string consentStatus = "unknown";            // resultado UMP cacheado

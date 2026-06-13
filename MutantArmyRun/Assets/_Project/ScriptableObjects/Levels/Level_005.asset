@@ -19,37 +19,36 @@ MonoBehaviour:
   gateSlots:
   - trackPosition: 30
     depth01: 0.125
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 72.5
-    depth01: 0.30208334
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 115
-    depth01: 0.47916666
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 157.5
-    depth01: 0.65625
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
-  - trackPosition: 200
-    depth01: 0.8333333
-    autoBalance: 1
-    leftGate: {fileID: 0}
-    rightGate: {fileID: 0}
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: bb8488b415f5ba54f86fe8d9210fee64, type: 2}
+    rightGate: {fileID: 11400000, guid: b076fdd235389054aa34b310df31a68f, type: 2}
+  - trackPosition: 80
+    depth01: 0.33333334
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: e811d4939ac4d6d478c734c21efb73c7, type: 2}
+    rightGate: {fileID: 11400000, guid: 73b9604b9defb144eb3f79cd94826601, type: 2}
+  - trackPosition: 130
+    depth01: 0.5416667
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: 9b7ea4758f63f434abd773b87d301872, type: 2}
+    rightGate: {fileID: 11400000, guid: 00eaa93e54e620d48b5fb754e2e07f1f, type: 2}
+  - trackPosition: 180
+    depth01: 0.75
+    autoBalance: 0
+    leftGate: {fileID: 11400000, guid: bb8488b415f5ba54f86fe8d9210fee64, type: 2}
+    rightGate: {fileID: 11400000, guid: c18e685bb2c7b2f4b9331b990ee2344c, type: 2}
   obstacles:
   - trackPosition: 39
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
-  - trackPosition: 106
+  - trackPosition: 110
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
-  - trackPosition: 191
+  - trackPosition: 195
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
+  enemies:
+  - trackPosition: 150
+    enemy: {fileID: 11400000, guid: 174b9ee9bc080634899c15afb28de841, type: 2}
+    count: 1
   boss: {fileID: 11400000, guid: f014fe0b697b9644b9b67dde425ba453, type: 2}
   bossHpMultiplier: 0.64
-  winReward: {fileID: 0}
+  winReward: {fileID: 11400000, guid: b76d2b22acb165641be2ba5823fcc3b5, type: 2}
   startingUnits: 1

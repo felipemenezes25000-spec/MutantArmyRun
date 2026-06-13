@@ -21,8 +21,9 @@ namespace MutantArmy.Editor
     /// 1. Copia os clips CC0 do staging (PLANO-DE-USO §1.7) para Assets/_Project/Audio com
     ///    nomes canônicos por evento; fonte ausente = aviso, nunca erro (fallback nulo).
     /// 2. Copia texturas do Kenney Particle Pack (§1.8) + gera o anel do telegraph em código.
-    /// 3. Materiais URP Particles/Unlit (aditivo/alpha) e 5 prefabs de ParticleSystem
-    ///    construídos em código (burst de portal, pop, moeda, confete, desmonte).
+    /// 3. Materiais URP Particles/Unlit (aditivo/alpha) e 6 prefabs de ParticleSystem
+    ///    construídos em código (burst de portal, pop, moeda, confete, desmonte e a
+    ///    chuva de moedas da morte do boss — missão Nota 10).
     /// 4. AudioCatalogSO preenchido por nome (clip ausente fica null — no-op silencioso).
     /// 5. Volume profile de derrota (ColorAdjustments saturation −100) p/ o JuiceController.
     /// 6. Cena Boot: catálogo no AudioManager + AudioListener/AudioSources garantidos.
@@ -112,9 +113,10 @@ namespace MutantArmy.Editor
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("MAR Tools: juice pronto — áudio importado + catálogo, 5 prefabs de partícula, " +
-                      "telegraph pulsante, volume de derrota e cenas Boot/Game costuradas " +
-                      "(JuiceController, DevScreenshotRig, FloatingTextSpawner, TutorialController FTUE).");
+            Debug.Log("MAR Tools: juice pronto — áudio importado + catálogo, 6 prefabs de partícula " +
+                      "(incl. chuva de moedas do boss), telegraph pulsante, volume de derrota e cenas " +
+                      "Boot/Game costuradas (JuiceController, DevScreenshotRig, FloatingTextSpawner, " +
+                      "TutorialController FTUE + banner contextual).");
         }
 
         // ------------------------------------------------------------------ 1/2. import do staging
@@ -274,7 +276,13 @@ namespace MutantArmy.Editor
                 ["despawnBurst"] = BuildBurstPrefab("PS_DespawnBurst", mats["smoke"], new Color(0.7f, 0.7f, 0.75f, 0.8f),
                     count: 10, speedMin: 1.0f, speedMax: 2.0f, sizeMin: 0.40f, sizeMax: 0.80f,
                     lifeMin: 0.50f, lifeMax: 0.80f, gravity: -0.1f),
-                ["confetti"] = BuildConfettiPrefab("PS_Confetti", mats["confetti"])
+                ["confetti"] = BuildConfettiPrefab("PS_Confetti", mats["confetti"]),
+                // Chuva de moedas da morte do boss (missão Nota 10, VFXManager.PlayCoinBurst):
+                // fonte dourada curta com gravidade — o manager dispara 1..3 emissores, então
+                // o teto por sistema (count+8) mantém o orçamento global §6.3 folgado.
+                ["coinRain"] = BuildBurstPrefab("VFX_CoinBurst", mats["burst"], new Color(1f, 0.84f, 0.25f),
+                    count: 26, speedMin: 4.0f, speedMax: 7.5f, sizeMin: 0.16f, sizeMax: 0.34f,
+                    lifeMin: 0.55f, lifeMax: 0.95f, gravity: 1.5f)
             };
             return prefabs;
         }
@@ -564,6 +572,9 @@ namespace MutantArmy.Editor
                 WireField(vfx, "_confettiPrefab", prefabs["confetti"]);
                 WireField(vfx, "_coinFanfarePrefab", prefabs["coinBurst"]);
                 WireField(vfx, "_despawnBurstPrefab", prefabs["despawnBurst"]);
+                // Chuva de moedas da morte do boss (missão Nota 10): sem este wire o
+                // PlayCoinBurst degrada para a fanfarra de moeda (fallback do manager).
+                WireField(vfx, "_coinBurstPrefab", prefabs["coinRain"]);
                 WireField(vfx, "_telegraphDecal", decalRoot);
                 WireField(vfx, "_telegraphRenderer", decalRenderer);
             }
@@ -715,10 +726,52 @@ namespace MutantArmy.Editor
                 new Vector2(0f, 60f));
             BuildChooseHintVisuals(chooseHint);
 
+            // (c) Banner do diretor contextual (missão Nota 10): faixa escura translúcida +
+            // dica curta em âmbar, topo central abaixo do bloco do HUD — campos novos
+            // _stepHint/_stepHintGroup/_stepHintText do TutorialController.
+            (RectTransform stepHint, CanvasGroup stepGroup) = EnsureStepHintHolder(root);
+            TMP_Text stepText = CreateHintLabel(stepHint, "Label", string.Empty, 52f,
+                Vector2.zero, new Vector2(800f, 100f), new Color(1f, 0.86f, 0.35f));
+
             WireField(controller, "_dragHint", dragHint);
             WireField(controller, "_dragHintGroup", dragGroup);
             WireField(controller, "_chooseHint", chooseHint);
             WireField(controller, "_chooseHintGroup", chooseGroup);
+            WireField(controller, "_stepHint", stepHint);
+            WireField(controller, "_stepHintGroup", stepGroup);
+            WireField(controller, "_stepHintText", stepText);
+        }
+
+        // Holder do banner de passo contextual: topo central (abaixo da barra de Supply do
+        // HUD, que termina em y -310), com fundo escuro NO próprio holder e CanvasGroup p/
+        // fade. Idempotente: re-rodar limpa os filhos e reconstrói o rótulo no lugar.
+        private static (RectTransform, CanvasGroup) EnsureStepHintHolder(RectTransform parent)
+        {
+            Transform existing = FindChildRecursive(parent, "StepHint");
+            GameObject go = existing != null ? existing.gameObject : new GameObject("StepHint", typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = new Vector2(0.5f, 1f);
+            rect.anchorMax = new Vector2(0.5f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -330f);
+            rect.sizeDelta = new Vector2(820f, 110f);
+
+            for (int i = rect.childCount - 1; i >= 0; i--)   // rebuild limpo
+                Object.DestroyImmediate(rect.GetChild(i).gameObject);
+
+            var bg = go.GetComponent<Image>();
+            if (bg == null) bg = go.AddComponent<Image>();
+            bg.color = new Color(0.05f, 0.06f, 0.10f, 0.62f);   // legível sobre qualquer pista
+            bg.raycastTarget = false;
+
+            var group = go.GetComponent<CanvasGroup>();
+            if (group == null) group = go.AddComponent<CanvasGroup>();
+            group.alpha = 0f;
+            group.interactable = false;
+            group.blocksRaycasts = false;   // nunca rouba o toque do AutoPilot/jogador
+            go.SetActive(false);            // o controller ativa por evento
+            return (rect, group);
         }
 
         // Holder de uma dica: RectTransform centrado (âncora inferior) + CanvasGroup p/ fade.

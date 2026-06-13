@@ -27,6 +27,12 @@ namespace MutantArmy.Services
             [RcKeys.SupplyCap] = 60,
             [RcKeys.BossHpGlobalMult] = 1f,
             [RcKeys.ChestRareGemPrice] = 300,
+            // Missão Nota 10: defaults espelham os campos serializados no Gameplay (a entrega
+            // RC → Gameplay é por parâmetro/hook na Onda 4 — Gameplay não enxerga Services §2.3).
+            [RcKeys.RareBossChance] = 0.06f,
+            [RcKeys.ComboBonusMult] = 1f,
+            [RcKeys.EnemyHpMult] = 1f,
+            [RcKeys.EnemyDamageMult] = 1f,
         };
 
         public Task InitAsync(bool online, int timeoutMs)

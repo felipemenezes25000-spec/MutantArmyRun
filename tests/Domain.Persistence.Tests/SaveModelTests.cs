@@ -50,6 +50,16 @@ namespace Domain.Persistence.Tests
             Assert.Empty(d.ownedSkinIds);
             Assert.NotNull(d.upgradeTracks);
             Assert.Empty(d.upgradeTracks);
+            Assert.NotNull(d.bossCollection);      // álbum de bosses (v5) nasce vazio
+            Assert.Empty(d.bossCollection);
+        }
+
+        [Fact]
+        public void NovoSave_TutorialStepMask_NasceZerado()
+        {
+            // bitmask v5: nenhum passo do TutorialDirector visto em instalação fresca.
+            var d = new SaveData();
+            Assert.Equal(0, d.tutorialStepMask);
         }
 
         [Fact]
@@ -108,6 +118,8 @@ namespace Domain.Persistence.Tests
         [InlineData("musicOn")]
         [InlineData("hapticsOn")]
         [InlineData("consentStatus")]
+        [InlineData("bossCollection")]
+        [InlineData("tutorialStepMask")]
         public void SaveData_TemCampoPublicoDeInstancia(string nome)
         {
             FieldInfo f = typeof(SaveData).GetField(nome, BindingFlags.Public | BindingFlags.Instance);
@@ -119,6 +131,7 @@ namespace Domain.Persistence.Tests
         [InlineData(typeof(UnitProgress))]
         [InlineData(typeof(TrackProgress))]
         [InlineData(typeof(LevelRecord))]
+        [InlineData(typeof(BossCollectionMath.BossRecord))]
         public void TiposDoModelo_TemAtributoSerializable(Type tipo)
         {
             // JsonUtility do Unity exige [Serializable] nos tipos aninhados
@@ -157,12 +170,22 @@ namespace Domain.Persistence.Tests
                 sfxOn = false,
                 musicOn = true,
                 hapticsOn = false,
-                consentStatus = "granted"
+                consentStatus = "granted",
+                tutorialStepMask = 0b1011          // passos 0, 1 e 3 do TutorialDirector vistos (v5)
             };
             original.levelRecords.Add(new LevelRecord { levelIndex = 9, won = true, bestSurvivors = 33, bestTime = 58.2f });
             original.units.Add(new UnitProgress { unitId = "soldier", level = 2, shards = 15, unlocked = true });
             original.ownedSkinIds.Add("soldier_red");
             original.upgradeTracks.Add(new TrackProgress { trackId = "start_army", level = 4 });
+            original.bossCollection.Add(new BossCollectionMath.BossRecord
+            {
+                bossId = "golem_pedra",
+                kills = 6,
+                bestTimeSeconds = 27.5f,
+                bestSurvivors = 18,
+                weaknessDiscovered = true,
+                rareKills = 2
+            });
 
             string json = JsonSerializer.Serialize(original, opts);
             SaveData copia = JsonSerializer.Deserialize<SaveData>(json, opts);
@@ -211,6 +234,16 @@ namespace Domain.Persistence.Tests
             Assert.Single(copia.upgradeTracks);
             Assert.Equal("start_army", copia.upgradeTracks[0].trackId);
             Assert.Equal(4, copia.upgradeTracks[0].level);
+
+            // Campos da missão Nota 10 (v5): álbum de bosses + máscara de tutorial
+            Assert.Equal(original.tutorialStepMask, copia.tutorialStepMask);
+            Assert.Single(copia.bossCollection);
+            Assert.Equal("golem_pedra", copia.bossCollection[0].bossId);
+            Assert.Equal(6, copia.bossCollection[0].kills);
+            Assert.Equal(27.5f, copia.bossCollection[0].bestTimeSeconds, 3);
+            Assert.Equal(18, copia.bossCollection[0].bestSurvivors);
+            Assert.True(copia.bossCollection[0].weaknessDiscovered);
+            Assert.Equal(2, copia.bossCollection[0].rareKills);
         }
     }
 }

@@ -20,24 +20,25 @@ MonoBehaviour:
   - trackPosition: 35
     depth01: 0.1590909
     autoBalance: 0
-    leftGate: {fileID: 11400000, guid: 9b7ea4758f63f434abd773b87d301872, type: 2}
-    rightGate: {fileID: 11400000, guid: bb8488b415f5ba54f86fe8d9210fee64, type: 2}
-  - trackPosition: 145.20001
-    depth01: 0.66
+    leftGate: {fileID: 11400000, guid: bb8488b415f5ba54f86fe8d9210fee64, type: 2}
+    rightGate: {fileID: 11400000, guid: b076fdd235389054aa34b310df31a68f, type: 2}
+  - trackPosition: 145
+    depth01: 0.65909094
     autoBalance: 0
     leftGate: {fileID: 11400000, guid: 00eaa93e54e620d48b5fb754e2e07f1f, type: 2}
     rightGate: {fileID: 11400000, guid: 4d8f14c4160aa54419ab88ff89e6e518, type: 2}
   - trackPosition: 175
     depth01: 0.79545456
     autoBalance: 0
-    leftGate: {fileID: 11400000, guid: aa2727e84acd0a2468ff34b5f5ea0a9b, type: 2}
-    rightGate: {fileID: 11400000, guid: e811d4939ac4d6d478c734c21efb73c7, type: 2}
+    leftGate: {fileID: 11400000, guid: bb8488b415f5ba54f86fe8d9210fee64, type: 2}
+    rightGate: {fileID: 11400000, guid: aa2727e84acd0a2468ff34b5f5ea0a9b, type: 2}
   obstacles:
   - trackPosition: 25
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
   - trackPosition: 165
     prefab: {fileID: 7226069668244236473, guid: 2c15b04cb54c8214d869a7d0c7e74d90, type: 3}
-  boss: {fileID: 11400000, guid: f014fe0b697b9644b9b67dde425ba453, type: 2}
-  bossHpMultiplier: 0.47000003
+  enemies: []
+  boss: {fileID: 11400000, guid: ad185b2c82a4fd5438e02aa81388e908, type: 2}
+  bossHpMultiplier: 0.12
   winReward: {fileID: 0}
   startingUnits: 1

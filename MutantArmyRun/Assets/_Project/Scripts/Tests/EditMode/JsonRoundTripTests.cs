@@ -39,7 +39,8 @@ namespace MutantArmy.Tests
                 sfxOn = false,
                 musicOn = true,
                 hapticsOn = false,
-                consentStatus = "granted"
+                consentStatus = "granted",
+                tutorialStepMask = 0b1011                        // passos 0, 1 e 3 vistos (v5)
             };
             data.levelRecords.Add(new LevelRecord { levelIndex = 9, won = true, bestSurvivors = 31, bestTime = 72.5f });
             data.units.Add(new UnitProgress { unitId = "unit_soldier", level = 3, shards = 12, unlocked = true });
@@ -47,6 +48,15 @@ namespace MutantArmy.Tests
             data.ownedSkinIds.Add("soldier_default");
             data.ownedSkinIds.Add("soldier_neon");
             data.upgradeTracks.Add(new TrackProgress { trackId = "StartDamage", level = 3 });
+            data.bossCollection.Add(new BossCollectionMath.BossRecord
+            {
+                bossId = "golem_pedra",
+                kills = 6,
+                bestTimeSeconds = 27.5f,
+                bestSurvivors = 18,
+                weaknessDiscovered = true,
+                rareKills = 2
+            });
             return data;
         }
 
@@ -115,6 +125,38 @@ namespace MutantArmy.Tests
             Assert.AreEqual(original.upgradeTracks.Count, loaded.upgradeTracks.Count);
             Assert.AreEqual(original.upgradeTracks[0].trackId, loaded.upgradeTracks[0].trackId);
             Assert.AreEqual(original.upgradeTracks[0].level, loaded.upgradeTracks[0].level);
+
+            // Campos da missão Nota 10 (schema v5): álbum de bosses + máscara de tutorial
+            Assert.AreEqual(original.tutorialStepMask, loaded.tutorialStepMask);
+            Assert.AreEqual(original.bossCollection.Count, loaded.bossCollection.Count);
+            Assert.AreEqual(original.bossCollection[0].bossId, loaded.bossCollection[0].bossId);
+            Assert.AreEqual(original.bossCollection[0].kills, loaded.bossCollection[0].kills);
+            Assert.AreEqual(original.bossCollection[0].bestTimeSeconds, loaded.bossCollection[0].bestTimeSeconds);
+            Assert.AreEqual(original.bossCollection[0].bestSurvivors, loaded.bossCollection[0].bestSurvivors);
+            Assert.AreEqual(original.bossCollection[0].weaknessDiscovered, loaded.bossCollection[0].weaknessDiscovered);
+            Assert.AreEqual(original.bossCollection[0].rareKills, loaded.bossCollection[0].rareKills);
+        }
+
+        [Test]
+        public void Migration_V4Payload_GanhaAlbumVazioEVersao5()
+        {
+            // Save v4 REAL: o JSON gravado antes da missão Nota 10 não tinha bossCollection/
+            // tutorialStepMask. JsonUtility.FromJson sobre um JSON sem o campo mantém o valor
+            // do ctor (lista já vazia) — o gate v5 garante o invariante mesmo se vier null.
+            SaveData v4 = BuildFullSave();
+            v4.schemaVersion = 4;
+            v4.bossCollection = null;     // pior caso: campo nulo após desserialização legada
+            v4.tutorialStepMask = 0;
+
+            string payload = SaveChecksum.Pack(JsonUtility.ToJson(v4));
+            SaveData loaded = TryLoadPayload(payload);   // Load real: unpack → FromJson → Migrate
+
+            Assert.NotNull(loaded);
+            Assert.AreEqual(SaveMigration.CurrentVersion, loaded.schemaVersion);
+            Assert.NotNull(loaded.bossCollection);
+            Assert.AreEqual(0, loaded.bossCollection.Count);
+            Assert.AreEqual(0, loaded.tutorialStepMask);
+            Assert.AreEqual(777, loaded.coins);          // dados v4 preservados pelo gate aditivo
         }
 
         [Test]

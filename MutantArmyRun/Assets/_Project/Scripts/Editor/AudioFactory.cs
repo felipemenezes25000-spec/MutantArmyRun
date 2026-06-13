@@ -16,8 +16,10 @@ namespace MutantArmy.Editor
     /// 1. Importa os .ogg CC0 do staging (PLANO-DE-USO §1.7) para Assets/_Project/Audio com
     ///    nomes canônicos por evento — inclui os novos footstep/explosão e as faixas de mundo.
     ///    Fonte ausente vira aviso (nunca erro): o campo correspondente fica null (no-op).
-    /// 2. Preenche o AudioCatalog.asset COMPLETO (SFX por evento + musicByWorld[]). Cria o asset
-    ///    se não existir. Clip ausente = null = evento mudo (contrato do AudioManager).
+    /// 2. Preenche o AudioCatalog.asset COMPLETO (SFX por evento + musicByWorld[]), incluindo os
+    ///    slots da missão Nota 10 (weaknessHit/resistedHit/specialWarning/bossDeath/comboSting/
+    ///    coinBurst/enemyPop/goodChoice/badChoice/riskWin/riskLose). Cria o asset se não existir.
+    ///    Clip ausente = null = evento mudo (contrato do AudioManager).
     /// 3. Música de fundo por mundo (Lacuna L7 — não há loops dedicados): aponta 1 jingle CC0
     ///    distinto por mundo para tocar EM LOOP como ambiente leve. Indexado direto por
     ///    worldIndex (assets do MVP são 1-based: W01=1, W02=2, W03=3 — slot 0 fica vago).
@@ -59,6 +61,20 @@ namespace MutantArmy.Editor
             // --- Novos: passos da multidão e explosão (PLANO §1.7) ---
             ("sfx_footstep.ogg",       @"audio\kenney_impact-sounds\Audio\footstep_grass_000.ogg"),
             ("sfx_explosion.ogg",      @"audio\kenney_sci-fi-sounds\Audio\explosionCrunch_001.ogg"),
+
+            // --- Missão Nota 10: boss elemental / combos / inimigos / veredito de escolha ---
+            // (tudo CC0 do staging; reuso de famílias já aprovadas, variações ainda não usadas)
+            ("sfx_weakness_hit.ogg",    @"audio\kenney_impact-sounds\Audio\impactBell_heavy_002.ogg"),   // sino brilhante: "acertou a fraqueza"
+            ("sfx_resisted_hit.ogg",    @"audio\kenney_impact-sounds\Audio\impactMetal_heavy_000.ogg"),  // "bateu em parede" seco
+            ("sfx_special_warning.ogg", @"audio\kenney_digital-audio\Audio\threeTone2.ogg"),             // alarme curto do telegraph
+            ("sfx_boss_death.ogg",      @"audio\kenney_sci-fi-sounds\Audio\explosionCrunch_002.ogg"),    // camada de peso da morte cinematográfica
+            ("sfx_combo_sting.ogg",     @"audio\kenney_digital-audio\Audio\powerUp3.ogg"),               // sting de combo conquistado
+            ("sfx_coin_burst.ogg",      @"audio\kenney_rpg-audio\Audio\handleCoins2.ogg"),               // chuva de moedas (wave limpa)
+            ("sfx_enemy_pop.ogg",       @"audio\kenney_digital-audio\Audio\pepSound2.ogg"),              // pop de inimigo de pista
+            ("sfx_good_choice.ogg",     @"audio\kenney_interface-sounds\Audio\confirmation_001.ogg"),    // BOA ESCOLHA!
+            ("sfx_bad_choice.ogg",      @"audio\kenney_interface-sounds\Audio\error_004.ogg"),           // portal armadilha
+            ("sfx_risk_win.ogg",        @"audio\kenney_digital-audio\Audio\powerUp8.ogg"),               // risco vencido ("x10!")
+            ("sfx_risk_lose.ogg",       @"audio\kenney_digital-audio\Audio\lowDown.ogg"),                // risco perdido (descida seca)
 
             // --- Música de fundo por mundo (Lacuna L7 — jingles CC0 em loop como ambiente) ---
             ("music_world_01.ogg",     @"audio\kenney_music-jingles\Audio\Hit jingles\jingles_HIT08.ogg"),
@@ -153,6 +169,20 @@ namespace MutantArmy.Editor
             catalog.uiConfirm = LoadClip("sfx_ui_confirm");
             catalog.victoryJingle = LoadClip("jingle_victory");
             catalog.defeatJingle = LoadClip("jingle_defeat");
+
+            // Slots da missão Nota 10 (boss elemental, combos, inimigos de pista, veredito de
+            // escolha) — mesma regra de contrato: clip ausente = null = evento mudo.
+            catalog.weaknessHit = LoadClip("sfx_weakness_hit");
+            catalog.resistedHit = LoadClip("sfx_resisted_hit");
+            catalog.specialWarning = LoadClip("sfx_special_warning");
+            catalog.bossDeath = LoadClip("sfx_boss_death");
+            catalog.comboSting = LoadClip("sfx_combo_sting");
+            catalog.coinBurst = LoadClip("sfx_coin_burst");
+            catalog.enemyPop = LoadClip("sfx_enemy_pop");
+            catalog.goodChoice = LoadClip("sfx_good_choice");
+            catalog.badChoice = LoadClip("sfx_bad_choice");
+            catalog.riskWin = LoadClip("sfx_risk_win");
+            catalog.riskLose = LoadClip("sfx_risk_lose");
 
             catalog.musicByWorld = BuildMusicByWorld();
 

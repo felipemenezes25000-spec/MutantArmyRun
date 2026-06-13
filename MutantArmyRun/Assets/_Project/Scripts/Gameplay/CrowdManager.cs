@@ -49,7 +49,12 @@ namespace MutantArmy.Gameplay
         private bool _arenaFormation;
         private int _arenaEntryCount;
         private int _fallenThisFight;   // cadáveres acumulados na arena → alvos do Necromante (Levantar)
+        private bool _lastLossWasHazard;   // último funil de morte foi obstáculo/hazard? (fail reason HitByLava)
         private readonly Countdown _invincibility = new Countdown();   // Domain: janela pós-revive
+
+        // buffer de DPS por elemento (DominantElement) — tamanho com folga p/ o enum append-only
+        // de ElementType (9 valores hoje); índices fora do range são ignorados com guarda.
+        private readonly float[] _dpsByElement = new float[16];
 
         // catálogo typeId → config (evita depender do UnitManager, que vive na Meta — §2.3)
         private readonly List<UnitConfigSO> _types = new List<UnitConfigSO>();
@@ -93,6 +98,15 @@ namespace MutantArmy.Gameplay
         /// <summary>Tropa de spawn padrão (Soldado): alvo do revive do Necromante quando o tipo não é ditado.</summary>
         public UnitConfigSO DefaultUnit => _defaultUnit;
         public SpatialGridXZ Grid => _grid;                  // reusada pelo CombatSystem (doc 12 §4.4)
+
+        // ---- Contadores da corrida (contrato §5, missão Nota 10) — reset no ResetArmy (BeginRun) ----
+
+        /// <summary>Unidades MORTAS na corrida+arena (funil KillUnit: obstáculos, especial, contato).
+        /// Conversões voluntárias (overflow/sacrifício/portal negativo) NÃO contam — não são perda.</summary>
+        public int RunUnitsLost { get; private set; }
+
+        /// <summary>Pico de exército da corrida — alimenta ComboMath (Clutch) e FailReasonResolver.</summary>
+        public int RunArmyPeak { get; private set; }
 
         public void Init()   // chamado pelo bootstrap da cena Game (doc 12 §3.3)
         {
@@ -187,6 +201,7 @@ namespace MutantArmy.Gameplay
             _dyingTimer[i] = _dyingSeconds;
             _dyingCount++;
             _fallenThisFight++;   // alimenta o Necromante (Levantar revive parte dos caídos)
+            RunUnitsLost++;       // perda REAL da corrida (contrato §5: ComboMath.NoLoss/FailReason)
             _supply.Remove(GetSupplyCost(_typeIds[i]));
             GameEvents.RaiseUnitDied(new UnitDeath(_typeIds[i], _positions[i]));
             GameEvents.RaiseCrowdChanged(Count, SupplyUsed);
@@ -265,6 +280,10 @@ namespace MutantArmy.Gameplay
             // nunca zera o exército inteiro num obstáculo: deixa ≥1 viva fora/dentro da faixa
             toRemove = Mathf.Min(toRemove, Mathf.Max(0, Count - 1));
             if (toRemove <= 0) return 0;
+
+            // o funil de morte que segue é HAZARD: se o wipe acontecer aqui, o fail reason
+            // sabe que o golpe fatal veio de obstáculo (FailReason.HitByLava)
+            _lastLossWasHazard = true;
 
             Vector3 vfxPos = Vector3.zero;
             int removed = 0;
@@ -399,10 +418,90 @@ namespace MutantArmy.Gameplay
             return false;
         }
 
+        // ------------------------------------------------------------------
+        // Veredito elemental do EXÉRCITO vs boss (missão Nota 10, W2-A): a matemática de
+        // fraqueza sempre existiu aqui mas era somada e descartada — agora ela é EXPOSTA
+        // para o feedback FRAQUEZA!/RESISTIU! e para o fail reason WrongElement.
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Classifica a relação elemental DOMINANTE do DPS do exército contra o boss, via
+        /// Domain.WeaknessJudge por unidade (corpo incluso: Veneno vs máquina = Immune).
+        /// Limiar assimétrico de propósito: ≥30% do DPS em fraqueza já merece "FRAQUEZA!"
+        /// (recompensa cedo o plano do Scout); só ≥50% bloqueado vira "RESISTIU!/IMUNE!"
+        /// (punição precisa ser inequívoca). Neutral = sem texto.
+        /// </summary>
+        public ElementRelation DominantRelationVs(BossRuntime boss)
+        {
+            if (boss == null || boss.Config == null || Count == 0) return ElementRelation.Neutral;
+
+            float total = 0f, weak = 0f, resisted = 0f, immune = 0f;
+            for (int i = 0; i < _count; i++)
+            {
+                if ((_flags[i] & FlagDying) != 0) continue;
+                UnitConfigSO cfg = _types[_typeIds[i]];
+                if (cfg == null) continue;
+                ElementType atk = ResolveAtkElement(cfg);
+                float offense = UnitOffense(cfg);
+                total += offense;
+                switch (WeaknessJudge.Classify(GetBossMultiplier(atk, boss)))
+                {
+                    case ElementRelation.Weakness: weak += offense; break;
+                    case ElementRelation.Resisted: resisted += offense; break;
+                    case ElementRelation.Immune: immune += offense; break;
+                }
+            }
+            if (total <= 0f) return ElementRelation.Neutral;
+            if (weak / total >= 0.30f) return ElementRelation.Weakness;
+            if ((resisted + immune) / total >= 0.50f)
+                return immune >= resisted ? ElementRelation.Immune : ElementRelation.Resisted;
+            return ElementRelation.Neutral;
+        }
+
+        /// <summary>
+        /// Elemento de ATAQUE com maior fatia do DPS vivo (portal &gt; mutação &gt; nativo, mesmo
+        /// resolvedor do dano real) — âncora do texto "FRAQUEZA! (Fogo)". None se exército vazio
+        /// ou se a maior fatia for de tropas sem elemento.
+        /// </summary>
+        public ElementType DominantElement()
+        {
+            for (int e = 0; e < _dpsByElement.Length; e++) _dpsByElement[e] = 0f;
+            for (int i = 0; i < _count; i++)
+            {
+                if ((_flags[i] & FlagDying) != 0) continue;
+                UnitConfigSO cfg = _types[_typeIds[i]];
+                if (cfg == null) continue;
+                int e = (int)ResolveAtkElement(cfg);
+                if (e < 0 || e >= _dpsByElement.Length) continue;   // folga do enum append-only
+                _dpsByElement[e] += UnitOffense(cfg);
+            }
+            int best = 0;
+            for (int e = 1; e < _dpsByElement.Length; e++)
+                if (_dpsByElement[e] > _dpsByElement[best]) best = e;
+            return (ElementType)best;
+        }
+
+        /// <summary>
+        /// Grito do Zumbi Titã (missão Nota 10): empurra o exército <paramref name="meters"/>
+        /// metros para TRÁS deslocando o CrowdAnchor (as unidades convergem aos slots sozinhas,
+        /// drift suave). Null-safe; clamp em ≥0 dos metros E do z resultante — nunca puxa para
+        /// frente nem joga o exército para fora da pista.
+        /// </summary>
+        public void KnockbackArmy(float meters)
+        {
+            if (meters <= 0f) return;
+            CrowdAnchor anchor = CrowdAnchor.Instance;
+            if (anchor == null) return;
+            Vector3 pos = CrowdAnchor.Position;
+            pos.z = Mathf.Max(0f, pos.z - meters);
+            anchor.ResetTo(pos);
+        }
+
         /// <summary>Especial do boss: dano em área ao redor do centróide, por índice (doc 12 §4.4).</summary>
         public void DamageArea(float area, float damage)
         {
             if (!_invincibility.Done) return;
+            _lastLossWasHazard = false;   // dano de BOSS, não de obstáculo (fail reason)
             Vector3 center = Centroid;
             float sqr = area * area;
             for (int i = _count - 1; i >= 0; i--)
@@ -420,6 +519,7 @@ namespace MutantArmy.Gameplay
         public void ApplyAggregateDamage(float damage)
         {
             if (!_invincibility.Done || damage <= 0f) return;
+            _lastLossWasHazard = false;   // dano de COMBATE, não de obstáculo (fail reason)
             for (int i = _count - 1; i >= 0 && damage > 0f; i--)
             {
                 if ((_flags[i] & FlagDying) != 0) continue;
@@ -561,6 +661,9 @@ namespace MutantArmy.Gameplay
             _arenaFormation = false;
             _arenaEntryCount = 0;
             _fallenThisFight = 0;
+            RunUnitsLost = 0;            // contadores da corrida (contrato §5): zerados no soft reset
+            RunArmyPeak = 0;
+            _lastLossWasHazard = false;
             _invincibility.Set(0f);
             Centroid = CrowdAnchor.Position;
             GameEvents.RaiseCrowdChanged(0, 0);
@@ -730,6 +833,10 @@ namespace MutantArmy.Gameplay
                 _slot[i] = _freeSlots.Count > 0 ? _freeSlots.Pop() : _slotCursor++;
                 _supply.Add(type.supplyCost);
             }
+
+            // todo crescimento do exército passa por este funil (portais/revive/sacrifício),
+            // então o pico da corrida (contrato §5) é medido num ponto único
+            if (Count > RunArmyPeak) RunArmyPeak = Count;
         }
 
         // Remoção em LOTE, de trás pra frente (swap-back), com 1 VFX agregado (doc 12 §6.4).
@@ -825,15 +932,56 @@ namespace MutantArmy.Gameplay
             if (gm == null) return;
             if (gm.State == GameState.BossFight)
             {
+                // fail reason RICO resolvido ANTES da transição (missão Nota 10): se o revive
+                // salvar a corrida, o GameManager simplesmente ignora o valor (vitória = None)
+                ResolveAndRaiseFailReason(gm, diedOnTrack: false);
                 gm.SetDefeatReason(DefeatReason.BossWon);   // "O boss venceu" (motivo exibido na ResultScreen)
                 gm.OfferRevive();                           // revive 1×/fase (doc 12 §4.1)
             }
             else if (gm.State == GameState.Running)
             {
                 // exército zerou ANTES do boss: derrota imediata na corrida (doc 12 §4.1)
+                ResolveAndRaiseFailReason(gm, diedOnTrack: true);
                 gm.SetDefeatReason(DefeatReason.ArmyWiped);  // "Exército eliminado"
                 gm.ChangeState(GameState.Defeat);
             }
+        }
+
+        // Fotografia da derrota → Domain.FailReasonResolver (função pura) → evento ANTES da
+        // transição (contrato §5). Cada campo vem do manager que JÁ mede o dado — nada novo é
+        // calculado no momento do wipe além do snapshot.
+        private void ResolveAndRaiseFailReason(GameManager gm, bool diedOnTrack)
+        {
+            BossManager bm = BossManager.Instance;
+            BossRuntime boss = bm != null ? bm.Current : null;
+
+            // HP de referência do boss: runtime se a luta começou; senão o tuning da fase
+            // (morreu na pista sem nunca ver a arena — BossResistedDamage precisa do alvo real)
+            float bossMaxHp = 0f;
+            if (boss != null) bossMaxHp = boss.MaxHp;
+            else if (gm.CurrentLevel != null && gm.CurrentLevel.boss != null)
+                bossMaxHp = gm.CurrentLevel.boss.maxHp * Mathf.Max(0.01f, gm.CurrentLevel.bossHpMultiplier);
+
+            // DECISÃO: no wipe o exército não tem mais DPS — DominantRelationVs num exército
+            // vazio é sempre Neutral. Usamos o ÚLTIMO veredito registrado pelo CombatSystem
+            // na luta (BossManager.LastElementalRelation), que é a mesma classificação.
+            // Guarda boss != null: morte na PISTA não tem veredito desta fase (o registro
+            // poderia ser sujeira da luta anterior — BeginFight só reseta ao entrar na arena).
+            ElementRelation relation = boss != null ? bm.LastElementalRelation : ElementRelation.Neutral;
+
+            var ctx = new FailReasonResolver.DefeatContext
+            {
+                armySizeAtBossStart = _arenaEntryCount,
+                unitsLostOnTrack = RunUnitsLost,
+                armyPeak = RunArmyPeak,
+                damageDealtToBoss = CombatSystem.Instance != null ? CombatSystem.Instance.TotalDamageDealt : 0f,
+                bossMaxHp = bossMaxHp,
+                bossUsedLaser = boss != null && bm.UsedLaserThisFight,   // idem: só vale na luta ATUAL
+                armyHadResistedElement = relation == ElementRelation.Resisted || relation == ElementRelation.Immune,
+                diedOnTrack = diedOnTrack,
+                diedToHazard = _lastLossWasHazard
+            };
+            GameEvents.RaiseFailReasonResolved(FailReasonResolver.Resolve(ctx));
         }
     }
 

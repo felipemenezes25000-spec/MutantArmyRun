@@ -6,11 +6,30 @@ using UnityEngine;
 namespace MutantArmy.Services
 {
     /// <summary>
+    /// Contrato mínimo de loja, análogo ao IAdsProvider — mas LOCAL a Services: o único
+    /// consumidor é o IAPManager (a UI compra via blackboard do GameBootstrap, doc 12 §2.3),
+    /// então o interface não precisa morar em Core. O wrapper de RevenueCat/Unity IAP
+    /// implementa isto; o MockIapProvider simula em dev. SEM provider no prefab [Services],
+    /// o Purchase responde false (comportamento Null de fábrica — selo "EM BREVE").
+    /// </summary>
+    public interface IIapProvider
+    {
+        void Init();
+
+        /// <param name="onResult">true = compra CONFIRMADA (recibo validado no fluxo real).</param>
+        void Purchase(string productId, Action<bool> onResult);
+
+        void RestorePurchases(Action<bool> onResult);
+    }
+
+    /// <summary>
     /// IAP sem SDK (doc 12 §7.4): o RevenueCat entra pós-instalação do Unity atrás deste
     /// manager, sem tocar nos consumidores. No MVP o manager é a fonte de verdade dos
     /// ENTITLEMENTS lidos do save (no_ads / season_pass) e do estado da Oferta Inicial
     /// (48 h desde firstLaunchUnixUtc — CANON §11); compra real exige SDK e responde false.
-    /// Estado persistente entra por BindSaveState (SaveData é Domain — visível dos dois
+    /// A compra delega ao <see cref="IIapProvider"/> opcional resolvido do prefab [Services]
+    /// (MockIapProvider em dev; sem provider = comportamento Null de sempre). Estado
+    /// persistente entra por BindSaveState (SaveData é Domain — visível dos dois
     /// lados da fronteira Meta/Services); sem bind, cai no blackboard do GameBootstrap.
     /// </summary>
     public class IAPManager : MonoBehaviour, IInitializable
@@ -35,6 +54,7 @@ namespace MutantArmy.Services
 
         private SaveData _save;
         private Action _markSaveDirty;
+        private IIapProvider _provider;   // opcional: Mock em dev, RevenueCat depois; null = stub
 
         /// <summary>Chamado pelo GameBootstrap (doc 12 §3.3) via IInitializable — não bloqueia.</summary>
         public void Init()
@@ -46,12 +66,25 @@ namespace MutantArmy.Services
             {
                 BindSaveState(GameBootstrap.Current.Save, GameBootstrap.Current.MarkSaveDirty);
 
+                // Provider de loja opcional no prefab [Services] (mesmo padrão do IAdsProvider):
+                // ausente = fluxo Null de fábrica, Purchase responde false.
+                _provider = GameBootstrap.Current.GetComponentInChildren<IIapProvider>(true);
+                if (_provider != null) _provider.Init();
+
                 // Publica os hooks de IAP no blackboard: a UI (Loja/Passe) lê ownership e dispara a
                 // compra por aqui — UI não referencia Services (doc 12 §2.3). Com provider Null o
                 // Purchase responde false e a tela mantém o selo "EM BREVE" (doc 12 §7.4).
                 GameBootstrap.Current.SeasonPassOwned = () => HasSeasonPass;
                 GameBootstrap.Current.PurchaseProduct = Purchase;
             }
+        }
+
+        /// <summary>Overload com provider explícito — testes injetam um fake determinístico.</summary>
+        public void Init(IIapProvider provider)
+        {
+            Init();
+            _provider = provider;
+            if (_provider != null) _provider.Init();
         }
 
         /// <summary>Liga o manager ao estado persistente (mesma instância viva do SaveSystem).</summary>
@@ -120,22 +153,78 @@ namespace MutantArmy.Services
             }
         }
 
-        // ---- Compra / restore (stubs sem SDK) ----
+        // ---- Compra / restore (delegam ao provider opcional; sem provider = stub Null) ----
 
         /// <summary>
-        /// Sem SDK: loga o início do funil e responde false — a loja mostra estado
+        /// Sem provider: loga o início do funil e responde false — a loja mostra estado
         /// "indisponível/reconectando" (doc 12 §7.4), nunca um botão que finge comprar.
+        /// Com provider (Mock em dev, RevenueCat depois): delega e, na confirmação,
+        /// concede o entitlement local e fecha o funil (purchase_completed).
         /// </summary>
         public void Purchase(string productId, float priceUsd, string sourceScreen, Action<bool> onResult)
         {
             if (AnalyticsManager.Instance != null)
                 AnalyticsManager.Instance.LogPurchaseStarted(productId, priceUsd, sourceScreen);
-            if (onResult != null) onResult(false);
+            if (_provider == null)
+            {
+                if (onResult != null) onResult(false);
+                return;
+            }
+            _provider.Purchase(productId, granted =>
+            {
+                if (granted)
+                {
+                    GrantProductLocally(productId);
+                    if (AnalyticsManager.Instance != null)
+                        AnalyticsManager.Instance.LogPurchaseCompleted(productId, priceUsd, "USD",
+                                                                       isFirstPurchase: false,
+                                                                       HoursSinceInstall());
+                }
+                if (onResult != null) onResult(granted);
+            });
         }
 
         public void RestorePurchases(Action<bool> onResult)
         {
-            if (onResult != null) onResult(false);     // sem SDK não há recibos para restaurar
+            if (_provider == null)
+            {
+                if (onResult != null) onResult(false); // sem SDK não há recibos para restaurar
+                return;
+            }
+            _provider.RestorePurchases(onResult);
+        }
+
+        /// <summary>
+        /// Tradução produto → estado local pós-confirmação. As 200 gemas do Remover Anúncios
+        /// e o CONTEÚDO da Oferta Inicial são creditados pelo fluxo de UI/Meta via
+        /// EconomySystem (Services não enxerga Meta §2.3) — aqui só flags/entitlements.
+        /// </summary>
+        private void GrantProductLocally(string productId)
+        {
+            switch (productId)
+            {
+                case ProductRemoveAds:
+                    GrantEntitlement(EntitlementNoAds);
+                    break;
+                case ProductSeasonPass:
+                    GrantEntitlement(EntitlementSeasonPass);
+                    break;
+                case ProductStarterOffer:
+                    if (_save != null)
+                    {
+                        _save.starterOfferState = OfferPurchased;
+                        MarkDirty();
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>Horas desde o primeiro launch (firstLaunchUnixUtc) — 0 sem save vinculado.</summary>
+        private float HoursSinceInstall()
+        {
+            if (_save == null || _save.firstLaunchUnixUtc <= 0) return 0f;
+            long elapsed = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - _save.firstLaunchUnixUtc;
+            return elapsed > 0 ? elapsed / 3600f : 0f;
         }
 
         /// <summary>
