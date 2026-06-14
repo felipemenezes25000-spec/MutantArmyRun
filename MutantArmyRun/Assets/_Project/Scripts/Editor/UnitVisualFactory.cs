@@ -187,20 +187,33 @@ namespace MutantArmy.Editor
             new BossModelSpec { BossId = "m3_final_scorpion_mech",  ModelName = "Alien",            PreferFolder = "Big",    Scale = 4.0f, Tint = new Color(0.78f, 0.84f, 0.92f), Metallic = 0.85f, Smoothness = 0.70f },
 
             // -------- W4–W10: bosses de mundo NOVOS (CANON §6 / doc 05 §7.x) --------
+            // ATENÇÃO: o bossId aqui DEVE casar EXATAMENTE com o id gerado pela MvpContentFactory
+            // (sem infixo "_final_" nos mundos 4-10 — só M1/M2/M3 do MVP usam "_final_"). Casar
+            // errado = boss sem modelo (cai no greybox). Travado pelo teste de regressão de bosses.
             // W4 Planta Carnívora (fraco Fogo+Veneno) — MushroomKing orgânico, verde tóxico.
-            new BossModelSpec { BossId = "m4_final_carnivore_plant", ModelName = "MushroomKing",    PreferFolder = "Big",    Scale = 4.2f, Tint = new Color(0.52f, 0.86f, 0.40f), Metallic = 0.00f, Smoothness = 0.32f },
+            new BossModelSpec { BossId = "m4_carnivorous_plant",     ModelName = "MushroomKing",    PreferFolder = "Big",    Scale = 4.2f, Tint = new Color(0.52f, 0.86f, 0.40f), Metallic = 0.00f, Smoothness = 0.32f },
             // W5 Dragão de Lava (fraco Gelo, resiste Fogo) — Dragon_Evolved recolor lava.
-            new BossModelSpec { BossId = "m5_final_lava_dragon",     ModelName = "Dragon_Evolved",  PreferFolder = "Flying", Scale = 4.5f, Tint = new Color(1.00f, 0.50f, 0.22f), Metallic = 0.10f, Smoothness = 0.45f },
+            new BossModelSpec { BossId = "m5_lava_dragon",           ModelName = "Dragon_Evolved",  PreferFolder = "Flying", Scale = 4.5f, Tint = new Color(1.00f, 0.50f, 0.22f), Metallic = 0.10f, Smoothness = 0.45f },
             // W6 Rei de Gelo (fraco Fogo, resiste Gelo) — Yeti recolor gelo azul-branco.
-            new BossModelSpec { BossId = "m6_final_ice_king",        ModelName = "Yeti",            PreferFolder = "Big",    Scale = 4.2f, Tint = new Color(0.70f, 0.90f, 1.00f), Metallic = 0.05f, Smoothness = 0.55f },
+            new BossModelSpec { BossId = "m6_ice_king",              ModelName = "Yeti",            PreferFolder = "Big",    Scale = 4.2f, Tint = new Color(0.70f, 0.90f, 1.00f), Metallic = 0.05f, Smoothness = 0.55f },
             // W7 Cavaleiro Colosso (fraco Raio — armadura conduz) — BlueDemon recolor dourado-bronze armadura.
-            new BossModelSpec { BossId = "m7_final_colossus_knight", ModelName = "BlueDemon",       PreferFolder = "Big",    Scale = 4.4f, Tint = new Color(0.92f, 0.74f, 0.36f), Metallic = 0.55f, Smoothness = 0.50f },
+            new BossModelSpec { BossId = "m7_colossus_knight",       ModelName = "BlueDemon",       PreferFolder = "Big",    Scale = 4.4f, Tint = new Color(0.92f, 0.74f, 0.36f), Metallic = 0.55f, Smoothness = 0.50f },
             // W8 Alien Supremo (fraqueza rotativa) — Squidle exótico neon roxo-ciano, emissivo forte.
-            new BossModelSpec { BossId = "m8_final_alien_supreme",   ModelName = "Squidle",         PreferFolder = "Flying", Scale = 4.0f, Tint = new Color(0.70f, 0.45f, 1.00f), Metallic = 0.20f, Smoothness = 0.60f },
+            new BossModelSpec { BossId = "m8_alien_supreme",         ModelName = "Squidle",         PreferFolder = "Flying", Scale = 4.0f, Tint = new Color(0.70f, 0.45f, 1.00f), Metallic = 0.20f, Smoothness = 0.60f },
             // W9 Mecha Supremo (fraco Raio, imune Veneno) — Goleling_Evolved recolor industrial ciano-tech.
-            new BossModelSpec { BossId = "m9_final_mecha_supreme",   ModelName = "Goleling_Evolved", PreferFolder = "Flying", Scale = 4.6f, Tint = new Color(0.55f, 0.80f, 0.92f), Metallic = 0.80f, Smoothness = 0.65f },
+            new BossModelSpec { BossId = "m9_mecha_supreme",         ModelName = "Goleling_Evolved", PreferFolder = "Flying", Scale = 4.6f, Tint = new Color(0.55f, 0.80f, 0.92f), Metallic = 0.80f, Smoothness = 0.65f },
             // W10 Entidade Dimensional (alterna elementos) — Hywirl exótico, caos vibrante magenta-ciano.
-            new BossModelSpec { BossId = "m10_final_dimensional_entity", ModelName = "Hywirl",      PreferFolder = "Flying", Scale = 4.3f, Tint = new Color(0.95f, 0.40f, 0.95f), Metallic = 0.25f, Smoothness = 0.55f },
+            new BossModelSpec { BossId = "m10_dimensional_entity",   ModelName = "Hywirl",          PreferFolder = "Flying", Scale = 4.3f, Tint = new Color(0.95f, 0.40f, 0.95f), Metallic = 0.25f, Smoothness = 0.55f },
+
+            // -------- Arquétipos regionais (fases 1-9 de cada mundo) W3-W10 --------
+            // Sem entrada, ficariam greybox nas fases não-finais. Reusam modelos temáticos.
+            new BossModelSpec { BossId = "m4_carnivorous_sprout",    ModelName = "Mushnub_Evolved", PreferFolder = "Big",    Scale = 3.4f, Tint = new Color(0.58f, 0.84f, 0.44f), Metallic = 0.00f, Smoothness = 0.30f },
+            new BossModelSpec { BossId = "m5_lava_whelp",            ModelName = "Dragon_Evolved",  PreferFolder = "Flying", Scale = 3.2f, Tint = new Color(1.00f, 0.58f, 0.30f), Metallic = 0.05f, Smoothness = 0.40f },
+            new BossModelSpec { BossId = "m6_frost_sentinel",        ModelName = "Goleling",        PreferFolder = "Flying", Scale = 3.6f, Tint = new Color(0.74f, 0.92f, 1.00f), Metallic = 0.05f, Smoothness = 0.55f },
+            new BossModelSpec { BossId = "m7_armored_knight",        ModelName = "Orc",             PreferFolder = "Big",    Scale = 3.6f, Tint = new Color(0.86f, 0.70f, 0.40f), Metallic = 0.45f, Smoothness = 0.45f },
+            new BossModelSpec { BossId = "m8_alien_hybrid",          ModelName = "Glub_Evolved",    PreferFolder = "Flying", Scale = 3.6f, Tint = new Color(0.66f, 0.50f, 1.00f), Metallic = 0.15f, Smoothness = 0.55f },
+            new BossModelSpec { BossId = "m9_war_drone",             ModelName = "Armabee_Evolved", PreferFolder = "Flying", Scale = 3.4f, Tint = new Color(0.60f, 0.82f, 0.92f), Metallic = 0.70f, Smoothness = 0.60f },
+            new BossModelSpec { BossId = "m10_dim_rift",             ModelName = "Ghost",           PreferFolder = "Flying", Scale = 3.6f, Tint = new Color(0.92f, 0.45f, 0.95f), Metallic = 0.10f, Smoothness = 0.50f },
         };
 
         /// <summary>

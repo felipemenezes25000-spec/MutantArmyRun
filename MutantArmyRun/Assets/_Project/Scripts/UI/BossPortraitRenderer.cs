@@ -179,16 +179,24 @@ namespace MutantArmy.UI
                 _camera.targetTexture = _rt;
                 _camera.enabled = false;
 
-                // Luz-chave: dá volume ao modelo (a cena de gameplay pode ter luz flat).
+                // Luz-chave: dá volume ao modelo. CRÍTICO: tem de ser SPOT/POINT (com range
+                // limitado), NUNCA Directional — luz direcional ignora posição e ilumina a cena
+                // INTEIRA pela direção, então vazaria para o mundo de gameplay (a câmera principal
+                // renderiza a pista viva atrás do card translúcido do Boss Scout por ~2 s). Como
+                // m_SupportsLightLayers=0 no URP, cullingMask/light-layer não isola; o que isola é
+                // o RANGE: presa à câmera de preview, a Spot só alcança o modelo a ~9000 de
+                // distância do gameplay (range 60 << 9000), zero contaminação.
                 var lightGo = new GameObject("KeyLight");
-                lightGo.transform.SetParent(_root.transform, false);
-                lightGo.transform.localRotation = Quaternion.Euler(35f, 145f, 0f);
+                lightGo.transform.SetParent(_camera.transform, false);   // segue a câmera de preview
+                lightGo.transform.localPosition = new Vector3(1.5f, 2f, -1f);
+                lightGo.transform.localRotation = Quaternion.Euler(18f, -8f, 0f);   // leve top-front p/ volume
                 _keyLight = lightGo.AddComponent<Light>();
-                _keyLight.type = LightType.Directional;
-                _keyLight.intensity = 1.25f;
+                _keyLight.type = LightType.Spot;
+                _keyLight.spotAngle = 75f;
+                _keyLight.range = 60f;          // cobre o modelo enquadrado; << 9000 (gameplay intacto)
+                _keyLight.intensity = 3.2f;     // spot cai com distância — mais forte que a direcional antiga
                 _keyLight.color = new Color(1f, 0.97f, 0.9f);
-                // Só ilumina o preview: render fora dos passes globais é controlado pela
-                // proximidade; manter cullingMask amplo é ok pois o rig está isolado em -9000.
+                _keyLight.shadows = LightShadows.None;
 
                 EnsureBackdrop();
 

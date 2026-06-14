@@ -47,3 +47,8 @@ pv-*.log
 pf-*.log
 pf-*.xml
 uv-*.log
+uv2.log
+qa-*.log
+qa-*.xml
+qa2-*.log
+qa2-*.xml

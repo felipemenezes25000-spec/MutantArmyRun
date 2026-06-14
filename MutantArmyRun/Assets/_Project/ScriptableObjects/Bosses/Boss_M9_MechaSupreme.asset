@@ -28,6 +28,6 @@ MonoBehaviour:
   specialAttackArea: 6
   specialBaseCooldown: 2.4
   arenaWaves: []
-  prefab: {fileID: 781381211656405589, guid: 46ed0562a819e394e8c82de8db345a8e, type: 3}
+  prefab: {fileID: 3660334838104385421, guid: 99f2aa7abe252c540bc6ec56431a243a, type: 3}
   scoutCardArt: {fileID: 0}
   killReward: {fileID: 11400000, guid: e07383de2fb4c12469b4c1e1f6a7e311, type: 2}
